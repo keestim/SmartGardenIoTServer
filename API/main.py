@@ -4,10 +4,12 @@ import paho.mqtt.publish as publish
 import threading
 import pyshark
 import socket
+from enum import Enum  
 
-#enum for device state
-#initial
-#ready
+class ConnectionStatus(Enum):
+    init = 1
+    attempting_connection = 2
+    connected = 3
 
 class MQTTSniffer(threading.Thread):
     def __init__(self, connection_list):
@@ -27,13 +29,6 @@ class MQTTSniffer(threading.Thread):
                     self.fmqtt_ip_addresses.append(ip_data.src)
 
                     print(mqtt_data)
-
-                    '''
-                    print(ip_data.src)
-                    print(ip_data.dst)
-                    print(self.mqtt_ip_addresses)
-                    '''
-
                     print("New IP: " + ip_data.src)
                     
                     
@@ -93,7 +88,7 @@ class BiDirectionalMQTTComms:
         self.client.on_message = self.__onMessage
 
         self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
-        
+
         self.fmqtt_subscriber_thread = MQTTSubscriberThread(self.client)
         self.fmqtt_subscriber_thread.start()
 

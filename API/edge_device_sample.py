@@ -77,4 +77,14 @@ if __name__ == "__main__":
     mqtt_interface = BiDirectionalMQTTComms("", get_ip(), server_ip_address)
     print("Test Msg") 
     sleep(1)
+
+    #send message
     mqtt_interface.sendMsg("Hello World")
+
+    #add rest of code, likely in an infinite loop
+    #i.e.
+
+    while True:
+        #read some sensor/serial data
+        mqtt_interface.sendMsg("30 Degrees C")
+        sleep(2)
