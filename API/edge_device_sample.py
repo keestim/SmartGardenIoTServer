@@ -89,8 +89,6 @@ if __name__ == "__main__":
     print(server_ip_address)
     mqtt_interface = BiDirectionalMQTTComms("", get_ip(), server_ip_address)
 
-    sleep(1)
-
     #send message
     mqtt_interface.sendMsg("Hello World")
 
