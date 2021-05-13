@@ -22,6 +22,15 @@ def get_ip():
         s.close()
     return IP
 
+
+class MQTTSubscriberThread(threading.Thread):
+    def __init__(self, mqtt_client):
+        super().__init__()
+        self.fmqtt_client = mqtt_client
+        
+    def run(self):
+        self.fmqtt_client.client.loop_forever()
+
 class BiDirectionalMQTTComms:
     def __init__(self, topic, device_ip_address, dest_ip_address, port = 1883, keepAlive = 60):
         self.fdest_ip_address = dest_ip_address
@@ -31,6 +40,8 @@ class BiDirectionalMQTTComms:
 
         self.fport = port
         self.fkeepAlive = keepAlive
+
+        self.fmqtt_subscriber_thread = None
 
         self.client = None
         self.__setupReader()
@@ -48,8 +59,10 @@ class BiDirectionalMQTTComms:
         self.client.on_message = self.__onMessage
 
         self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
-        self.client.loop_forever()
 
+        self.fmqtt_subscriber_thread = MQTTSubscriberThread(self.client)
+        self.fmqtt_subscriber_thread.start()
+        
     def sendMsg(self, msgText):
         print("Send Message!")
         publish.single("/edge_device/data", msgText, hostname=self.fdest_ip_address)
