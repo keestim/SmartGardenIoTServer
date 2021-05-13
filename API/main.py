@@ -34,6 +34,10 @@ class MQTTSniffer(threading.Thread):
                     
                     print("New Connection")
                     new_mqtt_connection = BiDirectionalMQTTComms("Test", self.fdevice_ip_address, ip_data.src)
+                    
+                    mqtt_connection_initalizer = MQTTConnectInitializer(new_mqtt_connection)
+                    mqtt_connection_initalizer.start()
+
                     print("Append Connection")
                     self.fconnection_list.append(new_mqtt_connection)
 
@@ -62,6 +66,23 @@ class MQTTSubscriberThread(threading.Thread):
         
     def run(self):
         self.fmqtt_client.loop_forever()
+
+class MQTTConnectInitializer(threading.Thread):
+    def __init__(self, mqtt_bi_comms):
+        super().__init__()
+        self.fmqtt_bi_comms = mqtt_bi_comms
+        
+    def run(self):
+        while True:
+            if self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.init:
+                self.fmqtt_bi_comms.sendMsg("broadcast", "/edge_device/setup_device")
+            elif self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.attempting_connection:
+                self.fmqtt_bi_comms.sendMsg("initial message", "/edge_device/setup_device")
+            elif self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.connected:
+                exit()
+
+            sleep(1)
+
 class BiDirectionalMQTTComms:
     def __init__(self, topic, device_ip_address, dest_ip_address, port = 1883, keepAlive = 60):
         self.fdest_ip_address = dest_ip_address
@@ -86,7 +107,6 @@ class BiDirectionalMQTTComms:
         self.client.subscribe([("/edge_device/data", 0), ("/edge_device/setup_device", 0)])
 
     def __onMessage(self, client, userData, msg):
-        print("New Msg" + str(msg.payload) + msg.topic)
         print("Status: " + str(self.fdevice_status))
         if self.fdevice_status == ConnectionStatus.attempting_connection:
             if (msg.payload == "initial message"):
@@ -113,8 +133,11 @@ class BiDirectionalMQTTComms:
         print("init msg")
         self.sendMsg("initial message", "/edge_device/setup_device")
 
+    def getDeviceStatus(self):
+        return self.fdevice_status
+        
     def sendMsg(self, msgText, topic = "/edge_device/data"):
-        print("sending to: " + self.fdest_ip_address)
+        print("Sending Msg: " + topic + " | " + self.fdest_ip_address + "|" + msgText)
         publish.single(topic, msgText, hostname=self.fdest_ip_address)
 
 #https://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
