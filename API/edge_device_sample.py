@@ -68,8 +68,8 @@ class BiDirectionalMQTTComms:
         self.client.subscribe([("/edge_device/data", 0), ("/edge_device/setup_device", 0)])
 
     def __onMessage(self, client, userData, msg):
-        topic = msg.topic.decode("utf-8")
-        payload = msg.payload.decode("utf-8")
+        topic = msg.topic.encode("utf-8")
+        payload = msg.payload.encode("utf-8")
 
         print("New Msg" + payload + " | " + topic)
 
