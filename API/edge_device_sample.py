@@ -79,6 +79,7 @@ class BiDirectionalMQTTComms:
         self.sendMsg("initial message", "/edge_device/setup_device")
 
     def sendMsg(self, msgText, topic = "/edge_device/data"):
+        print("Sending Msg: " + topic + " | " + self.fdest_ip_address)
         publish.single(topic, msgText, hostname=self.fdest_ip_address)
 
 global server_ip_address
