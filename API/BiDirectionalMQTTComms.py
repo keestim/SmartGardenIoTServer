@@ -88,6 +88,8 @@ class BiDirectionalMQTTComms:
             #seems to only occur for server!
             if (payload == "initial message"):
                 self.sendMsg("initial message received", "/edge_device/setup_device")
+            elif ("topics" in payload):
+                print(self.__encodeTopicsString(payload))
             else:
                 print(topic + ", " + str(payload))
 
