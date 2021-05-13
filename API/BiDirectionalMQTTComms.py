@@ -89,6 +89,11 @@ class BiDirectionalMQTTComms:
             if (payload == "initial message"):
                 self.sendMsg("initial message received", "/edge_device/setup_device")
             elif ("topics" in payload):
+                #have topics as a private field
+                #once this msg comes in reload this new list into the private field
+                #then run:
+                #self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
+                #and in theory everything should work!
                 print(self.__encodeTopicsString(payload))
             else:
                 print(topic + ", " + str(payload))
