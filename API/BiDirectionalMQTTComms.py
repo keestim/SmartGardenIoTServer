@@ -61,8 +61,8 @@ class BiDirectionalMQTTComms:
                 self.fdevice_status = ConnectionStatus.connected
 
                 if (self.fmqtt_interface is not None):
-                    topics_json = json.dumps(self.fmqtt_interface.getTopicList()
-                    self.sendMsg(str("{'topics': ") + str(topics_json) + "}"), "/edge_device/setup_device")
+                    topics_json = json.dumps(self.fmqtt_interface.getTopicList())
+                    self.sendMsg(str("{'topics': ") + str(topics_json) + "}", "/edge_device/setup_device")
 
     def __encodeTopicsString(self, payload):
         topics = json.loads(payload["topics"])
