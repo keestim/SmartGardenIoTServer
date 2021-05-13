@@ -9,19 +9,11 @@ from BiDirectionalMQTTComms import *
 
 class CommunicationInterface():
     def __init__(self, topics):
-        self.ftopic_list = self.__constructTopicsList(topics)
+        self.ftopic_list = topics
 
     def getTopicList(self):
         return self.ftopic_list
-
-    def __constructTopicsList(self, topics):
-        result_arr = []
-        
-        for topic in topics:
-            result_arr.append((topic, 0))
-
-        return result_arr        
-
+    
     def onMessage(self, topic, payload):
         print(topic + "|" + payload)
 
