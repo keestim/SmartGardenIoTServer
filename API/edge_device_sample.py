@@ -37,7 +37,7 @@ def get_ip():
         IP = '127.0.0.1'
     finally:
         s.close()
-    return IP
+    return IP 
 
 global server_ip_address
 server_ip_address = "192.168.1.46"
@@ -48,6 +48,6 @@ if __name__ == "__main__":
 
     interface_obj = CommunicationInterface(["/edge_device/data", "/edge_device/setup_device"])
 
-    mqtt_interface = BiDirectionalMQTTComms("", get_ip(), server_ip_address)
+    mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, interface_obj)
     mqtt_connection_initalizer = MQTTConnectInitializer(mqtt_interface)
     mqtt_connection_initalizer.start()

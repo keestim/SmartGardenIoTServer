@@ -100,3 +100,5 @@ class BiDirectionalMQTTComms:
 
     def sendMsg(self, msgText, topic = "/edge_device/data"):
         publish.single(topic, msgText, hostname=self.fdest_ip_address)
+
+        
