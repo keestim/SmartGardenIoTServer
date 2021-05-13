@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 import paho.mqtt.client as mqtt
-import paho.mqtt.client as publish
+import paho.mqtt.publish as publish
 import threading
 import pyshark
 import socket
