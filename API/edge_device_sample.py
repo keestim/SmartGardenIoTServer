@@ -58,7 +58,7 @@ class BiDirectionalMQTTComms:
             if (msg.payload == "initial message"):
                 self.sendMsg("initial message received", "/edge_device/setup_device")
             elif (msg.payload == "initial message received"):
-                self.fdevice_status == ConnectionStatus.connected
+                self.fdevice_status = ConnectionStatus.connected
         elif self.fdevice_status == ConnectionStatus.connected:
             print(msg.topic + ", " + str(msg.payload))
 
@@ -72,6 +72,7 @@ class BiDirectionalMQTTComms:
         self.fmqtt_subscriber_thread = MQTTSubscriberThread(self.client)
         self.fmqtt_subscriber_thread.start()
 
+        print("broadcast msg!")
         self.sendMsg("broadcast", "/edge_device/setup_device")
         self.fdevice_status = ConnectionStatus.attempting_connection
 
