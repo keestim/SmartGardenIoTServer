@@ -1,7 +1,8 @@
 from enum import Enum  
 import socket
 import paho.mqtt.client as mqtt
-import paho.mqtt.client as publish
+import paho.mqtt.publish as publish
+from time import sleep
 
 class ConnectionStatus(Enum):
     init = 1
@@ -50,7 +51,8 @@ class BiDirectionalMQTTComms:
         self.client.loop_forever()
 
     def sendMsg(self, msgText):
-        publish.single("/edge_device/data", msgText, hostname = self.fdest_ip_address)
+        print("Send Message!")
+        publish.single("/edge_device/data", msgText, hostname=self.fdest_ip_address)
 
 global server_ip_address
 server_ip_address = "192.168.1.46"
@@ -59,4 +61,6 @@ if __name__ == "__main__":
     print(get_ip())
     print(server_ip_address)
     mqtt_interface = BiDirectionalMQTTComms("", get_ip(), server_ip_address)
+    print("Test Msg") 
+    sleep(1)
     mqtt_interface.sendMsg("Hello World")
