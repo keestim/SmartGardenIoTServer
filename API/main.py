@@ -38,7 +38,6 @@ class MQTTSniffer(threading.Thread):
                     mqtt_connection_initalizer = MQTTConnectInitializer(new_mqtt_connection)
                     mqtt_connection_initalizer.start()
 
-                    print("Append Connection")
                     self.fconnection_list.append(new_mqtt_connection)
 
                     print(len(self.fconnection_list))
@@ -107,8 +106,8 @@ class BiDirectionalMQTTComms:
         self.client.subscribe([("/edge_device/data", 0), ("/edge_device/setup_device", 0)])
 
     def __onMessage(self, client, userData, msg):
-        topic = str(msg.topic)
-        payload = str(msg.payload)
+        topic = msg.topic.decode("utf-8")
+        payload = msg.payload.decode("utf-8")
 
         print("New Msg" + payload + " | " + topic)
 
