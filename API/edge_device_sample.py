@@ -49,8 +49,7 @@ class BiDirectionalMQTTComms:
         self.__setupReader()
 
     def __onConnect(self, client, userData, flags, responseCode):
-        self.client.subscribe("/edge_device/setup_device")
-        self.client.subscribe("/edge_device/data")
+        self.client.subscribe([("/edge_device/data", 0), ("/edge_device/setup_device", 0)])
 
     def __onMessage(self, client, userData, msg):
         print("New Msg" + str(msg.payload) + msg.topic)
