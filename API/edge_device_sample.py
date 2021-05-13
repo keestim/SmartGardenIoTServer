@@ -73,7 +73,7 @@ class BiDirectionalMQTTComms:
         self.fmqtt_subscriber_thread.start()
 
         self.sendMsg("broadcast", "/edge_device/setup_device")
-        self.fdevice_status == ConnectionStatus.attempting_connection
+        self.fdevice_status = ConnectionStatus.attempting_connection
 
         self.sendMsg("initial message", "/edge_device/setup_device")
 
