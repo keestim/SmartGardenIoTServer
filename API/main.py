@@ -31,7 +31,6 @@ class MQTTSniffer(threading.Thread):
                     print(mqtt_data)
                     print("New IP: " + ip_data.src)
                     
-                    
                     print("New Connection")
                     new_mqtt_connection = BiDirectionalMQTTComms("Test", self.fdevice_ip_address, ip_data.src)
                     print("Append Connection")
@@ -73,6 +72,7 @@ class BiDirectionalMQTTComms:
         self.fkeepAlive = keepAlive
 
         self.client = None
+        self.fdevice_status = ConnectionStatus.init
         self.__setupReader()
         
     def __onConnect(self, client, userData, flags, responseCode):
@@ -80,8 +80,14 @@ class BiDirectionalMQTTComms:
         self.client.subscribe("/edge_device/data")
 
     def __onMessage(self, client, userData, msg):
-        print(msg.topic + ", " + str(msg.payload))
-
+        if self.fdevice_status == ConnectionStatus.attempting_connection:
+            if (msg.payload == "initial message"):
+                self.sendMsg("initial message received", "/edge_device/setup_device")
+            elif (msg.payload == "initial message received"):
+                self.fdevice_status == ConnectionStatus.connected
+        elif self.fdevice_status == ConnectionStatus.connected:
+            print(msg.topic + ", " + str(msg.payload))
+        
     def __setupReader(self):
         self.client = mqtt.Client()
         self.client.on_connect = self.__onConnect
@@ -91,6 +97,11 @@ class BiDirectionalMQTTComms:
 
         self.fmqtt_subscriber_thread = MQTTSubscriberThread(self.client)
         self.fmqtt_subscriber_thread.start()
+
+        self.sendMsg("broadcast", "/edge_device/setup_device")
+        self.fdevice_status == ConnectionStatus.attempting_connection
+
+        self.sendMsg("initial message", "/edge_device/setup_device")
 
     def sendMsg(self, msgText):
         publish.single(self.fdest_ip_address, msgText, hostname = self.fdest_ip_address)
