@@ -89,7 +89,7 @@ class BiDirectionalMQTTComms:
         self.client.loop_forever()
 
     def sendMsg(self, msgText):
-        publish.single(self.fdest_ip_address, msgText, hostname = self.fipAddress)
+        publish.single(self.fdest_ip_address, msgText, hostname = self.fdest_ip_address)
 
 #https://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
 app = Flask(__name__)
