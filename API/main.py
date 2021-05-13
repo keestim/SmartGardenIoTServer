@@ -64,22 +64,16 @@ class BiDirectionalMQTTComms:
     def __init__(self, topic, device_ip_address, dest_ip_address, port = 1883, keepAlive = 60):
         self.fdest_ip_address = dest_ip_address
         self.fdevice_ip_address = device_ip_address
-        self.fport = port
+
         self.ftopic = topic
+
+        self.fport = port
         self.fkeepAlive = keepAlive
 
-        print("Setup Reader")
         self.client = None
         self.__setupReader()
         
     def __onConnect(self, client, userData, flags, responseCode):
-        #print("On Connect")
-
-        #WILL NEED TO SUBSCRIBE TO TWO TOPICS
-        #ONE FOR INITIAL SETUP
-        #THEN ONE FOR ACTUAL DATA!
-        #print("client: " +  client)
-        #print("Connected with response code: "+ responseCode)
         self.client.subscribe("/edge_device/setup_device")
         self.client.subscribe("/edge_device/data")
 
