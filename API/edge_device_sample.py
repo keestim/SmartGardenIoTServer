@@ -50,10 +50,13 @@ class BiDirectionalMQTTComms:
         self.client.loop_forever()
 
     def sendMsg(self, msgText):
-        publish.single(self.fdest_ip_address, msgText, hostname = self.fipAddress)
+        publish.single("/edge_device/data", msgText, hostname = self.fdest_ip_address)
 
 global server_ip_address
 server_ip_address = "192.168.1.46"
 
 if __name__ == "__main__":
+    print(get_ip())
+    print(server_ip_address)
     mqtt_interface = BiDirectionalMQTTComms("", get_ip(), server_ip_address)
+    mqtt_interface.sendMsg("Hello World")
