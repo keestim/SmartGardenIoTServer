@@ -61,7 +61,16 @@ class BiDirectionalMQTTComms:
                 self.fdevice_status = ConnectionStatus.connected
 
                 if (self.fmqtt_interface is not None):
-                    self.sendMsg(json.dumps(self.fmqtt_interface.getTopicList()), "/edge_device/setup_device")
+                    self.sendMsg('{"topics": ' + json.dumps(self.fmqtt_interface.getTopicList() + "}"), "/edge_device/setup_device")
+
+    def __encodeTopicsString(self, payload):
+        topics = json.loads(payload["topics"])
+        result_arr = []
+        
+        for topic in topics:
+            result_arr.append((topic, 0))
+
+        return result_arr   
 
     def __onConnect(self, client, userData, flags, responseCode):
         #default topics!
@@ -80,6 +89,8 @@ class BiDirectionalMQTTComms:
                 self.sendMsg("initial message received", "/edge_device/setup_device")
             else:
                 print(topic + ", " + str(payload))
+
+            #need detect and decode topic msg!
         
     def __setupReader(self):
         self.client = mqtt.Client()
