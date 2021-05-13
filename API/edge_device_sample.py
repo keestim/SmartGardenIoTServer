@@ -23,7 +23,6 @@ def get_ip():
         s.close()
     return IP
 
-
 class MQTTSubscriberThread(threading.Thread):
     def __init__(self, mqtt_client):
         super().__init__()
@@ -45,14 +44,22 @@ class BiDirectionalMQTTComms:
         self.fmqtt_subscriber_thread = None
 
         self.client = None
+        self.fdevice_status = ConnectionStatus.init
+
         self.__setupReader()
-        
+
     def __onConnect(self, client, userData, flags, responseCode):
         self.client.subscribe("/edge_device/setup_device")
         self.client.subscribe("/edge_device/data")
 
     def __onMessage(self, client, userData, msg):
-        print(msg.topic + ", " + str(msg.payload))
+        if self.fdevice_status == ConnectionStatus.attempting_connection:
+            if (msg.payload == "initial message"):
+                self.sendMsg("initial message received", "/edge_device/setup_device")
+            elif (msg.payload == "initial message received"):
+                self.fdevice_status == ConnectionStatus.connected
+        elif self.fdevice_status == ConnectionStatus.connected:
+            print(msg.topic + ", " + str(msg.payload))
 
     def __setupReader(self):
         self.client = mqtt.Client()
@@ -63,10 +70,14 @@ class BiDirectionalMQTTComms:
 
         self.fmqtt_subscriber_thread = MQTTSubscriberThread(self.client)
         self.fmqtt_subscriber_thread.start()
-        
-    def sendMsg(self, msgText):
-        print("Send Message!")
-        publish.single("/edge_device/data", msgText, hostname=self.fdest_ip_address)
+
+        self.sendMsg("broadcast", "/edge_device/setup_device")
+        self.fdevice_status == ConnectionStatus.attempting_connection
+
+        self.sendMsg("initial message", "/edge_device/setup_device")
+
+    def sendMsg(self, msgText, topic = "/edge_device/data"):
+        publish.single(topic, msgText, hostname=self.fdest_ip_address)
 
 global server_ip_address
 server_ip_address = "192.168.1.46"
@@ -75,7 +86,7 @@ if __name__ == "__main__":
     print(get_ip())
     print(server_ip_address)
     mqtt_interface = BiDirectionalMQTTComms("", get_ip(), server_ip_address)
-    print("Test Msg") 
+    
     sleep(1)
 
     #send message
