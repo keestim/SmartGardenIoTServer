@@ -71,6 +71,8 @@ class BiDirectionalMQTTComms:
         self.fport = port
         self.fkeepAlive = keepAlive
 
+        self.fmqtt_subscriber_thread = None
+
         self.client = None
         self.fdevice_status = ConnectionStatus.init
         self.__setupReader()
@@ -105,8 +107,8 @@ class BiDirectionalMQTTComms:
         print("init msg")
         self.sendMsg("initial message", "/edge_device/setup_device")
 
-    def sendMsg(self, msgText):
-        publish.single(self.fdest_ip_address, msgText, hostname = self.fdest_ip_address)
+    def sendMsg(self, msgText, topic = "/edge_device/data"):
+        publish.single(topic, msgText, hostname=self.fdest_ip_address)
 
 #https://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
 app = Flask(__name__)
