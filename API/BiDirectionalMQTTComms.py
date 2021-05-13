@@ -3,6 +3,7 @@ import threading
 from time import sleep
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
+import json
 
 class ConnectionStatus(Enum):
     init = 1
@@ -60,7 +61,7 @@ class BiDirectionalMQTTComms:
                 self.fdevice_status = ConnectionStatus.connected
 
                 if (self.fmqtt_interface is not None):
-                    self.sendMsg(self.fmqtt_interface.getTopicList(), "/edge_device/setup_device")
+                    self.sendMsg(json.dumps(self.fmqtt_interface.getTopicList()), "/edge_device/setup_device")
 
     def __onConnect(self, client, userData, flags, responseCode):
         #default topics!
