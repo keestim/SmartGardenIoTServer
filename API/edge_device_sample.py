@@ -1,5 +1,7 @@
 from enum import Enum  
 import socket
+import paho.mqtt.client as mqtt
+import paho.mqtt.client as publish
 
 class ConnectionStatus(Enum):
     init = 1
