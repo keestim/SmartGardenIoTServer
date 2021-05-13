@@ -31,6 +31,22 @@ class MQTTSubscriberThread(threading.Thread):
     def run(self):
         self.fmqtt_client.loop_forever()
 
+class MQTTConnectInitializer(threading.Thread):
+    def __init__(self, mqtt_client):
+        super().__init__()
+        self.fmqtt_client = mqtt_client
+        
+    def run(self):
+        while True:
+            if self.fmqtt_client.getDeviceStatus() == ConnectionStatus.init:
+                self.fmqtt_client.sendMsg("broadcast", "/edge_device/setup_device")
+            elif self.fmqtt_client.getDeviceStatus() == ConnectionStatus.attempting_connection:
+                self.fmqtt_client.sendMsg("initial message", "/edge_device/setup_device")
+            elif self.fmqtt_client.getDeviceStatus() == ConnectionStatus.connected:
+                exit()
+
+            sleep(1)
+
 class BiDirectionalMQTTComms:
     def __init__(self, topic, device_ip_address, dest_ip_address, port = 1883, keepAlive = 60):
         self.fdest_ip_address = dest_ip_address
@@ -78,8 +94,11 @@ class BiDirectionalMQTTComms:
         print("init msg")
         self.sendMsg("initial message", "/edge_device/setup_device")
 
+    def getDeviceStatus(self):
+        return self.fdevice_status
+
     def sendMsg(self, msgText, topic = "/edge_device/data"):
-        print("Sending Msg: " + topic + " | " + self.fdest_ip_address)
+        print("Sending Msg: " + topic + " | " + self.fdest_ip_address + "|" + msgText)
         publish.single(topic, msgText, hostname=self.fdest_ip_address)
 
 global server_ip_address
@@ -88,7 +107,10 @@ server_ip_address = "192.168.1.46"
 if __name__ == "__main__":
     print(get_ip())
     print(server_ip_address)
+
     mqtt_interface = BiDirectionalMQTTComms("", get_ip(), server_ip_address)
+    mqtt_connection_initalizer = MQTTConnectInitializer(mqtt_interface)
+    mqtt_connection_initalizer.start()
 
     #send message
     mqtt_interface.sendMsg("Hello World")
