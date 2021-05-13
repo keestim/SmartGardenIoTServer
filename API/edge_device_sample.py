@@ -32,17 +32,17 @@ class MQTTSubscriberThread(threading.Thread):
         self.fmqtt_client.loop_forever()
 
 class MQTTConnectInitializer(threading.Thread):
-    def __init__(self, mqtt_client):
+    def __init__(self, mqtt_bi_comms):
         super().__init__()
-        self.fmqtt_client = mqtt_client
+        self.fmqtt_bi_comms = mqtt_bi_comms
         
     def run(self):
         while True:
-            if self.fmqtt_client.getDeviceStatus() == ConnectionStatus.init:
-                self.fmqtt_client.sendMsg("broadcast", "/edge_device/setup_device")
-            elif self.fmqtt_client.getDeviceStatus() == ConnectionStatus.attempting_connection:
-                self.fmqtt_client.sendMsg("initial message", "/edge_device/setup_device")
-            elif self.fmqtt_client.getDeviceStatus() == ConnectionStatus.connected:
+            if self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.init:
+                self.fmqtt_bi_comms.sendMsg("broadcast", "/edge_device/setup_device")
+            elif self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.attempting_connection:
+                self.fmqtt_bi_comms.sendMsg("initial message", "/edge_device/setup_device")
+            elif self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.connected:
                 exit()
 
             sleep(1)
@@ -71,14 +71,14 @@ class BiDirectionalMQTTComms:
         topic = msg.topic
         payload = msg.payload.decode('ascii')
 
-        print("New Msg" + payload + " | " + topic)
+        print("New Msg: " + payload + " | " + topic)
 
         if self.fdevice_status == ConnectionStatus.attempting_connection:
             if (payload == "initial message"):
                 self.sendMsg("initial message received", "/edge_device/setup_device")
             elif (payload == "initial message received"):
                 self.fdevice_status = ConnectionStatus.connected
-        elif self.fdevice_status == ConnectionStatus.connected:
+        if self.fdevice_status == ConnectionStatus.connected:
             print(topic + ", " + str(payload))
 
     def __setupReader(self):

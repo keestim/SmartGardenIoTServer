@@ -109,7 +109,7 @@ class BiDirectionalMQTTComms:
         topic = msg.topic
         payload = msg.payload.decode('ascii')
 
-        print("New Msg" + payload + " | " + topic)
+        print("New Msg: " + payload + " | " + topic)
 
         if self.fdevice_status == ConnectionStatus.attempting_connection:
             if (payload == "initial message"):
