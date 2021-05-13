@@ -5,10 +5,26 @@ import paho.mqtt.publish as publish
 from time import sleep
 import threading
 
-class ConnectionStatus(Enum):
-    init = 1
-    attempting_connection = 2
-    connected = 3
+from BiDirectionalMQTTComms import * 
+
+class CommunicationInterface():
+    def __init__(self, topics):
+        self.ftopic_list = self.__constructTopicsList(topics)
+
+    def getTopicList(self):
+        return self.ftopic_list
+
+    def __constructTopicsList(self, topics):
+        result_arr = []
+        
+        for topic in topics:
+            result_arr.append((topic, 0))
+
+        return result_arr        
+
+    def onMessage(self, topic, payload):
+        print(topic + "|" + payload)
+
 
 #Source: https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
 def get_ip():
@@ -23,94 +39,14 @@ def get_ip():
         s.close()
     return IP
 
-class MQTTSubscriberThread(threading.Thread):
-    def __init__(self, mqtt_client):
-        super().__init__()
-        self.fmqtt_client = mqtt_client
-        
-    def run(self):
-        self.fmqtt_client.loop_forever()
-
-class MQTTConnectInitializer(threading.Thread):
-    def __init__(self, mqtt_bi_comms):
-        super().__init__()
-        self.fmqtt_bi_comms = mqtt_bi_comms
-        
-    def run(self):
-        while True:
-            if self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.init:
-                self.fmqtt_bi_comms.sendMsg("broadcast", "/edge_device/setup_device")
-            elif self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.attempting_connection:
-                self.fmqtt_bi_comms.sendMsg("initial message", "/edge_device/setup_device")
-            elif self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.connected:
-                exit()
-
-            sleep(1)
-
-class BiDirectionalMQTTComms:
-    def __init__(self, topic, device_ip_address, dest_ip_address, port = 1883, keepAlive = 60):
-        self.fdest_ip_address = dest_ip_address
-        self.fdevice_ip_address = device_ip_address
-
-        self.ftopic = topic
-
-        self.fport = port
-        self.fkeepAlive = keepAlive
-
-        self.fmqtt_subscriber_thread = None
-
-        self.client = None
-        self.fdevice_status = ConnectionStatus.init
-
-        self.__setupReader()
-
-    def __onConnect(self, client, userData, flags, responseCode):
-        self.client.subscribe([("/edge_device/data", 0), ("/edge_device/setup_device", 0)])
-
-    def __onMessage(self, client, userData, msg):
-        topic = msg.topic
-        payload = msg.payload.decode('ascii')
-
-        print("New Msg: " + payload + " | " + topic)
-
-        if self.fdevice_status == ConnectionStatus.attempting_connection:
-            if (payload == "initial message"):
-                self.sendMsg("initial message received", "/edge_device/setup_device")
-            elif (payload == "initial message received"):
-                self.fdevice_status = ConnectionStatus.connected
-        if self.fdevice_status == ConnectionStatus.connected:
-            print(topic + ", " + str(payload))
-
-    def __setupReader(self):
-        self.client = mqtt.Client()
-        self.client.on_connect = self.__onConnect
-        self.client.on_message = self.__onMessage
-
-        self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
-
-        self.fmqtt_subscriber_thread = MQTTSubscriberThread(self.client)
-        self.fmqtt_subscriber_thread.start()
-
-        print("broadcast msg!")
-        self.sendMsg("broadcast", "/edge_device/setup_device")
-        self.fdevice_status = ConnectionStatus.attempting_connection
-
-        print("init msg")
-        self.sendMsg("initial message", "/edge_device/setup_device")
-
-    def getDeviceStatus(self):
-        return self.fdevice_status
-
-    def sendMsg(self, msgText, topic = "/edge_device/data"):
-        print("Sending Msg: " + topic + " | " + self.fdest_ip_address + "|" + msgText)
-        publish.single(topic, msgText, hostname=self.fdest_ip_address)
-
 global server_ip_address
 server_ip_address = "192.168.1.46"
 
 if __name__ == "__main__":
     print(get_ip())
     print(server_ip_address)
+
+    interface_obj = CommunicationInterface(["/edge_device/data", "/edge_device/setup_device"])
 
     mqtt_interface = BiDirectionalMQTTComms("", get_ip(), server_ip_address)
     mqtt_connection_initalizer = MQTTConnectInitializer(mqtt_interface)
