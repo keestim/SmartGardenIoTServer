@@ -4,7 +4,8 @@ import paho.mqtt.publish as publish
 import threading
 import pyshark
 import socket
-from enum import Enum  
+from enum import Enum
+from time import sleep  
 
 class ConnectionStatus(Enum):
     init = 1
@@ -75,6 +76,7 @@ class BiDirectionalMQTTComms:
 
         self.client = None
         self.fdevice_status = ConnectionStatus.init
+        sleep(2)
         self.__setupReader()
 
         self.sendMsg("test msg")
