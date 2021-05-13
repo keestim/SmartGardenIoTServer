@@ -12,7 +12,7 @@ class MQTTSubscriberThread(threading.Thread):
     def __init__(self, mqtt_client):
         super().__init__()
         self.fmqtt_client = mqtt_client
-        
+
     def run(self):
         self.fmqtt_client.loop_forever()
 
@@ -33,11 +33,11 @@ class MQTTConnectInitializer(threading.Thread):
             sleep(1)
 
 class BiDirectionalMQTTComms:
-    def __init__(self, topics, device_ip_address, dest_ip_address, port = 1883, keepAlive = 60):
+    def __init__(self, device_ip_address, dest_ip_address, mqtt_interface = None, port = 1883, keepAlive = 60):
         self.fdest_ip_address = dest_ip_address
         self.fdevice_ip_address = device_ip_address
 
-        self.ftopic_array = topics
+        self.fmqtt_interface = mqtt_interface
 
         self.fport = port
         self.fkeepAlive = keepAlive
@@ -58,6 +58,9 @@ class BiDirectionalMQTTComms:
                 self.sendMsg("initial message received", "/edge_device/setup_device")
             elif (payload == "initial message received"):
                 self.fdevice_status = ConnectionStatus.connected
+
+                if (self.fmqtt_interface is not None):
+                    self.sendMsg(self.fmqtt_interface.getTopicList(), "/edge_device/setup_device")
 
     def __onConnect(self, client, userData, flags, responseCode):
         #default topics!
@@ -87,16 +90,13 @@ class BiDirectionalMQTTComms:
         self.fmqtt_subscriber_thread = MQTTSubscriberThread(self.client)
         self.fmqtt_subscriber_thread.start()
 
-        print("broadcast msg!")
         self.sendMsg("broadcast", "/edge_device/setup_device")
         self.fdevice_status = ConnectionStatus.attempting_connection
 
-        print("init msg")
         self.sendMsg("initial message", "/edge_device/setup_device")
 
     def getDeviceStatus(self):
         return self.fdevice_status
 
     def sendMsg(self, msgText, topic = "/edge_device/data"):
-        print("Sending Msg: " + topic + " | " + self.fdest_ip_address + "|" + msgText)
         publish.single(topic, msgText, hostname=self.fdest_ip_address)

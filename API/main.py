@@ -1,10 +1,7 @@
 from flask import Flask, request, jsonify
-import paho.mqtt.client as mqtt
-import paho.mqtt.publish as publish
 import threading
 import pyshark
 import socket
-from enum import Enum
 from time import sleep  
 
 from BiDirectionalMQTTComms import * 
@@ -29,7 +26,7 @@ class MQTTSniffer(threading.Thread):
                     print("New IP: " + ip_data.src)
                     
                     print("New Connection")
-                    new_mqtt_connection = BiDirectionalMQTTComms("Test", self.fdevice_ip_address, ip_data.src)
+                    new_mqtt_connection = BiDirectionalMQTTComms(self.fdevice_ip_address, ip_data.src)
                     
                     print("starting backup comms")
                     mqtt_connection_initalizer = MQTTConnectInitializer(new_mqtt_connection)
