@@ -3,6 +3,7 @@ import socket
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 from time import sleep
+import threading
 
 class ConnectionStatus(Enum):
     init = 1
@@ -29,7 +30,7 @@ class MQTTSubscriberThread(threading.Thread):
         self.fmqtt_client = mqtt_client
         
     def run(self):
-        self.fmqtt_client.client.loop_forever()
+        self.fmqtt_client.loop_forever()
 
 class BiDirectionalMQTTComms:
     def __init__(self, topic, device_ip_address, dest_ip_address, port = 1883, keepAlive = 60):
@@ -74,6 +75,3 @@ if __name__ == "__main__":
     print(get_ip())
     print(server_ip_address)
     mqtt_interface = BiDirectionalMQTTComms("", get_ip(), server_ip_address)
-    print("Test Msg") 
-    sleep(1)
-    mqtt_interface.sendMsg("Hello World")
