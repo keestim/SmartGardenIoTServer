@@ -76,12 +76,16 @@ class BiDirectionalMQTTComms:
         self.client = None
         self.fdevice_status = ConnectionStatus.init
         self.__setupReader()
+
+        self.sendMsg("test msg")
+        #add field for device topics
         
     def __onConnect(self, client, userData, flags, responseCode):
         self.client.subscribe([("/edge_device/data", 0), ("/edge_device/setup_device", 0)])
 
     def __onMessage(self, client, userData, msg):
         print("New Msg" + str(msg.payload) + msg.topic)
+        print("Status: " + str(self.fdevice_status))
         if self.fdevice_status == ConnectionStatus.attempting_connection:
             if (msg.payload == "initial message"):
                 self.sendMsg("initial message received", "/edge_device/setup_device")
@@ -108,6 +112,7 @@ class BiDirectionalMQTTComms:
         self.sendMsg("initial message", "/edge_device/setup_device")
 
     def sendMsg(self, msgText, topic = "/edge_device/data"):
+        print("sending to: " + self.fdest_ip_address)
         publish.single(topic, msgText, hostname=self.fdest_ip_address)
 
 #https://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
