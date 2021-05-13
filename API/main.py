@@ -80,7 +80,7 @@ class BiDirectionalMQTTComms:
         self.client.subscribe("/edge_device/data")
 
     def __onMessage(self, client, userData, msg):
-        print("New Msg" + str(msg.payload))
+        print("New Msg" + str(msg.payload) + msg.topic)
         if self.fdevice_status == ConnectionStatus.attempting_connection:
             if (msg.payload == "initial message"):
                 self.sendMsg("initial message received", "/edge_device/setup_device")
@@ -103,6 +103,7 @@ class BiDirectionalMQTTComms:
         self.sendMsg("broadcast", "/edge_device/setup_device")
         self.fdevice_status = ConnectionStatus.attempting_connection
 
+        print("init msg")
         self.sendMsg("initial message", "/edge_device/setup_device")
 
     def sendMsg(self, msgText):
