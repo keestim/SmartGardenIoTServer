@@ -60,6 +60,13 @@ class MQTTSniffer(threading.Thread):
             s.close()
         return IP
 
+class MQTTSubscriberThread(threading.Thread):
+    def __init__(self, mqtt_client):
+        super().__init__()
+        self.fmqtt_client = mqtt_client
+        
+    def run(self):
+        self.fmqtt_client.loop_forever()
 class BiDirectionalMQTTComms:
     def __init__(self, topic, device_ip_address, dest_ip_address, port = 1883, keepAlive = 60):
         self.fdest_ip_address = dest_ip_address
@@ -86,7 +93,9 @@ class BiDirectionalMQTTComms:
         self.client.on_message = self.__onMessage
 
         self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
-        self.client.loop_forever()
+        
+        self.fmqtt_subscriber_thread = MQTTSubscriberThread(self.client)
+        self.fmqtt_subscriber_thread.start()
 
     def sendMsg(self, msgText):
         publish.single(self.fdest_ip_address, msgText, hostname = self.fdest_ip_address)
