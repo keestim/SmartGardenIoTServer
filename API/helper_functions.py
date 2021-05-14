@@ -1,3 +1,5 @@
+import socket
+
 #Source: https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
 def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

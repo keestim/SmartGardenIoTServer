@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 import threading
 import pyshark
-import socket
 from time import sleep  
 from helper_functions import *
 
@@ -10,7 +9,7 @@ class MQTTSniffer(threading.Thread):
     def __init__(self, connection_list):
         super().__init__()
         self.fmqtt_ip_addresses = []
-        self.fdevice_ip_address = self.get_ip()
+        self.fdevice_ip_address = get_ip()
         self.fcapture = pyshark.LiveCapture(interface='enp0s25')
         self.fconnection_list = connection_list
 
