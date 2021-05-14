@@ -55,9 +55,21 @@ app.config["DEBUG"] = True
 def home():
     return "API Test"
 
+@app.route("/probe_devices", methods=['GET'])
+def probe_devices():
+    devices_str = ""
+
+    for device in mqtt_sniffer.fconnection_list:
+        devices_str = devices_str + ", " + device.fdest_ip_address
+        device.sendMsg("The bois")
+
+    return devices_str
+
+
 if __name__ == "__main__":
     active_mqtt_connections = []
     mqtt_sniffer = MQTTSniffer(active_mqtt_connections)
     mqtt_sniffer.start()
     app.run()
+    
 
