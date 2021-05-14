@@ -57,7 +57,14 @@ class BiDirectionalMQTTComms:
         self.mqtt_connection_initalizer = MQTTConnectInitializer(self)
         self.mqtt_connection_initalizer.start()
 
-    def getDestinationIPAddress():
+    def getDestinationIPAddress(self):
+        return self.fdest_ip_address
+
+    def getTopicList(self):
+        return self.ftopic_list
+
+    def getDeviceStatus(self):
+        return self.fdevice_status
 
     def __registerDevice(self, topic, payload):
         if self.fdevice_status == ConnectionStatus.attempting_connection:
