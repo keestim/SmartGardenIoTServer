@@ -27,11 +27,6 @@ class MQTTSniffer(threading.Thread):
                     
                     print("New Connection")
                     new_mqtt_connection = BiDirectionalMQTTComms(self.fdevice_ip_address, ip_data.src)
-                    
-                    print("starting backup comms")
-                    mqtt_connection_initalizer = MQTTConnectInitializer(new_mqtt_connection)
-                    mqtt_connection_initalizer.start()
-
                     self.fconnection_list.append(new_mqtt_connection)
 
                     print(len(self.fconnection_list))
@@ -65,3 +60,4 @@ if __name__ == "__main__":
     mqtt_sniffer = MQTTSniffer(active_mqtt_connections)
     mqtt_sniffer.start()
     app.run()
+
