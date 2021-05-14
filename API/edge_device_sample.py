@@ -38,7 +38,7 @@ if __name__ == "__main__":
     print(get_ip())
     print(server_ip_address)
 
-    interface_obj = CommunicationInterface(["/edge_device/data", "/edge_device/setup_device"])
+    interface_obj = CommunicationInterface(["/edge_device/data", "/edge_device/setup_device", "/edge_device/topic_stream"])
 
     mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, interface_obj)
     mqtt_connection_initalizer = MQTTConnectInitializer(mqtt_interface)

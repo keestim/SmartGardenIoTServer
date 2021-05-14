@@ -45,6 +45,8 @@ class BiDirectionalMQTTComms:
 
         self.fmqtt_subscriber_thread = None
 
+        self.ftopic_list = [("/edge_device/data", 0), ("/edge_device/setup_device", 0)]
+
         self.client = None
         self.fdevice_status = ConnectionStatus.init
         sleep(2)
@@ -74,8 +76,7 @@ class BiDirectionalMQTTComms:
         return result_arr   
 
     def __onConnect(self, client, userData, flags, responseCode):
-        #default topics!
-        self.client.subscribe([("/edge_device/data", 0), ("/edge_device/setup_device", 0)])
+        self.client.subscribe(self.ftopic_list)
 
     def __onMessage(self, client, userData, msg):
         topic = msg.topic
@@ -94,7 +95,11 @@ class BiDirectionalMQTTComms:
                 #then run:
                 #self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
                 #and in theory everything should work!
-                print(self.__encodeTopicsString(payload))
+
+                #maybe publish this on a seperate topic
+                self.ftopic_list = self.__encodeTopicsString(payload)
+                self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
+
             else:
                 print(topic + ", " + str(payload))
 
