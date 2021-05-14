@@ -64,10 +64,16 @@ class BiDirectionalMQTTComms:
 
                 if (self.fmqtt_interface is not None):
                     topics_json = json.dumps(self.fmqtt_interface.getTopicList())
-                    self.sendMsg(str("{'topics': ") + str(topics_json) + "}", "/edge_device/setup_device")
+                    self.sendMsg(str("{\"topics\": ") + str(topics_json) + "}", "/edge_device/setup_device")
 
     def __encodeTopicsString(self, payload):
-        topics = json.loads(payload["topics"])
+        print("Topics: ")
+        print(payload)
+        topics = json.loads(payload)
+        print("b")
+        print(topics)
+        print("a")
+
         result_arr = []
         
         for topic in topics:
@@ -81,8 +87,6 @@ class BiDirectionalMQTTComms:
     def __onMessage(self, client, userData, msg):
         topic = msg.topic
         payload = msg.payload.decode('ascii')
-
-        print(topic + ", " + str(payload))
 
         self.__registerDevice(topic, payload)                
         if self.fdevice_status == ConnectionStatus.connected:
@@ -101,7 +105,6 @@ class BiDirectionalMQTTComms:
                 #maybe publish this on a seperate topic
                 self.ftopic_list = self.__encodeTopicsString(payload)
                 self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
-                self.sendMsg("test msg")
             else:
                 print(topic + ", " + str(payload))
 
