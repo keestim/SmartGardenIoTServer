@@ -67,15 +67,16 @@ class BiDirectionalMQTTComms:
                     topics_json = json.dumps(self.fmqtt_interface.getTopicList())
                     self.sendMsg(str("{\"topics\": ") + str(topics_json) + "}", "/edge_device/setup_device")
 
+                print("CONNECTED!")
+                self.sendMsg("THE BOIS we connected!", "/edge_device/data")
+
     def __encodeTopicsString(self, payload):
-        print("Topics: ")
         topics = json.loads(payload)
         topics = topics["topics"]
 
         result_arr = []
         
         for topic in topics:
-            print(topic)
             result_arr.append((topic, 0))
 
         return result_arr   
@@ -87,11 +88,7 @@ class BiDirectionalMQTTComms:
         topic = msg.topic
         payload = msg.payload.decode('ascii')
 
-        self.__registerDevice(topic, payload)                
         if self.fdevice_status == ConnectionStatus.connected:
-            #incase miscommunication occurs
-            #find a better way to handle this!
-            #seems to only occur for server!
             if (payload == "initial message"):
                 self.sendMsg("initial message received", "/edge_device/setup_device")
             elif ("topics" in payload):
@@ -109,6 +106,8 @@ class BiDirectionalMQTTComms:
                 self.fmqtt_interface.onMessage(topic, payload)
 
             #need detect and decode topic msg!
+        else:
+            self.__registerDevice(topic, payload)      
         
     def __setupReader(self):
         self.client = mqtt.Client()

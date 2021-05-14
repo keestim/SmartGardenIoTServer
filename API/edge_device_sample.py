@@ -4,6 +4,7 @@ import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 from time import sleep
 import threading
+import sys
 
 from BiDirectionalMQTTComms import * 
 
@@ -31,9 +32,13 @@ def get_ip():
     return IP 
 
 global server_ip_address
-server_ip_address = "192.168.1.46"
 
 if __name__ == "__main__":
+    try:
+        server_ip_address = sys.argv[1]
+    except:
+        print("You must enter the server ip address as an additional command line arg")
+
     print(get_ip())
     print(server_ip_address)
 
