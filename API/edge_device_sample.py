@@ -27,9 +27,10 @@ if __name__ == "__main__":
         server_ip_address = sys.argv[1]
     except:
         print("You must enter the server ip address as an additional command line arg")
+        exit()
 
     print(get_ip())
     print(server_ip_address)
 
-    interface_obj = CommunicationInterface(["/edge_device/data", "/edge_device/setup_device", "/edge_device/topic_stream"])
+    interface_obj = CommunicationInterface("plant_reader", ["/edge_device/data", "/edge_device/setup_device", "/edge_device/topic_stream"])
     mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, interface_obj)
