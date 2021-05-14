@@ -24,6 +24,8 @@ class MQTTConnectInitializer(threading.Thread):
         
     def run(self):
         while True:
+            print("Status: ")
+            print(self.fmqtt_bi_comms.getDeviceStatus())
             if self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.init:
                 self.fmqtt_bi_comms.sendMsg("broadcast", "/edge_device/setup_device")
             elif self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.attempting_connection:
@@ -92,13 +94,6 @@ class BiDirectionalMQTTComms:
             if (payload == "initial message"):
                 self.sendMsg("initial message received", "/edge_device/setup_device")
             elif ("topics" in payload):
-                #have topics as a private field
-                #once this msg comes in reload this new list into the private field
-                #then run:
-                #self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
-                #and in theory everything should work!
-
-                #maybe publish this on a seperate topic
                 self.ftopic_list = self.__encodeTopicsString(payload)
                 self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
             else:
@@ -128,6 +123,7 @@ class BiDirectionalMQTTComms:
         return self.fdevice_status
 
     def sendMsg(self, msgText, topic = "/edge_device/data"):
+        print("sending to: " + self.fdest_ip_address)
         publish.single(topic, msgText, hostname=self.fdest_ip_address)
 
         
