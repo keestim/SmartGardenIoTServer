@@ -49,11 +49,12 @@ class BiDirectionalMQTTComms:
 
         self.client = None
         self.fdevice_status = ConnectionStatus.init
+        
         sleep(2)
         self.__setupReader()
 
-        self.sendMsg("test msg")
-        #add field for device topics
+        self.mqtt_connection_initalizer = MQTTConnectInitializer(self)
+        self.mqtt_connection_initalizer.start()
 
     def __registerDevice(self, topic, payload):
         if self.fdevice_status == ConnectionStatus.attempting_connection:

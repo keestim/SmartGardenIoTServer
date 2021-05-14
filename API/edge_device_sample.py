@@ -17,7 +17,6 @@ class CommunicationInterface():
     def onMessage(self, topic, payload):
         print(topic + "|" + payload)
 
-
 #Source: https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
 def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -41,5 +40,3 @@ if __name__ == "__main__":
     interface_obj = CommunicationInterface(["/edge_device/data", "/edge_device/setup_device", "/edge_device/topic_stream"])
 
     mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, interface_obj)
-    mqtt_connection_initalizer = MQTTConnectInitializer(mqtt_interface)
-    mqtt_connection_initalizer.start()
