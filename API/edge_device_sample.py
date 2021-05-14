@@ -32,7 +32,7 @@ def get_ip():
     return IP 
 
 global server_ip_address
-server_ip_address = "192.168.1.46"
+server_ip_address = "192.168.90.254"
 
 if __name__ == "__main__":
     print(get_ip())
