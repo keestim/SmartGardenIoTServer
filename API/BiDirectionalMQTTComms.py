@@ -67,7 +67,9 @@ class BiDirectionalMQTTComms:
                     self.sendMsg(str("{\"topics\": ") + str(topics_json) + "}", "/edge_device/setup_device")
 
     def __encodeTopicsString(self, payload):
+        print("Topics: ")
         topics = json.loads(payload)
+        topics = topics["topics"]
 
         result_arr = []
         
