@@ -3,6 +3,7 @@ import threading
 import pyshark
 import socket
 from time import sleep  
+from helper_functions import *
 
 from BiDirectionalMQTTComms import * 
 class MQTTSniffer(threading.Thread):
@@ -34,19 +35,6 @@ class MQTTSniffer(threading.Thread):
             except:
                 continue
 
-    #Source: https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
-    def get_ip(self):
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        try:
-            # doesn't even have to be reachable
-            s.connect(('10.255.255.255', 1))
-            IP = s.getsockname()[0]
-        except Exception:
-            IP = '127.0.0.1'
-        finally:
-            s.close()
-        return IP
-
 #https://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -64,7 +52,6 @@ def probe_devices():
         device.sendMsg("The bois")
 
     return devices_str
-
 
 if __name__ == "__main__":
     active_mqtt_connections = []
