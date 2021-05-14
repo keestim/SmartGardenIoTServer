@@ -82,6 +82,8 @@ class BiDirectionalMQTTComms:
         topic = msg.topic
         payload = msg.payload.decode('ascii')
 
+        print(topic + ", " + str(payload))
+
         self.__registerDevice(topic, payload)                
         if self.fdevice_status == ConnectionStatus.connected:
             #incase miscommunication occurs
@@ -99,7 +101,7 @@ class BiDirectionalMQTTComms:
                 #maybe publish this on a seperate topic
                 self.ftopic_list = self.__encodeTopicsString(payload)
                 self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
-
+                self.sendMsg("test msg")
             else:
                 print(topic + ", " + str(payload))
 
