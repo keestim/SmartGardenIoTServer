@@ -61,9 +61,7 @@ class BiDirectionalMQTTComms:
 
         self.client = None
 
-        print("Constructor running for" + self.fdevice_ip_address)
         self.fdevice_status = ConnectionStatus.init
-
         self.fdevice_type = ""
 
         self.__setupReader()
@@ -130,25 +128,18 @@ class BiDirectionalMQTTComms:
 
     def __registerDevice(self, topic, payload):
         with self.fconnection_setup_lock:
-            print("ATTEMPTING TO REGISTER DEVICE")
-            print(self.fdevice_status)
-
             if self.fdevice_status == ConnectionStatus.attempting_connection:
-                print(Fore.YELLOW + "ATTEMPT | PAYLOAD: " + payload)
-                print("INIT RECEIVED?")
-                print(payload == "initial message received")
                 if (payload == "initial message"):
                     self.sendMsg("initial message received", "/edge_device/setup_device")
                 elif (payload == "initial message received"):
                     #just incase, remove this!
                     self.sendMsg("initial message received", "/edge_device/setup_device")
-
                     self.fdevice_status = ConnectionStatus.connection_accepted
                     return
             elif (self.fdevice_status == ConnectionStatus.connection_accepted):
                 if (self.fmqtt_interface is not None):
                     #wait for other side of connection to finish
-                    sleep(2)
+                    sleep(5)
                     topics_json = json.dumps(self.fmqtt_interface.getTopicList())
                     #store stuff like "topics" and "device_type" as CONSTANTS!"
                     self.sendMsg(
