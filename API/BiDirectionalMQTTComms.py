@@ -52,6 +52,18 @@ class MessageProcessor(threading.Thread):
         self.fuser_data = user_data
         self.fmsg = msg
 
+    def __encodeTopicsString(self, payload):
+        print(Fore.RED + payload)
+        json_output = json.loads(payload)
+        topics = json_output["topics"]
+
+        result_arr = []
+        
+        for topic in topics:
+            result_arr.append((topic, 0))
+
+        return result_arr   
+
     def run(self):
         topic = self.fmsg.topic
         payload = self.fmsg.payload.decode('ascii')
@@ -61,7 +73,7 @@ class MessageProcessor(threading.Thread):
                 self.fMQTTComms.sendMsg("initial message received", "/edge_device/setup_device")
             elif ("topics" in payload):
                 self.fMQTTComms.ftopic_list = self.__encodeTopicsString(payload)
-                self.fMQTTComms.fmqtt_interface = self.__assignDeviceInterface(payload)
+                self.fMQTTComms.fmqtt_interface = self.fMQTTComms.assignDeviceInterface(payload)
                 print(self.fMQTTComms.fmqtt_interface)
 
                 self.fMQTTComms.client.connect(
@@ -113,22 +125,10 @@ class BiDirectionalMQTTComms:
     def getDeviceStatus(self):
         return self.fdevice_status
 
-    def __encodeTopicsString(self, payload):
-        print(Fore.RED + payload)
-        json_output = json.loads(payload)
-        topics = json_output["topics"]
-
-        result_arr = []
-        
-        for topic in topics:
-            result_arr.append((topic, 0))
-
-        return result_arr   
-
     def __onConnect(self, client, userData, flags, responseCode):
         self.client.subscribe(self.ftopic_list)
 
-    def __assignDeviceInterface(self, payload):
+    def assignDeviceInterface(self, payload):
         print("ASSIGNING INTERFACE: " + self.fdest_ip_address)
         json_output = json.loads(payload)
         device_type = json_output["device_type"]
