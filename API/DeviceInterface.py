@@ -12,7 +12,7 @@ class DeviceInterface():
         pass
 
     def blinkLED(self):
-        print("BLINK LED")
+        output_msg = {}
         output_msg["topic"] = "edge_devices/control_device"
         output_msg["payload"] = "blink_led"
         return output_msg

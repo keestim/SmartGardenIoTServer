@@ -120,6 +120,9 @@ class BiDirectionalMQTTComms:
             elif ("topics" in payload):
                 self.ftopic_list = self.__encodeTopicsString(payload)
                 self.fmqtt_interface = self.__assignDeviceInterface(payload)
+                print(self.fmqtt_interface)
+
+
                 self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
             else:
                 print(topic + ", " + str(payload))
