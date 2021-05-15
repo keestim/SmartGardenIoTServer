@@ -139,7 +139,6 @@ class BiDirectionalMQTTComms:
             elif (self.fdevice_status == ConnectionStatus.connection_accepted):
                 if (self.fmqtt_interface is not None):
                     #wait for other side of connection to finish
-                    sleep(5)
                     topics_json = json.dumps(self.fmqtt_interface.getTopicList())
                     #store stuff like "topics" and "device_type" as CONSTANTS!"
                     self.sendMsg(
