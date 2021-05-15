@@ -46,6 +46,7 @@ class RegisterDeviceThread(threading.Thread):
         self.fpayload = payload
 
     def run(self):
+        print("THREAD: " + self.fpayload)
         if self.fMQTT_comms.getDeviceStatus == ConnectionStatus.attempting_connection:
             if (self.fpayload == "initial message"):
                 self.fMQTT_comms.sendMsg("initial message received", "/edge_device/setup_device")
