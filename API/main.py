@@ -63,6 +63,20 @@ def flash_all_lights():
 
     return "Flash LIGHTS!"
 
+@app.route("/get_device_details")
+def get_device_details():
+    output_str = ""
+
+    for device in mqtt_sniffer.fconnection_list:
+        if device.fmqtt_interface != None:
+            device_interface = device.fmqtt_interface
+            output_str = output_str + device_interface.fDeviceType + "," + device_interface.ftype_id + "<br/>"
+    
+    return output_str
+
+
+#something about avaliable methods?
+
 if __name__ == "__main__":
     try:
         server_network_interface = sys.argv[1]

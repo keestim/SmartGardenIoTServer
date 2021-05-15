@@ -35,6 +35,7 @@ if __name__ == "__main__":
     print(get_ip())
     print(server_ip_address)
 
+    #try make this constant!
     interface_obj = CommunicationInterface(
                         "PlantMonitor", 
                         ["/edge_device/data", 
