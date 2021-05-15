@@ -25,6 +25,7 @@ class MQTTConnectInitializer(threading.Thread):
         self.fmqtt_bi_comms = mqtt_bi_comms
         
     def run(self):
+        print("run start messaging!")
         while True:
             if self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.init:
                 self.fmqtt_bi_comms.sendMsg("broadcast", "/edge_device/setup_device")
