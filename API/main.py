@@ -58,6 +58,7 @@ def flash_all_lights():
     for device in mqtt_sniffer.fconnection_list:
         if device.fmqtt_interface != None:
             msg_details = getattr(device.fmqtt_interface, 'blinkLED')()
+            print(msg_details)
             device.sendMsg(msg_details["payload"], msg_details["topic"])
 
     return "Flash LIGHTS!"
