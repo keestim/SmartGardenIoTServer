@@ -28,20 +28,15 @@ class MQTTConnectInitializer(threading.Thread):
         
     def run(self):
         while True:
-            try:
-                self.fmqtt_bi_comms.fconnection_setup_lock.acquire()
-            finally:
-                if self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.init:
-                    self.fmqtt_bi_comms.fdevice_status = ConnectionStatus.attempting_connection
-                    self.fmqtt_bi_comms.sendMsg("broadcast", "/edge_device/setup_device")
-                elif self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.attempting_connection:
-                    self.fmqtt_bi_comms.sendMsg("initial message", "/edge_device/setup_device")
-                else:
-                    self.fmqtt_bi_comms.fconnection_setup_lock.release()
-                    exit()
+            if self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.init:
+                self.fmqtt_bi_comms.fdevice_status = ConnectionStatus.attempting_connection
+                self.fmqtt_bi_comms.sendMsg("broadcast", "/edge_device/setup_device")
+            elif self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.attempting_connection:
+                self.fmqtt_bi_comms.sendMsg("initial message", "/edge_device/setup_device")
+            else:
+                exit()
 
-                self.fmqtt_bi_comms.fconnection_setup_lock.release()
-                sleep(1)
+            sleep(1)
 
 class RegisterDeviceThread(threading.Thread):
     def __init__(self, MQTT_comms, topic, payload):
@@ -142,6 +137,8 @@ class BiDirectionalMQTTComms:
     def __onMessage(self, client, userData, msg):
         topic = msg.topic
         payload = msg.payload.decode('ascii')
+
+        print(topic + "|" + payload)
 
         if (self.fdevice_status == ConnectionStatus.device_registered):
             if (payload == "initial message"):
