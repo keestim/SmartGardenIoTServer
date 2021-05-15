@@ -52,6 +52,8 @@ class BiDirectionalMQTTComms:
                             ("edge_devices/control_device", 0)]
 
         self.client = None
+
+        print("Constructor running for" + self.fdevice_ip_address)
         self.fdevice_status = ConnectionStatus.init
 
         self.fdevice_type = ""
