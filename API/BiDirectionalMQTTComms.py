@@ -65,6 +65,9 @@ class BiDirectionalMQTTComms:
         self.mqtt_connection_initalizer = MQTTConnectInitializer(self)
         self.mqtt_connection_initalizer.start()
 
+        #create a set, so that this can be set through MQTTConnectInitializer
+        self.fdevice_status = ConnectionStatus.attempting_connection
+
     def getDestinationIPAddress(self):
         return self.fdest_ip_address
 
@@ -146,11 +149,6 @@ class BiDirectionalMQTTComms:
 
         self.fmqtt_subscriber_thread = MQTTSubscriberThread(self.client)
         self.fmqtt_subscriber_thread.start()
-
-        self.sendMsg("broadcast", "/edge_device/setup_device")
-        self.fdevice_status = ConnectionStatus.attempting_connection
-
-        self.sendMsg("initial message", "/edge_device/setup_device")
 
     def getDeviceStatus(self):
         return self.fdevice_status
