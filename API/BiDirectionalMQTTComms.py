@@ -68,6 +68,8 @@ class MessageProcessor(threading.Thread):
         topic = self.fmsg.topic
         payload = self.fmsg.payload.decode('ascii')
 
+        print("PAYLOAD: " + payload)
+
         if (self.fMQTTComms.fdevice_status == ConnectionStatus.device_registered):
             if (payload == "initial message"):
                 self.fMQTTComms.sendMsg("initial message received", "/edge_device/setup_device")
