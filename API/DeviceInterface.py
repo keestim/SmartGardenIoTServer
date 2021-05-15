@@ -44,7 +44,6 @@ class PlantMonitorInterface(DeviceInterface):
 class WaterSystemInterface(DeviceInterface):
     global num_watering_devices
     
-
     def __init__(self):
         super().__init__()
         global num_watering_devices
