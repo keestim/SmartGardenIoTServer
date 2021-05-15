@@ -103,14 +103,15 @@ class BiDirectionalMQTTComms:
         self.client.subscribe(self.ftopic_list)
 
     def __assignDeviceInterface(self, payload):
-        print("ASSIGNING INTERFACE: " + self.fdest_ip_address)
-        json_output = json.loads(payload)
-        device_type = json_output["device_type"]
+        if self.fmqtt_interface is None:
+            print("ASSIGNING INTERFACE: " + self.fdest_ip_address)
+            json_output = json.loads(payload)
+            device_type = json_output["device_type"]
 
-        #maybe use some kind of static enum?
-        print("device type: " + str(device_type))
-        if (device_type == "PlantMonitor"):
-            return PlantMonitorInterface()
+            #maybe use some kind of static enum?
+            print("device type: " + str(device_type))
+            if (device_type == "PlantMonitor"):
+                self.fmqtt_interface = PlantMonitorInterface()
 
     def __onMessage(self, client, userData, msg):
         topic = msg.topic
@@ -126,7 +127,7 @@ class BiDirectionalMQTTComms:
                 
 
                 print(self.fmqtt_interface)
-                self.fmqtt_interface = self.__assignDeviceInterface(payload)
+                self.__assignDeviceInterface(payload)
 
                 self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
             else:
