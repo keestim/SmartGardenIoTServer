@@ -72,7 +72,7 @@ class MessageProcessor(threading.Thread):
                 if self.fMQTTComms.fmqtt_interface is not None:
                     self.fMQTTComms.fmqtt_interface.onMessage(topic, payload)
         else:
-            self.fMQTTComms.__registerDevice(topic, payload)    
+            self.fMQTTComms.registerDevice(topic, payload)    
 
 class BiDirectionalMQTTComms:
     def __init__(self, device_ip_address, dest_ip_address, mqtt_interface = None, port = 1883, keepAlive = 60):
@@ -142,7 +142,7 @@ class BiDirectionalMQTTComms:
         message_processor = MessageProcessor(self, client, userData, msg)
         message_processor.start()
 
-    def __registerDevice(self, topic, payload):
+    def registerDevice(self, topic, payload):
         with self.fconnection_setup_lock:
             if self.fdevice_status == ConnectionStatus.attempting_connection:
                 if (payload == "initial message"):
