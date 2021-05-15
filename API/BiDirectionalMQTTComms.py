@@ -151,6 +151,7 @@ class BiDirectionalMQTTComms:
                 
                 #probably would be good to have some kind of response, etc for this 
                 self.fdevice_status = ConnectionStatus.device_registered
+                print("Device Fully registered")
                 return  
         
     def __setupReader(self):
