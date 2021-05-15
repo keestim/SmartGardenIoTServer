@@ -21,6 +21,7 @@ class CommunicationInterface():
         return self.fdevice_type
 
     def onMessage(self, topic, payload):
+        print("Edge device interface:")
         print(topic + "|" + payload)
 
 global server_ip_address
