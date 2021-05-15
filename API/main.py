@@ -30,8 +30,8 @@ class MQTTSniffer(threading.Thread):
                     self.fconnection_list.append(new_mqtt_connection)
 
                     print(len(self.fconnection_list))
-
             except:
+                print("packet sniffer issue!")
                 continue
 
 #https://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
@@ -47,7 +47,7 @@ def probe_devices():
     devices_str = ""
 
     for device in mqtt_sniffer.fconnection_list:
-        devices_str = devices_str + ", " + device.fdest_ip_address
+        devices_str = devices_str + device.fdest_ip_address + ", "
         device.sendMsg("The bois")
 
     return devices_str
@@ -57,5 +57,5 @@ if __name__ == "__main__":
     mqtt_sniffer = MQTTSniffer(active_mqtt_connections)
     mqtt_sniffer.start()
     app.run()
-    
 
+#maybe something to add to note either client or server side
