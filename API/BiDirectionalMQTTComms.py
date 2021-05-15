@@ -126,7 +126,7 @@ class BiDirectionalMQTTComms:
 
                 self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
             else:
-                print(topic + ", " + str(payload))
+                print(topic + ", " + str(payload) + "|" + self.fdest_ip_address)
 
                 if self.fmqtt_interface is not None:
                     self.fmqtt_interface.onMessage(topic, payload)
