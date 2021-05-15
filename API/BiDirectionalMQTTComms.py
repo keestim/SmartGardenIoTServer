@@ -69,6 +69,8 @@ class MessageProcessor(threading.Thread):
         payload = self.fmsg.payload.decode('ascii')
 
         print("PAYLOAD: " + payload)
+        print("Status: ")
+        print(self.fMQTTComms.fdevice_status)
 
         if (self.fMQTTComms.fdevice_status == ConnectionStatus.device_registered):
             if (payload == "initial message"):
