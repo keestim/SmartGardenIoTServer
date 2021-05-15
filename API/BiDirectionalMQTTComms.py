@@ -50,7 +50,9 @@ class BiDirectionalMQTTComms:
 
         self.client = None
         self.fdevice_status = ConnectionStatus.init
-        
+
+        self.fdevice_type = ""
+
         sleep(1)
         self.__setupReader()
 
@@ -128,6 +130,5 @@ class BiDirectionalMQTTComms:
         return self.fdevice_status
 
     def sendMsg(self, msgText, topic = "/edge_device/data"):
+        print("sending msg: " + msgText + " | " + self.fdest_ip_address)
         publish.single(topic, msgText, hostname = self.fdest_ip_address)
-
-        
