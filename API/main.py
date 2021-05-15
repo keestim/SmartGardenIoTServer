@@ -38,7 +38,6 @@ class MQTTSniffer(threading.Thread):
                 
                 print("New Connection")
                 self.fconnection_list.append(BiDirectionalMQTTComms(self.fdevice_ip_address, ip_data.src))
-
                 print(len(self.fconnection_list))
 
 #https://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
