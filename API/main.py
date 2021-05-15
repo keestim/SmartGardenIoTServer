@@ -24,7 +24,7 @@ class MQTTSniffer(threading.Thread):
             ip_data = item.ip
 
             if (ip_data.src not in self.fmqtt_ip_addresses) and not(ip_data.src == self.fdevice_ip_address):
-
+                #spawn new thread here?
                 print("Existing IP Addresses")
                 print(self.fmqtt_ip_addresses)
 

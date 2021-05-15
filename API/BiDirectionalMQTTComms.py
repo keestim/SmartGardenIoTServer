@@ -28,6 +28,7 @@ class MQTTConnectInitializer(threading.Thread):
         while True:
             if self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.init:
                 print("Send Broadcast!")
+                self.fmqtt_bi_comms.fdevice_status = ConnectionStatus.attempting_connection
                 self.fmqtt_bi_comms.sendMsg("broadcast", "/edge_device/setup_device")
             elif self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.attempting_connection:
                 self.fmqtt_bi_comms.sendMsg("initial message", "/edge_device/setup_device")
@@ -66,8 +67,7 @@ class BiDirectionalMQTTComms:
         self.mqtt_connection_initalizer.start()
 
         #create a set, so that this can be set through MQTTConnectInitializer
-        self.fdevice_status = ConnectionStatus.attempting_connection
-
+        
     def getDestinationIPAddress(self):
         return self.fdest_ip_address
 
@@ -84,6 +84,8 @@ class BiDirectionalMQTTComms:
             elif (payload == "initial message received"):
                 self.fdevice_status = ConnectionStatus.connected
 
+                sleep(1)
+                
                 if (self.fmqtt_interface is not None):
                     topics_json = json.dumps(self.fmqtt_interface.getTopicList())
                     #store stuff like "topics" and "device_type" as CONSTANTS!"
@@ -128,7 +130,6 @@ class BiDirectionalMQTTComms:
                 self.ftopic_list = self.__encodeTopicsString(payload)
                 self.fmqtt_interface = self.__assignDeviceInterface(payload)
                 print(self.fmqtt_interface)
-
 
                 self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
             else:
