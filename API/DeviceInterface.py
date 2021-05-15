@@ -34,9 +34,8 @@ class PlantMonitorInterface(DeviceInterface):
         self.fHumidity = 0
         self.fDeviceType = "PlantMonitor"
         
-        num_plant_devices = num_plant_devices + 1
-
         self.ftype_id = num_plant_devices
+        num_plant_devices = num_plant_devices + 1
 
     def onMessage(self, topic, payload):
         print(topic + "|" + payload)
@@ -52,9 +51,8 @@ class WaterSystemInterface(DeviceInterface):
         self.fValueOpen = False
         self.fDeviceType = "WaterSystem"
 
-        num_watering_devices = num_watering_devices + 1
-
         self.ftype_id = num_watering_devices
+        num_watering_devices = num_watering_devices + 1
 
     def onMessage(self, topic, payload):
         print(topic + "|" + payload)
