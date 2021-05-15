@@ -78,10 +78,11 @@ class BiDirectionalMQTTComms:
 
                 if (self.fmqtt_interface is not None):
                     topics_json = json.dumps(self.fmqtt_interface.getTopicList())
-                    #store stuff like "topics" and "device_type" as CONSTANTS!
-                    self.sendMsg(str("{\"topics\": ") + str(topics_json) + ", \"device_type\": " + self.fmqtt_interface.getDeviceType() + "}", "/edge_device/setup_device")
+                    #store stuff like "topics" and "device_type" as CONSTANTS!"
+                    self.sendMsg(str("{\"topics\": ") + str(topics_json) + ", \"device_type\": \"" + self.fmqtt_interface.getDeviceType() + "\"}", "/edge_device/setup_device")
 
     def __encodeTopicsString(self, payload):
+        print(payload)
         json_output = json.loads(payload)
         topics = json_output["topics"]
 
