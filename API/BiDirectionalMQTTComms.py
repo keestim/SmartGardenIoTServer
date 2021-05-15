@@ -112,7 +112,7 @@ class BiDirectionalMQTTComms:
         topic = msg.topic
         payload = msg.payload.decode('ascii')
 
-        print(topic + " | " + payload  + " | " + str(self.fdevice_status))
+        print(topic + " | " + payload  + " | " + str(self.fdevice_status) + " | " + self.fdest_ip_address)
 
         if (self.fdevice_status == ConnectionStatus.device_registered):
             if (payload == "initial message"):
