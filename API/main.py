@@ -3,6 +3,7 @@ import threading
 import pyshark
 from time import sleep  
 from helper_functions import *
+import sys
 
 from BiDirectionalMQTTComms import * 
 class MQTTSniffer(threading.Thread):
