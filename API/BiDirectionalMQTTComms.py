@@ -118,6 +118,7 @@ class BiDirectionalMQTTComms:
             if (payload == "initial message"):
                 self.sendMsg("initial message received", "/edge_device/setup_device")
             elif ("topics" in payload):
+
                 self.ftopic_list = self.__encodeTopicsString(payload)
                 self.fmqtt_interface = self.__assignDeviceInterface(payload)
                 print(self.fmqtt_interface)
@@ -136,6 +137,7 @@ class BiDirectionalMQTTComms:
                     self.sendMsg("initial message received", "/edge_device/setup_device")
                 elif (payload == "initial message received"):
                     #just incase, remove this!
+                    self.sendMsg("connection accepted", "/edge_device/setup_device")
                     self.sendMsg("connection accepted", "/edge_device/setup_device")
                     self.fdevice_status = ConnectionStatus.connection_accepted
                     return
