@@ -4,6 +4,7 @@ from time import sleep
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 import json
+from DeviceInterface import *
 
 class ConnectionStatus(Enum):
     init = 1
@@ -77,11 +78,12 @@ class BiDirectionalMQTTComms:
 
                 if (self.fmqtt_interface is not None):
                     topics_json = json.dumps(self.fmqtt_interface.getTopicList())
-                    self.sendMsg(str("{\"topics\": ") + str(topics_json) + "}", "/edge_device/setup_device")
+                    #store stuff like "topics" and "device_type" as CONSTANTS!
+                    self.sendMsg(str("{\"topics\": ") + str(topics_json) + ", \"device_type\": " + self.fmqtt_interface.getDeviceType() + "}", "/edge_device/setup_device")
 
     def __encodeTopicsString(self, payload):
-        topics = json.loads(payload)
-        topics = topics["topics"]
+        json_output = json.loads(payload)
+        topics = json_output["topics"]
 
         result_arr = []
         
@@ -93,6 +95,14 @@ class BiDirectionalMQTTComms:
     def __onConnect(self, client, userData, flags, responseCode):
         self.client.subscribe(self.ftopic_list)
 
+    def __assignDeviceInterface(self, payload):
+        json_output = json.loads(payload)
+        device_type = json_output["device_type"]
+
+        #maybe use some kind of static enum?
+        if (device_type == "PlantMonitor"):
+            return PlantMonitorInterface()
+
     def __onMessage(self, client, userData, msg):
         topic = msg.topic
         payload = msg.payload.decode('ascii')
@@ -102,6 +112,7 @@ class BiDirectionalMQTTComms:
                 self.sendMsg("initial message received", "/edge_device/setup_device")
             elif ("topics" in payload):
                 self.ftopic_list = self.__encodeTopicsString(payload)
+                self.fmqtt_interface = __assignDeviceInterface(payload)
                 self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
             else:
                 print(topic + ", " + str(payload))
