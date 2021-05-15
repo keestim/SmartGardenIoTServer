@@ -1,5 +1,8 @@
 import abc
 
+num_plant_devices = 0
+num_watering_devices = 0
+
 class DeviceInterface():
     def __init__(self, topics = ""):
         self.ftopic_list = topics
@@ -24,16 +27,14 @@ class PlantMonitorInterface(DeviceInterface):
 
     def __init__(self): 
         super().__init__()
+        global num_plant_devices
         
         self.fTemperature = 0
         self.fMoisture = 0
         self.fHumidity = 0
         self.fDeviceType = "PlantMonitor"
-
-        if num_plant_devices is None:
-            num_plant_devices = 0
-        else:
-            num_plant_devices = num_plant_devices + 1
+        
+        num_plant_devices = num_plant_devices + 1
 
         self.ftype_id = num_plant_devices
 
@@ -42,19 +43,17 @@ class PlantMonitorInterface(DeviceInterface):
 
 class WaterSystemInterface(DeviceInterface):
     global num_watering_devices
-    num_plant_device = 0
+    
 
     def __init__(self):
         super().__init__()
+        global num_watering_devices
 
         self.fWaterVolume = 0
         self.fValueOpen = False
         self.fDeviceType = "WaterSystem"
 
-        if num_watering_devices is None:
-            num_watering_devices = 0
-        else:
-            num_watering_devices = num_watering_devices + 1
+        num_watering_devices = num_watering_devices + 1
 
         self.ftype_id = num_watering_devices
 
