@@ -43,6 +43,37 @@ class MQTTConnectInitializer(threading.Thread):
                 self.fmqtt_bi_comms.fconnection_setup_lock.release()
                 sleep(1)
 
+class MessageProcessor(threading.Thread):
+    def __init__(self, MQTTComms, client, user_data, msg):
+        super().__init__()
+
+        self.fMQTTComms = MQTTComms
+        self.fclient = client
+        self.fuser_data = userData
+        self.fmsg = msg
+
+    def run(self):
+        topic = self.fmsg.topic
+        payload = self.fmsg.payload.decode('ascii')
+
+        if (self.fMQTTComms.fdevice_status == ConnectionStatus.device_registered):
+            if (payload == "initial message"):
+                self.fMQTTComms.sendMsg("initial message received", "/edge_device/setup_device")
+            elif ("topics" in payload):
+                self.fMQTTComms.ftopic_list = self.__encodeTopicsString(payload)
+                self.fMQTTComms.fmqtt_interface = self.__assignDeviceInterface(payload)
+                print(self.fMQTTComms.fmqtt_interface)
+
+                self.fMQTTComms.client.connect(
+                    self.fMQTTComms.fMQTTComms.fdevice_ip_address, 
+                    self.fMQTTComms.fport, 
+                    self.fMQTTComms.fkeepAlive)
+            else:
+                if self.fMQTTComms.fmqtt_interface is not None:
+                    self.fMQTTComms.fmqtt_interface.onMessage(topic, payload)
+        else:
+            self.fMQTTComms.__registerDevice(topic, payload)    
+
 class BiDirectionalMQTTComms:
     def __init__(self, device_ip_address, dest_ip_address, mqtt_interface = None, port = 1883, keepAlive = 60):
         self.fdest_ip_address = dest_ip_address
@@ -108,23 +139,8 @@ class BiDirectionalMQTTComms:
             return PlantMonitorInterface()
 
     def __onMessage(self, client, userData, msg):
-        topic = msg.topic
-        payload = msg.payload.decode('ascii')
-
-        if (self.fdevice_status == ConnectionStatus.device_registered):
-            if (payload == "initial message"):
-                self.sendMsg("initial message received", "/edge_device/setup_device")
-            elif ("topics" in payload):
-                self.ftopic_list = self.__encodeTopicsString(payload)
-                self.fmqtt_interface = self.__assignDeviceInterface(payload)
-                print(self.fmqtt_interface)
-
-                self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
-            else:
-                if self.fmqtt_interface is not None:
-                    self.fmqtt_interface.onMessage(topic, payload)
-        else:
-            self.__registerDevice(topic, payload)    
+        message_processor = MessageProcessor(self, client, userData, msg)
+        message_processor.start()
 
     def __registerDevice(self, topic, payload):
         with self.fconnection_setup_lock:
