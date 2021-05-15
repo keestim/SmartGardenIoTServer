@@ -106,6 +106,7 @@ class BiDirectionalMQTTComms:
         device_type = json_output["device_type"]
 
         #maybe use some kind of static enum?
+        print("device type: " + str(device_type))
         if (device_type == "PlantMonitor"):
             return PlantMonitorInterface()
 
