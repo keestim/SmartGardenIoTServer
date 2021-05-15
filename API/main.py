@@ -4,6 +4,7 @@ import pyshark
 from time import sleep  
 from helper_functions import *
 import sys
+from colorama import Fore, Back, Style
 
 from BiDirectionalMQTTComms import * 
 class MQTTSniffer(threading.Thread):
@@ -25,21 +26,20 @@ class MQTTSniffer(threading.Thread):
 
             if (ip_data.src not in self.fmqtt_ip_addresses) and not(ip_data.src == self.fdevice_ip_address):
                 #spawn new thread here?
-                print("Existing IP Addresses")
+                print(Fore.BLUE + "Existing IP Addresses")
                 print(self.fmqtt_ip_addresses)
+                print(Fore.BLUE + "NEW IP DISCOVERED!")
 
-                print("NEW IP DISCOVERED!")
                 self.fmqtt_ip_addresses.append(ip_data.src)
 
-                print(str(ip_data.src not in self.fmqtt_ip_addresses))
-
+                print(Fore.BLUE + str(ip_data.src not in self.fmqtt_ip_addresses))
                 print(mqtt_data)
-                print("New IP: " + ip_data.src)
-                
-                print("New Connection")
+                print(Fore.BLUE + "New IP: " + ip_data.src)
+                print(Fore.BLUE + "New Connection")
+
                 self.fconnection_list.append(BiDirectionalMQTTComms(self.fdevice_ip_address, ip_data.src))
 
-                print(len(self.fconnection_list))
+                print(Fore.BLUE + str(len(self.fconnection_list)))
 
 #https://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
 app = Flask(__name__)

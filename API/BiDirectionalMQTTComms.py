@@ -5,6 +5,7 @@ import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 import json
 from DeviceInterface import *
+from colorama import Fore, Back, Style
 
 class ConnectionStatus(Enum):
     init = 1
@@ -30,9 +31,8 @@ class MQTTConnectInitializer(threading.Thread):
             try:
                 self.fmqtt_bi_comms.fconnection_setup_lock.acquire()
             finally:
-                print("ATTEMPT CONNECTION!")
+                print(Fore.GREEN + "ATTEMPT CONNECTION!")
                 if self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.init:
-                    print("Send Broadcast!")
                     self.fmqtt_bi_comms.fdevice_status = ConnectionStatus.attempting_connection
                     self.fmqtt_bi_comms.sendMsg("broadcast", "/edge_device/setup_device")
                 elif self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.attempting_connection:
@@ -85,36 +85,8 @@ class BiDirectionalMQTTComms:
     def getDeviceStatus(self):
         return self.fdevice_status
 
-    def __registerDevice(self, topic, payload):
-        with self.fconnection_setup_lock:
-            print("ATTEMPTING TO REGISTER DEVICE")
-            print(self.fdevice_status)
-
-            if self.fdevice_status == ConnectionStatus.attempting_connection:
-                print("ATTEMPT | PAYLOAD: " + payload)
-                print("INIT RECEIVED?")
-                print(payload == "initial message received")
-
-                if (payload == "initial message"):
-                    self.sendMsg("initial message received", "/edge_device/setup_device")
-                elif (payload == "initial message received"):
-                    self.fdevice_status = ConnectionStatus.connection_accepted
-                    return
-            elif (self.fdevice_status == ConnectionStatus.connection_accepted):
-                if (self.fmqtt_interface is not None):
-                    topics_json = json.dumps(self.fmqtt_interface.getTopicList())
-                    #store stuff like "topics" and "device_type" as CONSTANTS!"
-                    self.sendMsg(
-                        str("{\"topics\": ") + str(topics_json) + ", " + 
-                            "\"device_type\": \"" + self.fmqtt_interface.getDeviceType() + "\"}", 
-                            "/edge_device/setup_device")
-                
-                #probably would be good to have some kind of response, etc for this 
-                self.fdevice_status = ConnectionStatus.device_registered
-                return
-
     def __encodeTopicsString(self, payload):
-        print(payload)
+        print(Fore.RED + payload)
         json_output = json.loads(payload)
         topics = json_output["topics"]
 
@@ -142,8 +114,8 @@ class BiDirectionalMQTTComms:
         topic = msg.topic
         payload = msg.payload.decode('ascii')
 
-        print(topic + ", " + str(payload) + "|" + self.fdest_ip_address)
-        print("Current Status:")
+        print(Fore.CYAN + topic + ", " + str(payload) + "|" + self.fdest_ip_address)
+        print(Fore.RED + "Current Status:")
         print(self.fdevice_status)
 
         if self.fdevice_status == ConnectionStatus.device_registered:
@@ -159,7 +131,38 @@ class BiDirectionalMQTTComms:
                 if self.fmqtt_interface is not None:
                     self.fmqtt_interface.onMessage(topic, payload)
         else:
-            self.__registerDevice(topic, payload)      
+            self.__registerDevice(topic, payload)    
+
+    def __registerDevice(self, topic, payload):
+        with self.fconnection_setup_lock:
+            print("ATTEMPTING TO REGISTER DEVICE")
+            print(self.fdevice_status)
+
+            if self.fdevice_status == ConnectionStatus.attempting_connection:
+                print(Fore.YELLOW + "ATTEMPT | PAYLOAD: " + payload)
+                print("INIT RECEIVED?")
+                print(payload == "initial message received")
+                if (payload == "initial message"):
+                    self.sendMsg("initial message received", "/edge_device/setup_device")
+                elif (payload == "initial message received"):
+                    #just incase, remove this!
+                    self.sendMsg("initial message received", "/edge_device/setup_device")
+
+                    print(Fore.CYAN + "Setting CONECTION ACCEPTED!!!")
+                    self.fdevice_status = ConnectionStatus.connection_accepted
+                    return
+            elif (self.fdevice_status == ConnectionStatus.connection_accepted):
+                if (self.fmqtt_interface is not None):
+                    topics_json = json.dumps(self.fmqtt_interface.getTopicList())
+                    #store stuff like "topics" and "device_type" as CONSTANTS!"
+                    self.sendMsg(
+                        str("{\"topics\": ") + str(topics_json) + ", " + 
+                            "\"device_type\": \"" + self.fmqtt_interface.getDeviceType() + "\"}", 
+                            "/edge_device/setup_device")
+                
+                #probably would be good to have some kind of response, etc for this 
+                self.fdevice_status = ConnectionStatus.device_registered
+                return  
         
     def __setupReader(self):
         print("setup reader for: " + self.fdest_ip_address + "|" + self.fdevice_ip_address)
@@ -176,5 +179,5 @@ class BiDirectionalMQTTComms:
         return self.fdevice_status
 
     def sendMsg(self, msgText, topic = "/edge_device/data"):
-        print("sending msg: " + msgText + " | " + self.fdest_ip_address)
+        print(Fore.YELLOW + "sending msg: " + msgText + " | " + self.fdest_ip_address)
         publish.single(topic, msgText, hostname = self.fdest_ip_address)
