@@ -121,7 +121,7 @@ class BiDirectionalMQTTComms:
         if self.fdevice_status == ConnectionStatus.connected:
             if (payload == "initial message"):
                 self.sendMsg("initial message received", "/edge_device/setup_device")
-            elif ("topics" in payload):
+            elif (("topics" in payload) and (self.fmqtt_interface is not None)):
                 self.ftopic_list = self.__encodeTopicsString(payload)
                 self.fmqtt_interface = self.__assignDeviceInterface(payload)
                 print(self.fmqtt_interface)
