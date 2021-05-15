@@ -49,7 +49,7 @@ class MessageProcessor(threading.Thread):
 
         self.fMQTTComms = MQTTComms
         self.fclient = client
-        self.fuser_data = userData
+        self.fuser_data = user_data
         self.fmsg = msg
 
     def run(self):
