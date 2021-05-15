@@ -53,6 +53,13 @@ def probe_devices():
 
     return devices_str
 
+@app.route("/flash_all_lights", methods=['GET'])
+def flash_all_lights():
+    for device in mqtt_sniffer.fconnection_list:
+        if device.fmqtt_interface != None:
+            msg_details = getattr(device.fmqtt_interface, 'blinkLED')()
+            device.sendMsg(msg_details["payload"], msg_details["topic"])
+
 if __name__ == "__main__":
     try:
         server_network_interface = sys.argv[1]
