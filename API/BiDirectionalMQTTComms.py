@@ -31,7 +31,6 @@ class MQTTConnectInitializer(threading.Thread):
             try:
                 self.fmqtt_bi_comms.fconnection_setup_lock.acquire()
             finally:
-                print(Fore.GREEN + "ATTEMPT CONNECTION!")
                 if self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.init:
                     self.fmqtt_bi_comms.fdevice_status = ConnectionStatus.attempting_connection
                     self.fmqtt_bi_comms.sendMsg("broadcast", "/edge_device/setup_device")
@@ -114,11 +113,7 @@ class BiDirectionalMQTTComms:
         topic = msg.topic
         payload = msg.payload.decode('ascii')
 
-        print(Fore.CYAN + topic + ", " + str(payload) + "|" + self.fdest_ip_address)
-        print(Fore.RED + "Current Status:")
-        print(self.fdevice_status)
-
-        if self.fdevice_status == ConnectionStatus.device_registered:
+        if (self.fdevice_status == ConnectionStatus.device_registered) or (self.fdevice_status == ConnectionStatus.connection_accepted):
             if (payload == "initial message"):
                 self.sendMsg("initial message received", "/edge_device/setup_device")
             elif ("topics" in payload):
@@ -148,7 +143,6 @@ class BiDirectionalMQTTComms:
                     #just incase, remove this!
                     self.sendMsg("initial message received", "/edge_device/setup_device")
 
-                    print(Fore.CYAN + "Setting CONECTION ACCEPTED!!!")
                     self.fdevice_status = ConnectionStatus.connection_accepted
                     return
             elif (self.fdevice_status == ConnectionStatus.connection_accepted):
