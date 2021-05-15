@@ -15,24 +15,20 @@ class MQTTSniffer(threading.Thread):
 
     def run(self):
         for item in self.fcapture.sniff_continuously():
-            try:
-                mqtt_data = item.mqtt
-                ip_data = item.ip
+            mqtt_data = item.mqtt
+            ip_data = item.ip
 
-                if (ip_data.src not in self.fmqtt_ip_addresses) and not(ip_data.src == self.fdevice_ip_address):
-                    self.fmqtt_ip_addresses.append(ip_data.src)
+            if (ip_data.src not in self.fmqtt_ip_addresses) and not(ip_data.src == self.fdevice_ip_address):
+                self.fmqtt_ip_addresses.append(ip_data.src)
 
-                    print(mqtt_data)
-                    print("New IP: " + ip_data.src)
-                    
-                    print("New Connection")
-                    new_mqtt_connection = BiDirectionalMQTTComms(self.fdevice_ip_address, ip_data.src)
-                    self.fconnection_list.append(new_mqtt_connection)
+                print(mqtt_data)
+                print("New IP: " + ip_data.src)
+                
+                print("New Connection")
+                new_mqtt_connection = BiDirectionalMQTTComms(self.fdevice_ip_address, ip_data.src)
+                self.fconnection_list.append(new_mqtt_connection)
 
-                    print(len(self.fconnection_list))
-            except:
-                print("packet sniffer issue!")
-                continue
+                print(len(self.fconnection_list))
 
 #https://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
 app = Flask(__name__)
