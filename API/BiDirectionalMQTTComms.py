@@ -137,6 +137,7 @@ class BiDirectionalMQTTComms:
             self.__registerDevice(topic, payload)      
         
     def __setupReader(self):
+        print("setup reader for: " + self.fdest_ip_address + "|" + self.fdevice_ip_address)
         self.client = mqtt.Client()
         self.client.on_connect = self.__onConnect
         self.client.on_message = self.__onMessage
