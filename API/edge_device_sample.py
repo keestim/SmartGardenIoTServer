@@ -35,7 +35,13 @@ if __name__ == "__main__":
     print(get_ip())
     print(server_ip_address)
 
-    interface_obj = CommunicationInterface("PlantMonitor", ["/edge_device/data", "/edge_device/setup_device", "/edge_device/topic_stream"])
+    interface_obj = CommunicationInterface(
+                        "PlantMonitor", 
+                        ["/edge_device/data", 
+                        "edge_devices/control_device", 
+                        "/edge_device/setup_device", 
+                        "/edge_device/topic_stream"])
+    
     mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, interface_obj)
 
 
