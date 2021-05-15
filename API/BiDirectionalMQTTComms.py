@@ -145,7 +145,7 @@ class BiDirectionalMQTTComms:
 
                 if (self.fmqtt_interface is not None):
                     #wait for other side of connection to finish
-                    timer = Timer(5, self.__publish_topics)
+                    timer = Timer(7, self.__publish_topics)
                     timer.start()                
                 return  
         
