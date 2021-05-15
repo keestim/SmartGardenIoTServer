@@ -30,7 +30,11 @@ class PlantMonitorInterface(DeviceInterface):
         self.fHumidity = 0
         self.fDeviceType = "PlantMonitor"
 
-        num_plant_devices = num_plant_devices + 1
+        if num_plant_devices is None:
+            num_plant_devices = 0
+        else:
+            num_plant_devices = num_plant_devices + 1
+
         self.ftype_id = num_plant_devices
 
     def onMessage(self, topic, payload):
@@ -38,6 +42,7 @@ class PlantMonitorInterface(DeviceInterface):
 
 class WaterSystemInterface(DeviceInterface):
     global num_watering_devices
+    num_plant_device = 0
 
     def __init__(self):
         super().__init__()
@@ -46,7 +51,11 @@ class WaterSystemInterface(DeviceInterface):
         self.fValueOpen = False
         self.fDeviceType = "WaterSystem"
 
-        num_watering_devices = num_watering_devices + 1
+        if num_watering_devices is None:
+            num_watering_devices = 0
+        else:
+            num_watering_devices = num_watering_devices + 1
+
         self.ftype_id = num_watering_devices
 
     def onMessage(self, topic, payload):
