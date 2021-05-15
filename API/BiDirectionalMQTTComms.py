@@ -136,18 +136,17 @@ class BiDirectionalMQTTComms:
                     self.sendMsg("initial message received", "/edge_device/setup_device")
                 elif (payload == "initial message received"):
                     #just incase, remove this!
-                    self.sendMsg("initial message received", "/edge_device/setup_device")
+                    self.sendMsg("connection accepted", "/edge_device/setup_device")
                     self.fdevice_status = ConnectionStatus.connection_accepted
                     return
             elif (self.fdevice_status == ConnectionStatus.connection_accepted):
+                self.fdevice_status = ConnectionStatus.device_registered
+                print("Device Fully registered")
+
                 if (self.fmqtt_interface is not None):
                     #wait for other side of connection to finish
                     timer = Timer(5, self.__publish_topics)
-                    timer.start()
-                
-                #probably would be good to have some kind of response, etc for this 
-                self.fdevice_status = ConnectionStatus.device_registered
-                print("Device Fully registered")
+                    timer.start()                
                 return  
         
     def __publish_topics(self):
