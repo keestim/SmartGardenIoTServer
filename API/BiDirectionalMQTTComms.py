@@ -47,7 +47,9 @@ class BiDirectionalMQTTComms:
 
         self.fmqtt_subscriber_thread = None
 
-        self.ftopic_list = [("/edge_device/data", 0), ("/edge_device/setup_device", 0)]
+        self.ftopic_list = [("/edge_device/data", 0), 
+                            ("/edge_device/setup_device", 0), 
+                            ("edge_devices/control_device", 0)]
 
         self.client = None
         self.fdevice_status = ConnectionStatus.init
