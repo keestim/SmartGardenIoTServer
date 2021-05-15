@@ -16,7 +16,11 @@ class MQTTSniffer(threading.Thread):
 
     def run(self):
         for item in self.fcapture.sniff_continuously():
-            mqtt_data = item.mqtt
+            try:
+                mqtt_data = item.mqtt
+            except:
+                continue
+            
             ip_data = item.ip
 
             if (ip_data.src not in self.fmqtt_ip_addresses) and not(ip_data.src == self.fdevice_ip_address):
