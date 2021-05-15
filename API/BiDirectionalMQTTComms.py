@@ -51,28 +51,28 @@ class RegisterDeviceThread(threading.Thread):
         self.fpayload = payload
 
     def run(self):
-        if self.fdevice_status == ConnectionStatus.attempting_connection:
-            if (payload == "initial message"):
-                self.sendMsg("initial message received", "/edge_device/setup_device")
-            elif (payload == "initial message received"):
+        if self.fMQTT_comms.getDeviceStatus == ConnectionStatus.attempting_connection:
+            if (self.fpayload == "initial message"):
+                self.fMQTT_comms.sendMsg("initial message received", "/edge_device/setup_device")
+            elif (self.fpayload == "initial message received"):
                 #just incase, remove this!
-                self.sendMsg("initial message received", "/edge_device/setup_device")
-                self.fdevice_status = ConnectionStatus.connection_accepted
+                self.fMQTT_comms.sendMsg("initial message received", "/edge_device/setup_device")
+                self.fMQTT_comms.setDeviceStatus(ConnectionStatus.connection_accepted)
                 return
-        elif (self.fdevice_status == ConnectionStatus.connection_accepted):
-            if (self.fmqtt_interface is not None):
+        elif (self.fMQTT_comms.fdevice_status == ConnectionStatus.connection_accepted):
+            if (self.fMQTT_comms.fmqtt_interface is not None):
                 sleep(7)
 
                 #wait for other side of connection to finish
-                topics_json = json.dumps(self.fmqtt_interface.getTopicList())
+                topics_json = json.dumps(self.fMQTT_comms.fmqtt_interface.getTopicList())
                 #store stuff like "topics" and "device_type" as CONSTANTS!"
-                self.sendMsg(
+                self.fMQTT_comms.sendMsg(
                     str("{\"topics\": ") + str(topics_json) + ", " + 
-                        "\"device_type\": \"" + self.fmqtt_interface.getDeviceType() + "\"}", 
+                        "\"device_type\": \"" + self.fMQTT_comms.fmqtt_interface.getDeviceType() + "\"}", 
                         "/edge_device/setup_device")
             
             #probably would be good to have some kind of response, etc for this 
-            self.fdevice_status = ConnectionStatus.device_registered
+            self.fMQTT_comms.setDeviceStatus(ConnectionStatus.device_registered)
             return  
 
 class BiDirectionalMQTTComms:
