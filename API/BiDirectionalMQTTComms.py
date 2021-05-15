@@ -1,5 +1,6 @@
 from enum import Enum
 import threading
+from threading import Timer
 from time import sleep
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
@@ -141,19 +142,22 @@ class BiDirectionalMQTTComms:
             elif (self.fdevice_status == ConnectionStatus.connection_accepted):
                 if (self.fmqtt_interface is not None):
                     #wait for other side of connection to finish
-                    sleep(5)
-                    topics_json = json.dumps(self.fmqtt_interface.getTopicList())
-                    #store stuff like "topics" and "device_type" as CONSTANTS!"
-                    self.sendMsg(
-                        str("{\"topics\": ") + str(topics_json) + ", " + 
-                            "\"device_type\": \"" + self.fmqtt_interface.getDeviceType() + "\"}", 
-                            "/edge_device/setup_device")
+                    timer = Timer(5, self.__publish_topics)
+                    timer.start()
                 
                 #probably would be good to have some kind of response, etc for this 
                 self.fdevice_status = ConnectionStatus.device_registered
                 print("Device Fully registered")
                 return  
         
+    def __publish_topics(self):
+        topics_json = json.dumps(self.fmqtt_interface.getTopicList())
+        #store stuff like "topics" and "device_type" as CONSTANTS!"
+        self.sendMsg(
+            str("{\"topics\": ") + str(topics_json) + ", " + 
+                "\"device_type\": \"" + self.fmqtt_interface.getDeviceType() + "\"}", 
+                "/edge_device/setup_device")
+
     def __setupReader(self):
         print("setup reader for: " + self.fdest_ip_address + "|" + self.fdevice_ip_address)
         self.client = mqtt.Client()
