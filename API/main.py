@@ -1,44 +1,61 @@
 from flask import Flask, request, jsonify
-import paho.mqtt.client as mqtt
-import paho.mqtt.client as publish
+import threading
+import pyshark
+from time import sleep  
+from helper_functions import *
 
-class MQTTReader:
-    def __init__(self, topic, ipAddress, port = 1883, keepAlive = 60):
-        self.fipAddress = ipAddress
-        self.fport = port
-        self.ftopic = topic
-        self.fkeepAlive = keepAlive
-        self.client = self.__setupReader()
-        
-    def __setupReader(self):
-        result = mqtt.Client()
-        result.on_connect = self.__onConnect
-        result.on_message = self.__onMessage
-        result.connect(self.fipAddress, self.fport, self.fkeepAlive)
+from BiDirectionalMQTTComms import * 
+class MQTTSniffer(threading.Thread):
+    def __init__(self, connection_list):
+        super().__init__()
+        self.fmqtt_ip_addresses = []
+        self.fdevice_ip_address = get_ip()
+        self.fcapture = pyshark.LiveCapture(interface='enp0s25')
+        self.fconnection_list = connection_list
 
-        result.loop_forever()
+    def run(self):
+        for item in self.fcapture.sniff_continuously():
+            try:
+                mqtt_data = item.mqtt
+                ip_data = item.ip
 
-    def __onConnect(self, client, userData, flags, responseCode):
-        self.client.subscribe(self.topic)
+                if (ip_data.src not in self.fmqtt_ip_addresses) and not(ip_data.src == self.fdevice_ip_address):
+                    self.fmqtt_ip_addresses.append(ip_data.src)
 
-    def __onMessage(self, client, userData, msg):
-        print(msg)
+                    print(mqtt_data)
+                    print("New IP: " + ip_data.src)
+                    
+                    print("New Connection")
+                    new_mqtt_connection = BiDirectionalMQTTComms(self.fdevice_ip_address, ip_data.src)
+                    self.fconnection_list.append(new_mqtt_connection)
 
-class MQTTWriter():
-    def __init__(self, ipAddress, topic):
-        self.fipAddrerss = ipAddress
-        self.ftopic = topic
+                    print(len(self.fconnection_list))
 
-    def sendMsg(self, msgText):
-        publish.single(self.fipAddrerss, msgText, hostname = self.fipAddrerss)
+            except:
+                continue
 
 #https://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
-app = flask.Flask(__name__)
+app = Flask(__name__)
 app.config["DEBUG"] = True
 
 @app.route('/', methods=['GET'])
+def home():
+    return "API Test"
 
+@app.route("/probe_devices", methods=['GET'])
+def probe_devices():
+    devices_str = ""
 
+    for device in mqtt_sniffer.fconnection_list:
+        devices_str = devices_str + ", " + device.fdest_ip_address
+        device.sendMsg("The bois")
 
+    return devices_str
 
-app.run()
+if __name__ == "__main__":
+    active_mqtt_connections = []
+    mqtt_sniffer = MQTTSniffer(active_mqtt_connections)
+    mqtt_sniffer.start()
+    app.run()
+    
+
