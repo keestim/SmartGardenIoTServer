@@ -24,14 +24,14 @@ class MQTTSniffer(threading.Thread):
             ip_data = item.ip
 
             if (ip_data.src not in self.fmqtt_ip_addresses) and not(ip_data.src == self.fdevice_ip_address):
+                print("NEW IP DISCOVERED!")
                 self.fmqtt_ip_addresses.append(ip_data.src)
 
                 print(mqtt_data)
                 print("New IP: " + ip_data.src)
                 
                 print("New Connection")
-                new_mqtt_connection = BiDirectionalMQTTComms(self.fdevice_ip_address, ip_data.src)
-                self.fconnection_list.append(new_mqtt_connection)
+                self.fconnection_list.append(BiDirectionalMQTTComms(self.fdevice_ip_address, ip_data.src))
 
                 print(len(self.fconnection_list))
 
