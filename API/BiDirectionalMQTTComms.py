@@ -43,6 +43,38 @@ class MQTTConnectInitializer(threading.Thread):
                 self.fmqtt_bi_comms.fconnection_setup_lock.release()
                 sleep(1)
 
+class RegisterDeviceThread(threading.Thread):
+    def __init__(self, MQTT_comms, topic, payload):
+        super().__init__()
+        self.fMQTT_comms = MQTT_comms
+        self.ftopic = topic
+        self.fpayload = payload
+
+    def run(self):
+        if self.fdevice_status == ConnectionStatus.attempting_connection:
+            if (payload == "initial message"):
+                self.sendMsg("initial message received", "/edge_device/setup_device")
+            elif (payload == "initial message received"):
+                #just incase, remove this!
+                self.sendMsg("initial message received", "/edge_device/setup_device")
+                self.fdevice_status = ConnectionStatus.connection_accepted
+                return
+        elif (self.fdevice_status == ConnectionStatus.connection_accepted):
+            if (self.fmqtt_interface is not None):
+                sleep(7)
+
+                #wait for other side of connection to finish
+                topics_json = json.dumps(self.fmqtt_interface.getTopicList())
+                #store stuff like "topics" and "device_type" as CONSTANTS!"
+                self.sendMsg(
+                    str("{\"topics\": ") + str(topics_json) + ", " + 
+                        "\"device_type\": \"" + self.fmqtt_interface.getDeviceType() + "\"}", 
+                        "/edge_device/setup_device")
+            
+            #probably would be good to have some kind of response, etc for this 
+            self.fdevice_status = ConnectionStatus.device_registered
+            return  
+
 class BiDirectionalMQTTComms:
     def __init__(self, device_ip_address, dest_ip_address, mqtt_interface = None, port = 1883, keepAlive = 60):
         self.fdest_ip_address = dest_ip_address
@@ -124,33 +156,8 @@ class BiDirectionalMQTTComms:
                 if self.fmqtt_interface is not None:
                     self.fmqtt_interface.onMessage(topic, payload)
         else:
-            self.__registerDevice(topic, payload)    
-
-    def __registerDevice(self, topic, payload):
-        with self.fconnection_setup_lock:
-            if self.fdevice_status == ConnectionStatus.attempting_connection:
-                if (payload == "initial message"):
-                    self.sendMsg("initial message received", "/edge_device/setup_device")
-                elif (payload == "initial message received"):
-                    #just incase, remove this!
-                    self.sendMsg("initial message received", "/edge_device/setup_device")
-                    self.fdevice_status = ConnectionStatus.connection_accepted
-                    return
-            elif (self.fdevice_status == ConnectionStatus.connection_accepted):
-                if (self.fmqtt_interface is not None):
-                    sleep(7)
-
-                    #wait for other side of connection to finish
-                    topics_json = json.dumps(self.fmqtt_interface.getTopicList())
-                    #store stuff like "topics" and "device_type" as CONSTANTS!"
-                    self.sendMsg(
-                        str("{\"topics\": ") + str(topics_json) + ", " + 
-                            "\"device_type\": \"" + self.fmqtt_interface.getDeviceType() + "\"}", 
-                            "/edge_device/setup_device")
-                
-                #probably would be good to have some kind of response, etc for this 
-                self.fdevice_status = ConnectionStatus.device_registered
-                return  
+            registration_thread = RegisterDeviceThread(self, topic, payload)
+            registration_thread.start()
         
     def __setupReader(self):
         print("setup reader for: " + self.fdest_ip_address + "|" + self.fdevice_ip_address)
@@ -165,6 +172,9 @@ class BiDirectionalMQTTComms:
 
     def getDeviceStatus(self):
         return self.fdevice_status
+
+    def setDeviceStatus(self, new_status):
+        self.fdevice_status = new_status
 
     def sendMsg(self, msgText, topic = "/edge_device/data"):
         print(Fore.YELLOW + "sending msg: " + msgText + " | " + self.fdest_ip_address)
