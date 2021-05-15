@@ -102,6 +102,7 @@ class BiDirectionalMQTTComms:
         self.client.subscribe(self.ftopic_list)
 
     def __assignDeviceInterface(self, payload):
+        print("ASSIGNING INTERFACE: " + self.fdest_ip_address)
         json_output = json.loads(payload)
         device_type = json_output["device_type"]
 
