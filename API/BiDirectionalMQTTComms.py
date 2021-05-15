@@ -125,6 +125,10 @@ class BiDirectionalMQTTComms:
         topic = msg.topic
         payload = msg.payload.decode('ascii')
 
+        print(topic + ", " + str(payload) + "|" + self.fdest_ip_address)
+        print("Current Status:")
+        print(self.fdevice_status)
+
         if self.fdevice_status == ConnectionStatus.device_registered:
             if (payload == "initial message"):
                 self.sendMsg("initial message received", "/edge_device/setup_device")
@@ -135,8 +139,6 @@ class BiDirectionalMQTTComms:
 
                 self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
             else:
-                print(topic + ", " + str(payload) + "|" + self.fdest_ip_address)
-
                 if self.fmqtt_interface is not None:
                     self.fmqtt_interface.onMessage(topic, payload)
         else:
