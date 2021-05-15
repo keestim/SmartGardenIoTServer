@@ -22,16 +22,17 @@ class MQTTSubscriberThread(threading.Thread):
         self.fmqtt_client.loop_forever()
 
 class MQTTConnectInitializer(threading.Thread):
-    def __init__(self):
+    def __init__(self, mqtt_bi_comms):
         super().__init__()
+        self.fmqtt_bi_comms = mqtt_bi_comms
         
-    def run(self, mqtt_bi_comms):
+    def run(self):
         while True:
-            if mqtt_bi_comms.getDeviceStatus() == ConnectionStatus.init:
-                mqtt_bi_comms.fdevice_status = ConnectionStatus.attempting_connection
-                mqtt_bi_comms.sendMsg("broadcast", "/edge_device/setup_device")
-            elif mqtt_bi_comms.getDeviceStatus() == ConnectionStatus.attempting_connection:
-                mqtt_bi_comms.sendMsg("initial message", "/edge_device/setup_device")
+            if self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.init:
+                self.fmqtt_bi_comms.fdevice_status = ConnectionStatus.attempting_connection
+                self.fmqtt_bi_comms.sendMsg("broadcast", "/edge_device/setup_device")
+            elif self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.attempting_connection:
+                self.fmqtt_bi_comms.sendMsg("initial message", "/edge_device/setup_device")
             else:
                 exit()
 
@@ -45,7 +46,6 @@ class RegisterDeviceThread(threading.Thread):
         self.fpayload = payload
 
     def run(self):
-        print("THREAD: " + self.fpayload)
         if self.fMQTT_comms.getDeviceStatus == ConnectionStatus.attempting_connection:
             if (self.fpayload == "initial message"):
                 self.fMQTT_comms.sendMsg("initial message received", "/edge_device/setup_device")
@@ -95,8 +95,8 @@ class BiDirectionalMQTTComms:
 
         self.fconnection_setup_lock = threading.Lock()
 
-        self.mqtt_connection_initalizer = MQTTConnectInitializer()
-        self.mqtt_connection_initalizer.start(self)
+        self.mqtt_connection_initalizer = MQTTConnectInitializer(self)
+        self.mqtt_connection_initalizer.start()
 
         #create a set, so that this can be set through MQTTConnectInitializer
         
