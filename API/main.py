@@ -63,7 +63,7 @@ def flash_all_lights():
 
     return "Flash LIGHTS!"
 
-@app.route("/get_device_details")
+@app.route("/get_device_details", methods=['GET'])
 def get_device_details():
     output_str = ""
 
