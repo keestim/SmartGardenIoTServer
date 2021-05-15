@@ -92,6 +92,9 @@ class BiDirectionalMQTTComms:
                     str("{\"topics\": ") + str(topics_json) + ", " + 
                         "\"device_type\": \"" + self.fmqtt_interface.getDeviceType() + "\"}", 
                         "/edge_device/setup_device")
+            
+            #probably would be good to have some kind of response, etc for this 
+            self.fdevice_status = ConnectionStatus.device_registered
 
     def __encodeTopicsString(self, payload):
         print(payload)
