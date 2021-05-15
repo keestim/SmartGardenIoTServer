@@ -70,7 +70,7 @@ def get_device_details():
     for device in mqtt_sniffer.fconnection_list:
         if device.fmqtt_interface != None:
             device_interface = device.fmqtt_interface
-            output_str = output_str + device_interface.fDeviceType + "," + device_interface.ftype_id + "<br/>"
+            output_str = output_str + device_interface.fDeviceType + "," + str(device_interface.ftype_id) + "<br/>"
     
     return output_str
 
