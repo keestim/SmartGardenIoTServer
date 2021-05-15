@@ -27,13 +27,14 @@ class MQTTConnectInitializer(threading.Thread):
         
     def run(self):
         while True:
+            print("ATTEMPT CONNECTION!")
             if self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.init:
                 print("Send Broadcast!")
                 self.fmqtt_bi_comms.fdevice_status = ConnectionStatus.attempting_connection
                 self.fmqtt_bi_comms.sendMsg("broadcast", "/edge_device/setup_device")
             elif self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.attempting_connection:
                 self.fmqtt_bi_comms.sendMsg("initial message", "/edge_device/setup_device")
-            elif ((self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.connection_accepted) or (self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.device_registered)):
+            else:
                 exit()
 
             sleep(1)
