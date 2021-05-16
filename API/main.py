@@ -21,6 +21,8 @@ class MQTTSniffer(threading.Thread):
         for item in self.fcapture.sniff_continuously():
             try:
                 new_connection_lock.acquire()
+            except:
+                continue
             finally:
                 try:
                     ip_data = item.ip
