@@ -22,7 +22,7 @@ class MQTTSniffer(threading.Thread):
         self.fcapture = pyshark.LiveCapture(interface = interfacename)
 
     def run(self):
-        while True:
+        for item in self.fcapture.sniff_continuously():
             try:
                 new_connection_lock.acquire()
             finally:
