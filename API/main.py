@@ -23,23 +23,23 @@ class MQTTSniffer(threading.Thread):
                 new_connection_lock.acquire()
             except:
                 continue
-            finally:
-                try:
-                    ip_data = item.ip
-                    mqtt_data = item.mqtt
-                except:
-                    new_connection_lock.release()
-                    continue
-                                
-                if (ip_data.src not in mqtt_ip_addresses) and not(ip_data.src == device_ip_address):
-                    mqtt_ip_addresses.append(ip_data.src)
-
-                    print(mqtt_data)
-                    print("Setting up MQTT Connection with IP: " + ip_data.src)
-                    
-                    connection_list.append(BiDirectionalMQTTComms(device_ip_address, ip_data.src))
-
+            
+            try:
+                ip_data = item.ip
+                mqtt_data = item.mqtt
+            except:
                 new_connection_lock.release()
+                continue
+                            
+            if (ip_data.src not in mqtt_ip_addresses) and not(ip_data.src == device_ip_address):
+                mqtt_ip_addresses.append(ip_data.src)
+
+                print(mqtt_data)
+                print("Setting up MQTT Connection with IP: " + ip_data.src)
+                
+                connection_list.append(BiDirectionalMQTTComms(device_ip_address, ip_data.src))
+
+            new_connection_lock.release()
 
 #https://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
 app = Flask(__name__)
