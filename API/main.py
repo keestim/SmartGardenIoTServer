@@ -6,6 +6,10 @@ from helper_functions import *
 import sys
 from BiDirectionalMQTTComms import * 
 
+global add_new_connection_lock
+global mqtt_ip_addresses
+global connection_list
+
 connection_list = []
 mqtt_ip_addresses = []
 device_ip_address = get_ip()
@@ -18,7 +22,7 @@ class MQTTSniffer(threading.Thread):
         self.fcapture = pyshark.LiveCapture(interface = interfacename)
 
     def run(self):
-        for item in self.fcapture.sniff_continuously():
+        while True:
             try:
                 new_connection_lock.acquire()
             finally:

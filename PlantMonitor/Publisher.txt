@@ -1,0 +1,57 @@
+
+import paho.mqtt.publish as publish
+import serial
+from picamera import PiCamera
+from time import sleep
+import datetime
+
+#send data over MQTT
+def send_data(moistureData, tempData, humidData, date, img_path):
+        #ip address set
+        ip_address = "192.168.0.11"
+
+        #setup for pic publish
+        f = open(img_path, "rb")
+        fileContent = f.read()
+        byteArr = bytearray(fileContent)
+
+        #publishing data over to client
+        #moisture, temp and humid
+        publish.single("/edge_device/PlantData","{'dateTime': %s, 'moisture': %s, 'temperature': %s, 'humidity': %s}" %( date$
+
+        #publish pic
+        publish.single("/edge_device/Picture", byteArr, hostname = ip_address)
+
+#camera take picture
+def capture_photo(date, img_path):
+        #setup variables
+        camera = PiCamera()
+        capture_img = '/home/pi/Desktop/images/picture_' + date + '.jpg'
+
+        #annotates picture with date
+        camera.annotate_text = date
+
+        #capture image
+        camera.capture(capture_img)
+
+#main###########################################################
+
+#date,time and image path
+date = datetime.datetime.now().strftime('%m-%d-%Y_%H.%M.%S')
+img_path = '/home/pi/Desktop/images/picture_' + date + '.jpg'
+
+#Setup Serial and flush
+arduino = serial.Serial('/dev/ttyACM0', 9600)
+arduino.flush()
+
+#data read in
+moisture = float(arduino.readline().decode())
+temp = float(arduino.readline().decode())
+humid = float(arduino.readline().decode())
+
+#run functions
+capture_photo(date, img_path)
+send_data(moisture, temp, humid, date, img_path)
+
+################################################################
+
