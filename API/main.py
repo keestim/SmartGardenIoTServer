@@ -4,15 +4,16 @@ import pyshark
 from time import sleep  
 from helper_functions import *
 import sys
-
 from BiDirectionalMQTTComms import * 
+
+connection_list = []
+mqtt_ip_addresses = []
+
 class MQTTSniffer(threading.Thread):
     def __init__(self, interfacename):
         super().__init__()
-        self.fmqtt_ip_addresses = []
         self.fdevice_ip_address = get_ip()
         self.fcapture = pyshark.LiveCapture(interface = interfacename)
-        self.fconnection_list = []
 
     def run(self):
         for item in self.fcapture.sniff_continuously():
@@ -23,13 +24,13 @@ class MQTTSniffer(threading.Thread):
             
             ip_data = item.ip
 
-            if (ip_data.src not in self.fmqtt_ip_addresses) and not(ip_data.src == self.fdevice_ip_address):
-                self.fmqtt_ip_addresses.append(ip_data.src)
+            if (ip_data.src not in mqtt_ip_addresses) and not(ip_data.src == self.fdevice_ip_address):
+                mqtt_ip_addresses.append(ip_data.src)
 
                 print(mqtt_data)
                 print("Setting up MQTT Connection with IP: " + ip_data.src)
                 
-                self.fconnection_list.append(BiDirectionalMQTTComms(self.fdevice_ip_address, ip_data.src))
+                connection_list.append(BiDirectionalMQTTComms(self.fdevice_ip_address, ip_data.src))
 
 #https://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
 app = Flask(__name__)
@@ -43,7 +44,7 @@ def home():
 def probe_devices():
     devices_str = ""
 
-    for device in mqtt_sniffer.fconnection_list:
+    for device in connection_list:
         devices_str = devices_str + device.fdest_ip_address + ", "
         device.sendMsg("The bois")
 
@@ -51,7 +52,7 @@ def probe_devices():
 
 @app.route("/flash_all_lights", methods=['GET'])
 def flash_all_lights():
-    for device in mqtt_sniffer.fconnection_list:
+    for device in connection_list:
         if device.fmqtt_interface != None:
             msg_details = getattr(device.fmqtt_interface, 'blinkLED')()
             print(msg_details)
@@ -63,7 +64,7 @@ def flash_all_lights():
 def get_device_details():
     output_str = ""
 
-    for device in mqtt_sniffer.fconnection_list:
+    for device in connection_list:
         if device.fmqtt_interface != None:
             device_interface = device.fmqtt_interface
             output_str = output_str + device_interface.fDeviceType + "," + str(device_interface.ftype_id) + "<br/>"
