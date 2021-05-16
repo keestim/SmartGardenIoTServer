@@ -44,7 +44,7 @@ class CommunicationInterface():
 		self.fmoisture = value
 
 	def getPlantDataMsg(self):
-		return "{'dateTime': %s, 'moisture': %s, 'temperature': %s, 'humidity': %s}" % (self.getDate(), self.fMoisture, self.ftemperature, self.fhumidity) 
+		return "{'dateTime': %s, 'moisture': %s, 'temperature': %s, 'humidity': %s}" % (self.getDate(), self.fmoisture, self.ftemperature, self.fhumidity) 
 
 	def capture_photo(self, img_path = '/home/pi/Desktop/images/'):
 		#setup variables
