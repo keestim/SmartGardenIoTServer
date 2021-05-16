@@ -46,13 +46,13 @@ class CommunicationInterface():
 	def getPlantDataMsg(self):
 		return "{'dateTime': %s, 'moisture': %s, 'temperature': %s, 'humidity': %s}" % (self.getDate(), self.fMoisture, self.ftemperature, self.fhumidity) 
 
-	def capture_photo(self, date, img_path = '/home/pi/Desktop/images/'):
+	def capture_photo(self, img_path = '/home/pi/Desktop/images/'):
 		#setup variables
 		camera = PiCamera()
 		capture_img_path = img_path + 'picture_' + self.getDate() + '.jpg'
 
 		#annotates picture with date
-		camera.annotate_text = date
+		camera.annotate_text = self.getDate()
 
 		#capture image
 		camera.capture(capture_img_path)
