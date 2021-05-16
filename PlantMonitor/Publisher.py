@@ -5,13 +5,16 @@ import paho.mqtt.publish as publish
 from time import sleep
 import threading
 import sys
-from helper_functions import *
 import serial
 from picamera import PiCamera
 from time import sleep
 import datetime
 
-from BiDirectionalMQTTComms import * 
+import repackage
+repackage.up()
+from SharedClasses.BiDirectionalMQTTComms import * 
+from SharedClasses.DeviceInterface import * 
+from SharedClasses.helper_functions import * 
 
 class CommunicationInterface():
 	def __init__(self, device_type, topics):
@@ -44,15 +47,15 @@ class CommunicationInterface():
 		self.fmoisture = value
 
 	def getPlantDataMsg(self):
-		return "{'dateTime': %s, 'moisture': %s, 'temperature': %s, 'humidity': %s}" % (self.getDate(), self.fMoisture, self.ftemperature, self.fhumidity) 
+		return "{'dateTime': %s, 'moisture': %s, 'temperature': %s, 'humidity': %s}" % (self.getDate(), self.fmoisture, self.ftemperature, self.fhumidity) 
 
-	def capture_photo(self, date, img_path = '/home/pi/Desktop/images/'):
+	def capture_photo(self, img_path = '/home/pi/Desktop/images/'):
 		#setup variables
 		camera = PiCamera()
-		capture_img_path = img_path + 'picture_' + date + '.jpg'
+		capture_img_path = img_path + 'picture_' + self.getDate() + '.jpg'
 
 		#annotates picture with date
-		camera.annotate_text = date
+		camera.annotate_text = self.getDate()
 
 		#capture image
 		camera.capture(capture_img_path)
@@ -88,24 +91,18 @@ if __name__ == "__main__":
 	
 	mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, interface_obj)
 
-	#arduino = serial.Serial('/dev/ttyACM0', 9600)
+	arduino = serial.Serial('/dev/ttyACM0', 9600)
 
 	while True:
-		#arduino.flush()
+		arduino.flush()
 
 		#data read in
-		'''
 		interface_obj.setMoisture(float(arduino.readline().decode()))
 		interface_obj.setTemperature(float(arduino.readline().decode()))
 		interface_obj.setHumidity(float(arduino.readline().decode()))
-		'''
+		
+		img_path = interface_obj.capture_photo()
 
-		interface_obj.setMoisture(0)
-		interface_obj.setTemperature(0)
-		interface_obj.setHumidity(0)
-
-		img_path = capture_photo()
-
-		mqtt_interface.sendMsg("/edge_device/PlantData", interface_obj.getPlantDataMsg())
-		mqtt_interface.sendMsg("/edge_device/Picture", interface_obj.getCameraDataMsg(img_path))
+		mqtt_interface.sendMsg(interface_obj.getPlantDataMsg(), "/edge_device/PlantData")
+		mqtt_interface.sendMsg(interface_obj.getCameraDataMsg(img_path), "/edge_device/Picture")
 		
