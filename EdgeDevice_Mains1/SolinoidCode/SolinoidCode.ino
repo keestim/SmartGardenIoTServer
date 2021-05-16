@@ -1,6 +1,8 @@
 int solenoidPin = 4;    //This is the output pin on the Arduino we are using
 bool solOnOff = false;
 int state = 1; //start in close position
+int LED = 7; // led pin
+int counter = 0; //counter gets set to 20 to blink the LED 10 times
 
 // FLOWRATE
   volatile int flow_frequency; // Measures flow sensor pulses
@@ -17,13 +19,15 @@ int state = 1; //start in close position
 void setup() {
   // put your setup code here, to run once:
   pinMode(solenoidPin, OUTPUT);           //Sets the pin as an output
+  pinMode(LED, OUTPUT);
   Serial.begin(9600);
   digitalWrite(flowsensor, HIGH); // Optional Internal Pull-Up
   attachInterrupt(digitalPinToInterrupt(flowsensor), flow, RISING); // Setup Interrupt
+  digitalWrite(LED, LOW);
 }
  
 void loop() {
-
+ Serial.println(counter);
 if (skipflow < 1)
    {
   if(flow_frequency != 0)
@@ -55,11 +59,24 @@ if (skipflow < 1)
     //Serial.println("Closed");
     Serial.println(state);
     }
-  if (state == 2
-  ) {
+  if (state == 2) 
+    {
     solOnOff = true;
     //Serial.println("Open");
     Serial.println(state);
+    }
+    if (state == 3) 
+    {
+    counter = 10;
+    state = 0;
+    }
+
+    if (counter > 0)
+    {
+      counter--;
+      digitalWrite(LED, HIGH);
+      delay(1000);
+      digitalWrite(LED, LOW);
     }
   
   if (solOnOff == true)
