@@ -8,11 +8,11 @@ from BiDirectionalMQTTComms import *
 
 connection_list = []
 mqtt_ip_addresses = []
+device_ip_address = get_ip()
 
 class MQTTSniffer(threading.Thread):
     def __init__(self, interfacename):
         super().__init__()
-        self.fdevice_ip_address = get_ip()
         self.fcapture = pyshark.LiveCapture(interface = interfacename)
 
     def run(self):
@@ -24,13 +24,13 @@ class MQTTSniffer(threading.Thread):
             
             ip_data = item.ip
 
-            if (ip_data.src not in mqtt_ip_addresses) and not(ip_data.src == self.fdevice_ip_address):
+            if (ip_data.src not in mqtt_ip_addresses) and not(ip_data.src == device_ip_address):
                 mqtt_ip_addresses.append(ip_data.src)
 
                 print(mqtt_data)
                 print("Setting up MQTT Connection with IP: " + ip_data.src)
                 
-                connection_list.append(BiDirectionalMQTTComms(self.fdevice_ip_address, ip_data.src))
+                connection_list.append(BiDirectionalMQTTComms(device_ip_address, ip_data.src))
 
 #https://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
 app = Flask(__name__)
