@@ -101,8 +101,8 @@ if __name__ == "__main__":
 		interface_obj.setTemperature(float(arduino.readline().decode()))
 		interface_obj.setHumidity(float(arduino.readline().decode()))
 		
-		img_path = interface_obj.capture_photo()
+		#img_path = interface_obj.capture_photo()
 
 		mqtt_interface.sendMsg(interface_obj.getPlantDataMsg(), "/edge_device/PlantData")
-		mqtt_interface.sendMsg(interface_obj.getCameraDataMsg(img_path), "/edge_device/Picture")
+		#mqtt_interface.sendMsg(interface_obj.getCameraDataMsg(img_path), "/edge_device/Picture")
 		
