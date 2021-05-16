@@ -4,6 +4,7 @@ from time import sleep
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 import json
+from DeviceInterface import *
 
 class ConnectionStatus(Enum):
     init = 1
@@ -46,18 +47,21 @@ class BiDirectionalMQTTComms:
 
         self.fmqtt_subscriber_thread = None
 
-        self.ftopic_list = [("/edge_device/data", 0), ("/edge_device/setup_device", 0)]
+        #initial topics for all connected devices
+        self.ftopic_list = [("/edge_device/data", 0), 
+                            ("/edge_device/setup_device", 0), 
+                            ("edge_devices/control_device", 0)]
 
         self.client = None
         self.fdevice_status = ConnectionStatus.init
 
         self.fdevice_type = ""
 
-        sleep(1)
         self.__setupReader()
 
         self.mqtt_connection_initalizer = MQTTConnectInitializer(self)
         self.mqtt_connection_initalizer.start()
+        self.fdevice_status = ConnectionStatus.attempting_connection
 
     def getDestinationIPAddress(self):
         return self.fdest_ip_address
@@ -77,11 +81,16 @@ class BiDirectionalMQTTComms:
 
                 if (self.fmqtt_interface is not None):
                     topics_json = json.dumps(self.fmqtt_interface.getTopicList())
-                    self.sendMsg(str("{\"topics\": ") + str(topics_json) + "}", "/edge_device/setup_device")
+                    #store stuff like "topics" and "device_type" as CONSTANTS!"
+                    self.sendMsg(
+                        str("{\"topics\": ") + str(topics_json) + ", " + 
+                            "\"device_type\": \"" + self.fmqtt_interface.getDeviceType() + "\"}", 
+                            "/edge_device/setup_device")
 
     def __encodeTopicsString(self, payload):
-        topics = json.loads(payload)
-        topics = topics["topics"]
+        print(payload)
+        json_output = json.loads(payload)
+        topics = json_output["topics"]
 
         result_arr = []
         
@@ -93,6 +102,16 @@ class BiDirectionalMQTTComms:
     def __onConnect(self, client, userData, flags, responseCode):
         self.client.subscribe(self.ftopic_list)
 
+    def __assignDeviceInterface(self, payload):
+        if self.fmqtt_interface is None:
+            json_output = json.loads(payload)
+            device_type = json_output["device_type"]
+
+            #maybe use some kind of static enum?
+            print("device type: " + str(device_type))
+            if (device_type == "PlantMonitor"):
+                self.fmqtt_interface = PlantMonitorInterface()
+
     def __onMessage(self, client, userData, msg):
         topic = msg.topic
         payload = msg.payload.decode('ascii')
@@ -102,10 +121,10 @@ class BiDirectionalMQTTComms:
                 self.sendMsg("initial message received", "/edge_device/setup_device")
             elif ("topics" in payload):
                 self.ftopic_list = self.__encodeTopicsString(payload)
+                self.__assignDeviceInterface(payload)
+
                 self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
             else:
-                print(topic + ", " + str(payload))
-
                 if self.fmqtt_interface is not None:
                     self.fmqtt_interface.onMessage(topic, payload)
         else:
@@ -120,11 +139,6 @@ class BiDirectionalMQTTComms:
 
         self.fmqtt_subscriber_thread = MQTTSubscriberThread(self.client)
         self.fmqtt_subscriber_thread.start()
-
-        self.sendMsg("broadcast", "/edge_device/setup_device")
-        self.fdevice_status = ConnectionStatus.attempting_connection
-
-        self.sendMsg("initial message", "/edge_device/setup_device")
 
     def getDeviceStatus(self):
         return self.fdevice_status
