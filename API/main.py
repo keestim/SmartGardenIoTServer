@@ -9,28 +9,35 @@ from BiDirectionalMQTTComms import *
 connection_list = []
 mqtt_ip_addresses = []
 device_ip_address = get_ip()
+new_connection_lock = threading.Lock()
 
 class MQTTSniffer(threading.Thread):
     def __init__(self, interfacename):
+        global new_connection_lock
         super().__init__()
         self.fcapture = pyshark.LiveCapture(interface = interfacename)
 
     def run(self):
         for item in self.fcapture.sniff_continuously():
             try:
-                mqtt_data = item.mqtt
-            except:
-                continue
-            
-            ip_data = item.ip
+                new_connection_lock.acquire()
+            finally:
+                try:
+                    ip_data = item.ip
+                    mqtt_data = item.mqtt
+                except:
+                    new_connection_lock.release()
+                    continue
+                                
+                if (ip_data.src not in mqtt_ip_addresses) and not(ip_data.src == device_ip_address):
+                    mqtt_ip_addresses.append(ip_data.src)
 
-            if (ip_data.src not in mqtt_ip_addresses) and not(ip_data.src == device_ip_address):
-                mqtt_ip_addresses.append(ip_data.src)
+                    print(mqtt_data)
+                    print("Setting up MQTT Connection with IP: " + ip_data.src)
+                    
+                    connection_list.append(BiDirectionalMQTTComms(device_ip_address, ip_data.src))
 
-                print(mqtt_data)
-                print("Setting up MQTT Connection with IP: " + ip_data.src)
-                
-                connection_list.append(BiDirectionalMQTTComms(device_ip_address, ip_data.src))
+                new_connection_lock.release()
 
 #https://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
 app = Flask(__name__)
