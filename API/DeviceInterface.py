@@ -1,7 +1,6 @@
 import abc
 
-num_plant_devices = 0
-num_watering_devices = 0
+num_edge_devices = 0
 
 class DeviceInterface():
     def __init__(self, topics = ""):
@@ -23,36 +22,34 @@ class DeviceInterface():
         return output_msg
 
 class PlantMonitorInterface(DeviceInterface):
-    global num_plant_devices
+    global num_edge_devices
 
     def __init__(self): 
         super().__init__()
-        global num_plant_devices
         
         self.fTemperature = 0
         self.fMoisture = 0
         self.fHumidity = 0
         self.fDeviceType = "PlantMonitor"
         
-        self.ftype_id = num_plant_devices
-        num_plant_devices = num_plant_devices + 1
+        self.ftype_id = num_edge_devices
+        num_edge_devices = num_edge_devices + 1
 
     def onMessage(self, topic, payload):
         print(topic + "|" + payload)
 
 class WaterSystemInterface(DeviceInterface):
-    global num_watering_devices
+    global num_edge_devices
     
     def __init__(self):
         super().__init__()
-        global num_watering_devices
 
         self.fWaterVolume = 0
         self.fValueOpen = False
         self.fDeviceType = "WaterSystem"
 
-        self.ftype_id = num_watering_devices
-        num_watering_devices = num_watering_devices + 1
+        self.ftype_id = num_edge_devices
+        num_edge_devices = num_edge_devices + 1
 
     def onMessage(self, topic, payload):
         print(topic + "|" + payload)
