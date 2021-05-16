@@ -26,6 +26,7 @@ class PlantMonitorInterface(DeviceInterface):
 
     def __init__(self): 
         super().__init__()
+        global num_edge_devices
         
         self.fTemperature = 0
         self.fMoisture = 0
@@ -43,6 +44,7 @@ class WaterSystemInterface(DeviceInterface):
     
     def __init__(self):
         super().__init__()
+        global num_edge_devices
 
         self.fWaterVolume = 0
         self.fValueOpen = False
