@@ -88,24 +88,18 @@ if __name__ == "__main__":
 	
 	mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, interface_obj)
 
-	#arduino = serial.Serial('/dev/ttyACM0', 9600)
+	arduino = serial.Serial('/dev/ttyACM0', 9600)
 
 	while True:
-		#arduino.flush()
+		arduino.flush()
 
 		#data read in
-		'''
 		interface_obj.setMoisture(float(arduino.readline().decode()))
 		interface_obj.setTemperature(float(arduino.readline().decode()))
 		interface_obj.setHumidity(float(arduino.readline().decode()))
-		'''
-
-		interface_obj.setMoisture(0)
-		interface_obj.setTemperature(0)
-		interface_obj.setHumidity(0)
-
-		#img_path = interface_obj.capture_photo()
+		
+		img_path = interface_obj.capture_photo()
 
 		mqtt_interface.sendMsg(interface_obj.getPlantDataMsg(), "/edge_device/PlantData")
-		#mqtt_interface.sendMsg(interface_obj.getCameraDataMsg(img_path), "/edge_device/Picture")
+		mqtt_interface.sendMsg(interface_obj.getCameraDataMsg(img_path), "/edge_device/Picture")
 		
