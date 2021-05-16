@@ -24,21 +24,12 @@ class MQTTSniffer(threading.Thread):
             ip_data = item.ip
 
             if (ip_data.src not in self.fmqtt_ip_addresses) and not(ip_data.src == self.fdevice_ip_address):
-
-                print("Existing IP Addresses")
-                print(self.fmqtt_ip_addresses)
-
-                print("NEW IP DISCOVERED!")
                 self.fmqtt_ip_addresses.append(ip_data.src)
 
-                print(str(ip_data.src not in self.fmqtt_ip_addresses))
-
                 print(mqtt_data)
-                print("New IP: " + ip_data.src)
+                print("Setting up MQTT Connection with IP: " + ip_data.src)
                 
-                print("New Connection")
                 self.fconnection_list.append(BiDirectionalMQTTComms(self.fdevice_ip_address, ip_data.src))
-                print(len(self.fconnection_list))
 
 #https://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
 app = Flask(__name__)
