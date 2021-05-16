@@ -98,6 +98,7 @@ class BiDirectionalMQTTComms:
         for topic in topics:
             result_arr.append((topic, 0))
 
+        print(result_arr)
         return result_arr   
 
     def __onConnect(self, client, userData, flags, responseCode):
@@ -127,6 +128,7 @@ class BiDirectionalMQTTComms:
 
                 self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
             else:
+                print("attempt to display msg!")
                 if self.fmqtt_interface is not None:
                     self.fmqtt_interface.onMessage(topic, payload)
         else:

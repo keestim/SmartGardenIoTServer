@@ -106,6 +106,6 @@ if __name__ == "__main__":
 
 		#img_path = interface_obj.capture_photo()
 
-		mqtt_interface.sendMsg("/edge_device/PlantData", interface_obj.getPlantDataMsg())
-		#mqtt_interface.sendMsg("/edge_device/Picture", interface_obj.getCameraDataMsg(img_path))
+		mqtt_interface.sendMsg(interface_obj.getPlantDataMsg(), "/edge_device/PlantData")
+		#mqtt_interface.sendMsg(interface_obj.getCameraDataMsg(img_path), "/edge_device/Picture")
 		
