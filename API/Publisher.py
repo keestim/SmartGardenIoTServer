@@ -104,8 +104,8 @@ if __name__ == "__main__":
 		interface_obj.setTemperature(0)
 		interface_obj.setHumidity(0)
 
-		img_path = interface_obj.capture_photo()
+		#img_path = interface_obj.capture_photo()
 
 		mqtt_interface.sendMsg("/edge_device/PlantData", interface_obj.getPlantDataMsg())
-		mqtt_interface.sendMsg("/edge_device/Picture", interface_obj.getCameraDataMsg(img_path))
+		#mqtt_interface.sendMsg("/edge_device/Picture", interface_obj.getCameraDataMsg(img_path))
 		
