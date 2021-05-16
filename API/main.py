@@ -2,9 +2,13 @@ from flask import Flask, request, jsonify
 import threading
 import pyshark
 from time import sleep  
-from helper_functions import *
 import sys
-from BiDirectionalMQTTComms import * 
+
+import repackage
+repackage.up()
+from SharedClasses.BiDirectionalMQTTComms import * 
+from SharedClasses.DeviceInterface import * 
+from SharedClasses.helper_functions import * 
 
 connection_list = []
 mqtt_ip_addresses = []
@@ -23,7 +27,7 @@ class MQTTSniffer(threading.Thread):
                 new_connection_lock.acquire()
             except:
                 continue
-            
+
             try:
                 ip_data = item.ip
                 mqtt_data = item.mqtt

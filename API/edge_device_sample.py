@@ -5,9 +5,11 @@ import paho.mqtt.publish as publish
 from time import sleep
 import threading
 import sys
-from helper_functions import *
-
-from BiDirectionalMQTTComms import * 
+import repackage
+repackage.up()
+from SharedClasses.BiDirectionalMQTTComms import * 
+from SharedClasses.DeviceInterface import * 
+from SharedClasses.helper_functions import * 
 
 class CommunicationInterface():
     def __init__(self, device_type, topics):
