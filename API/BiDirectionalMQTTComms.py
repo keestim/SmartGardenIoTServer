@@ -25,6 +25,7 @@ class MQTTConnectInitializer(threading.Thread):
         self.fmqtt_bi_comms = mqtt_bi_comms
         
     def run(self):
+        print("run start messaging!")
         while True:
             if self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.init:
                 self.fmqtt_bi_comms.sendMsg("broadcast", "/edge_device/setup_device")
@@ -104,6 +105,7 @@ class BiDirectionalMQTTComms:
 
     def __assignDeviceInterface(self, payload):
         if self.fmqtt_interface is None:
+            print("ASSIGNING INTERFACE: " + self.fdest_ip_address)
             json_output = json.loads(payload)
             device_type = json_output["device_type"]
 
