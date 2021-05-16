@@ -49,7 +49,7 @@ class CommunicationInterface():
 	def capture_photo(self, date, img_path = '/home/pi/Desktop/images/'):
 		#setup variables
 		camera = PiCamera()
-		capture_img_path = img_path + 'picture_' + date + '.jpg'
+		capture_img_path = img_path + 'picture_' + self.getDate() + '.jpg'
 
 		#annotates picture with date
 		camera.annotate_text = date
