@@ -91,7 +91,7 @@ if __name__ == "__main__":
 	#arduino = serial.Serial('/dev/ttyACM0', 9600)
 
 	while True:
-		arduino.flush()
+		#arduino.flush()
 
 		#data read in
 		'''
