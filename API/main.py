@@ -6,9 +6,9 @@ import sys
 
 import repackage
 repackage.up()
-from SharedClasses.BiDirectionalMQTTComms import * 
 from SharedClasses.DeviceInterface import * 
 from SharedClasses.helper_functions import * 
+from SharedClasses.BiDirectionalMQTTComms import * 
 
 connection_list = []
 mqtt_ip_addresses = []
@@ -73,6 +73,36 @@ def flash_all_lights():
 
     return "Flash LIGHTS!"
 
+@app.route("/change_valve_state/<device_id>/<state>", methods=['GET'])
+def turn_on_valve(device_id, state):
+    output_str = ""
+
+    selected_device = None
+
+    #validate that id is an in
+
+    if state not in ["open", "closed"]:
+        return "invalid state provided"
+
+    for device in connection_list:
+        if device.fmqtt_interface != None:
+            print(device.fmqtt_interface)
+            if (type(device.fmqtt_interface) is WaterSystemInterface):
+                if (str(device.fmqtt_interface.getDeviceID()) == str(device_id)):
+                    selected_device = device
+                    break
+    
+    if selected_device is not None:
+        if state == "open":
+            msg_details = getattr(selected_device.fmqtt_interface, 'openValve')()
+        elif state == "closed":
+            msg_details = getattr(selected_device.fmqtt_interface, 'closeValve')()
+        
+        print(msg_details)
+        device.sendMsg(msg_details["payload"], msg_details["topic"])
+        
+    return "Pump " + state
+
 @app.route("/get_device_details", methods=['GET'])
 def get_device_details():
     output_str = ""
@@ -80,10 +110,9 @@ def get_device_details():
     for device in connection_list:
         if device.fmqtt_interface != None:
             device_interface = device.fmqtt_interface
-            output_str = output_str + device_interface.fDeviceType + "," + str(device_interface.ftype_id) + "<br/>"
+            output_str = output_str + device_interface.fDeviceType + "," + str(device_interface.getDeviceID()) + "<br/>"
     
     return output_str
-
 
 #something about avaliable methods?
 
