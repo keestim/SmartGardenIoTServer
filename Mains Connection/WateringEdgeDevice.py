@@ -38,7 +38,10 @@ class CommunicationInterface():
         return self.farduino
 
     def readArdinoSerial(self):
-        return self.farduino.read(self.farduino.inWaiting()).decode() 
+        try:
+            return self.farduino.read(self.farduino.inWaiting()).decode() 
+        except:
+            return ""
 
 global server_ip_address
 
