@@ -32,7 +32,7 @@ class CommunicationInterface():
         
         if ("valve_state" in payload):
             #fix this, try to pass payload straight in!
-            self.farduino.write(b'{"valve_state" : "open"}')
+            self.farduino.write(payload.encode('utf_8'))
 
     def getArdiuno(self):
         return self.farduino
