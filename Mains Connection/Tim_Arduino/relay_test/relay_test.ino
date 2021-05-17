@@ -33,9 +33,11 @@ void setup() {
   initialiseFlowMeter();
 }
 
-void blinkLed()
+void acuateBlinkLed()
 {
-  if (blinkLed)
+  Serial.write("BLINK LED");
+  
+  if (blinkLED)
   {
     for (int i = 0; i < 10; i++)
     {
@@ -105,7 +107,7 @@ void readFlowMeter(){
 
 //when every 0.5 seconds quickly close and open valve, to prevent any over pour issues, etc
 void loop() 
-{ 
+{
   readSerialMsgs();
   
   if (valveOpen)
@@ -117,21 +119,23 @@ void loop()
     totalMilliLitres = 0;
     digitalWrite(relayPin, LOW);
   }  
-
+  
   String waterVolumeJSON = "{\"total_volume\" : " + String(totalMilliLitres) + ", \"pump_state\" : " + String(valveOpen) + "}\n";
   Serial.print(waterVolumeJSON);
 
-  blinkLed();
+  acuateBlinkLed();
+  delay(500);
 }
 
 void readSerialMsgs()
 {
-  DynamicJsonDocument doc(200);
   String serialMsg;
-
+  
   // put your main code here, to run repeatedly:
+
   while(Serial.available()) {
     delay(3);
+    Serial.print("Reading MSG");
     
     if (Serial.available() > 0) {
       serialMsg += char(Serial.read());// read the incoming data as string
@@ -140,6 +144,7 @@ void readSerialMsgs()
 
   if (serialMsg.length() > 0)
   {
+    DynamicJsonDocument doc(200);
     Serial.print(serialMsg);
     Serial.println("");
     
