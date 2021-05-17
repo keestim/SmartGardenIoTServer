@@ -53,6 +53,45 @@ app.config["DEBUG"] = True
 def home():
     return "API Test"
 
+
+@app.route("/get_device_details", methods=['GET'])
+def get_device_details():
+    output_str = ""
+
+    for device in connection_list:
+        if output_str == "":
+            output_str += "{"
+        else:
+            output_str += ", "
+
+        if device.fmqtt_interface != None:
+            device_interface = device.fmqtt_interface
+            output_str += "["
+            output_str += "[\"id\": " + int(device_interface.getDeviceID()) + ", "
+            output_str += "\"device_type\" : \"" + device_interface.getDeviceType() + "\""
+            output_str += "]"
+        
+    return output_str + "}"
+
+@app.route("/get_device_of_type/<type>", methods=['GET'])
+def get_device_of_type(type):
+    output_str = ""
+
+    for device in connection_list:
+        if output_str == "":
+            output_str += "{"
+        else:
+            output_str += ", "
+
+        if device.fmqtt_interface != None:
+            if (device.fmqtt_interface.getDeviceType() == type):
+                device_interface = device.fmqtt_interface
+                output_str += "["
+                output_str += "\"id\": " + int(device_interface.getDeviceID()) + ", " 
+                output_str += "\"device_type\" : \"" + device_interface.getDeviceType() + "\""
+                output_str += "]"
+    return output_str + "}"
+
 @app.route("/probe_devices", methods=['GET'])
 def probe_devices():
     devices_str = ""
@@ -101,17 +140,7 @@ def turn_on_valve(device_id, state):
         
     return "Pump " + state
 
-@app.route("/get_device_details", methods=['GET'])
-def get_device_details():
-    output_str = ""
-
-    for device in connection_list:
-        if device.fmqtt_interface != None:
-            device_interface = device.fmqtt_interface
-            output_str = output_str + device_interface.fDeviceType + "," + str(device_interface.getDeviceID()) + "<br/>"
-    
-    return output_str
-
+#better to spawn a therad for this
 @app.route("/water_set_volume/<device_id>/<volume>", methods=['GET'])
 def water_set_volume(device_id, volume):
     selected_device = None
@@ -143,6 +172,12 @@ def water_set_volume(device_id, volume):
 
 #something about avaliable methods?
 
+#probably swap to GET variables approach
+#this makes for a most readable URL
+@app.route("/water_plant_to_target_moisture/<plant_id>/<watering_id>/<target_moisture>")
+def water_plant_to_target_moisture():
+    return "Watering plant"
+
 if __name__ == "__main__":
     try:
         server_network_interface = sys.argv[1]
@@ -155,3 +190,4 @@ if __name__ == "__main__":
     app.run()
 
 #maybe something to add to note either client or server side
+#implement clean exit for script!

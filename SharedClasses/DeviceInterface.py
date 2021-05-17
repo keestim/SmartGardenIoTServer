@@ -30,6 +30,9 @@ class DeviceInterface():
     def getDeviceID(self):
         return self.fdevice_id
 
+    def getDeviceType(self):
+        return self.fDeviceType
+
 class PlantMonitorInterface(DeviceInterface):
     def __init__(self): 
         super().__init__()

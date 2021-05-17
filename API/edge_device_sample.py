@@ -46,7 +46,3 @@ if __name__ == "__main__":
                         "/edge_device/topic_stream"])
     
     mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, interface_obj)
-
-
-#PlantData
-#Picture
