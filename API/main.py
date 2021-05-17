@@ -83,7 +83,7 @@ def turn_on_valve(device_id):
         if device.fmqtt_interface != None:
             print(device.fmqtt_interface)
             if (type(device.fmqtt_interface) is WaterSystemInterface):
-                if (device.fmqtt_interface.getDeviceID() == device_id):
+                if (str(device.fmqtt_interface.getDeviceID()) == str(device_id)):
                     selected_device = device
                     break
     
