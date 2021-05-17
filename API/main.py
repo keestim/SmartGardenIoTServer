@@ -6,9 +6,9 @@ import sys
 
 import repackage
 repackage.up()
-from SharedClasses.BiDirectionalMQTTComms import * 
 from SharedClasses.DeviceInterface import * 
 from SharedClasses.helper_functions import * 
+from SharedClasses.BiDirectionalMQTTComms import * 
 
 connection_list = []
 mqtt_ip_addresses = []

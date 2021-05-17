@@ -4,6 +4,11 @@ from time import sleep
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 import json
+import sys
+import repackage
+repackage.up()
+from SharedClasses.DeviceInterface import * 
+from SharedClasses.helper_functions import * 
 
 class ConnectionStatus(Enum):
     init = 1
