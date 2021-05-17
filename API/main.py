@@ -73,11 +73,16 @@ def flash_all_lights():
 
     return "Flash LIGHTS!"
 
-@app.route("/turn_on_valve/<device_id>", methods=['GET'])
-def turn_on_valve(device_id):
+@app.route("/change_valve_state/<device_id>/<state>", methods=['GET'])
+def turn_on_valve(device_id, state):
     output_str = ""
 
     selected_device = None
+
+    #validate that id is an in
+
+    if state not in ["open", "closed"]:
+        return "invalid state provided"
 
     for device in connection_list:
         if device.fmqtt_interface != None:
@@ -88,11 +93,15 @@ def turn_on_valve(device_id):
                     break
     
     if selected_device is not None:
-        msg_details = getattr(selected_device.fmqtt_interface, 'openValve')()
+        if state == "open":
+            msg_details = getattr(selected_device.fmqtt_interface, 'openValve')()
+        elif state == "closed:":
+            msg_details = getattr(selected_device.fmqtt_interface, 'closeValve')()
+        
         print(msg_details)
         device.sendMsg(msg_details["payload"], msg_details["topic"])
         
-    return "Pump ON"
+    return "Pump " + state
 
 @app.route("/get_device_details", methods=['GET'])
 def get_device_details():
