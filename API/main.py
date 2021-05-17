@@ -75,8 +75,6 @@ def flash_all_lights():
 
 @app.route("/change_valve_state/<device_id>/<state>", methods=['GET'])
 def turn_on_valve(device_id, state):
-    output_str = ""
-
     selected_device = None
 
     #validate that id is an in
@@ -102,6 +100,9 @@ def turn_on_valve(device_id, state):
         device.sendMsg(msg_details["payload"], msg_details["topic"])
         
     return "Pump " + state
+
+@app.route("/")
+
 
 @app.route("/get_device_details", methods=['GET'])
 def get_device_details():

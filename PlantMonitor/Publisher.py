@@ -81,7 +81,7 @@ if __name__ == "__main__":
 	interface_obj = CommunicationInterface(
 						"PlantMonitor", 
 						["/edge_device/data", 
-						"edge_devices/control_device", 
+						"/edge_device/control_device", 
 						"/edge_device/setup_device", 
 						"/edge_device/topic_stream",
 						"/edge_device/PlantData",

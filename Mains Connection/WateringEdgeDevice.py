@@ -28,6 +28,7 @@ class CommunicationInterface():
         print(topic + "|" + payload)
 
         if (payload == "blink_led"):
+            #try pass through payload directly, just like with the valve state
             self.farduino.write(b'{"blink_led": "true"}')
         
         if ("valve_state" in payload):
@@ -59,7 +60,8 @@ if __name__ == "__main__":
     interface_obj = CommunicationInterface(
                         "WateringSystem", 
                         ["/edge_device/data", 
-                        "edge_devices/control_device", 
+                        "/edge_device/water_info"
+                        "/edge_device/control_device", 
                         "/edge_device/setup_device", 
                         "/edge_device/topic_stream"])
     
@@ -69,10 +71,6 @@ if __name__ == "__main__":
         msg = interface_obj.readArdinoSerial()
 
         if len(msg) > 0:
-            print(msg)
+            mqtt_interface.sendMsg(msg, "/edge_device/water_info")
 
         sleep(0.2)
- 
-
-#PlantData
-#Picture

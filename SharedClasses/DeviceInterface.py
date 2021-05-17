@@ -1,5 +1,7 @@
 import abc
 
+from flask import json
+
 num_edge_devices = 0
 
 class DeviceInterface():
@@ -21,7 +23,7 @@ class DeviceInterface():
 
     def blinkLED(self):
         output_msg = {}
-        output_msg["topic"] = "edge_devices/control_device"
+        output_msg["topic"] = "/edge_devices/control_device"
         output_msg["payload"] = "blink_led"
         return output_msg
 
@@ -50,14 +52,21 @@ class WaterSystemInterface(DeviceInterface):
     def onMessage(self, topic, payload):
         print(topic + "|" + payload)
 
+        if (topic == "/edge_device"):
+            device_data = json.loads(payload)
+            self.fValueOpen = str(device_data["pump_state"]) == "1"
+            self.fWaterVolume = float(device_data["total_volume"])
+
+            print("Updated Private Fields for Watering Device!")
+
     def openValve(self):
         output_msg = {}
-        output_msg["topic"] = "edge_devices/control_device"
+        output_msg["topic"] = "/edge_device/control_device"
         output_msg["payload"] = "{\"valve_state\" : \"open\"}"
         return output_msg
 
     def closeValve(self):
         output_msg = {}
-        output_msg["topic"] = "edge_devices/control_device"
+        output_msg["topic"] = "/edge_device/control_device"
         output_msg["payload"] = "{\"valve_state\" : \"closed\"}"
         return output_msg
