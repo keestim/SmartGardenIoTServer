@@ -101,9 +101,6 @@ def turn_on_valve(device_id, state):
         
     return "Pump " + state
 
-@app.route("/")
-
-
 @app.route("/get_device_details", methods=['GET'])
 def get_device_details():
     output_str = ""
@@ -114,6 +111,35 @@ def get_device_details():
             output_str = output_str + device_interface.fDeviceType + "," + str(device_interface.getDeviceID()) + "<br/>"
     
     return output_str
+
+@app.route("/water_set_volume/<device_id>/<volume>", methods=['GET'])
+def water_set_volume(device_id, volume):
+    selected_device = None
+
+    #validate that id is an in
+
+    for device in connection_list:
+        if device.fmqtt_interface != None:
+            print(device.fmqtt_interface)
+            if (type(device.fmqtt_interface) is WaterSystemInterface):
+                if (str(device.fmqtt_interface.getDeviceID()) == str(device_id)):
+                    #make sure this is by reference!
+                    selected_device = device
+                    break
+    
+    if selected_device is not None:
+        msg_details = getattr(selected_device.fmqtt_interface, 'openValve')()
+        print(msg_details)
+        device.sendMsg(msg_details["payload"], msg_details["topic"])
+
+        while (device.fmqtt_interface.getWaterVolume() <= float(volume)):
+            sleep(0.2)
+            continue
+
+        msg_details = getattr(selected_device.fmqtt_interface, 'closeValve')()
+        device.sendMsg(msg_details["payload"], msg_details["topic"])
+
+    return "Specified Volume Released"
 
 #something about avaliable methods?
 

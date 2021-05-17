@@ -35,15 +35,11 @@ class CommunicationInterface():
 	def getDate(self):
 		return datetime.datetime.now().strftime('%m-%d-%Y_%H.%M.%S')
 
-
-
 	def setPlantData(self, value):
 		self.fplantData = value
 
 	def getPlantData(self):
 		return self.fplantData
-
-
 
 	def capture_photo(self, img_path = '/home/pi/Desktop/images/'):
 		#setup variables

@@ -41,6 +41,21 @@ class PlantMonitorInterface(DeviceInterface):
     def onMessage(self, topic, payload):
         print(topic + "|" + payload)
 
+        if (topic == "/edge_device/PlantData"):
+            device_data = json.loads(payload)
+            self.fHumidity = device_data["humidity"]
+            self.fMoisture = device_data["moisture"]
+            self.fTemperature = device_data["temperature"]
+
+    def getTemperature(self):
+        return self.fTemperature
+
+    def getMoisture(self):
+        return self.fMoisture
+
+    def getHumidity(self):
+        return self.fHumidity
+
 class WaterSystemInterface(DeviceInterface):
     def __init__(self):
         super().__init__()
@@ -58,6 +73,12 @@ class WaterSystemInterface(DeviceInterface):
             self.fWaterVolume = float(device_data["total_volume"])
 
             print("Updated Private Fields for Watering Device!")
+
+    def getWaterVolume(self):
+        return self.fWaterVolume
+        
+    def getValveState(self):
+        return self.fValueOpen
 
     def openValve(self):
         output_msg = {}
