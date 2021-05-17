@@ -95,7 +95,7 @@ def turn_on_valve(device_id, state):
     if selected_device is not None:
         if state == "open":
             msg_details = getattr(selected_device.fmqtt_interface, 'openValve')()
-        elif state == "closed:":
+        elif state == "closed":
             msg_details = getattr(selected_device.fmqtt_interface, 'closeValve')()
         
         print(msg_details)
