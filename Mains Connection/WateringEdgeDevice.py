@@ -68,7 +68,7 @@ if __name__ == "__main__":
         if len(msg) > 0:
             print(msg)
 
-        sleep(1)
+        sleep(0.2)
  
 
 #PlantData
