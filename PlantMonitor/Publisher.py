@@ -16,18 +16,16 @@ from SharedClasses.BiDirectionalMQTTComms import *
 from SharedClasses.DeviceInterface import * 
 from SharedClasses.helper_functions import * 
 
+#####################################communicationInterface class##################################################
 class CommunicationInterface():
 	def __init__(self, device_type, topics):
 		self.ftopic_list = topics
 		self.fdevice_type = device_type
-
-		self.fmoisture = 0
-		self.ftemperature = 0
-		self.fhumidity = 0
+		self.fplantData = " "
 
 	def getTopicList(self):
 		return self.ftopic_list
-	
+
 	def getDeviceType(self):
 		return self.fdevice_type
 
@@ -37,17 +35,15 @@ class CommunicationInterface():
 	def getDate(self):
 		return datetime.datetime.now().strftime('%m-%d-%Y_%H.%M.%S')
 
-	def setTemperature(self, value):
-		self.ftemperature = value
 
-	def setMoisture(self, value):
-		self.fmoisture = value
 
-	def setHumidity(self, value):
-		self.fmoisture = value
+	def setPlantData(self, value):
+		self.fplantData = value
 
-	def getPlantDataMsg(self):
-		return "{'dateTime': %s, 'moisture': %s, 'temperature': %s, 'humidity': %s}" % (self.getDate(), self.fmoisture, self.ftemperature, self.fhumidity) 
+	def getPlantData(self):
+		return self.fplantData
+
+
 
 	def capture_photo(self, img_path = '/home/pi/Desktop/images/'):
 		#setup variables
@@ -67,8 +63,10 @@ class CommunicationInterface():
 		byteArr = bytearray(fileContent)
 		return byteArr
 
-global server_ip_address
+###############################################################################################################
 
+############################################ MAIN #############################################################
+global server_ip_address
 if __name__ == "__main__":
 	try:
 		server_ip_address = sys.argv[1]
@@ -88,21 +86,23 @@ if __name__ == "__main__":
 						"/edge_device/topic_stream",
 						"/edge_device/PlantData",
 						"/edge_data/Picture"])
-	
+
 	mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, interface_obj)
 
-	arduino = serial.Serial('/dev/ttyACM0', 9600)
+	arduino = serial.Serial('/dev/ttyACM2', 9600)
 
 	while True:
+
 		arduino.flush()
 
 		#data read in
-		interface_obj.setMoisture(float(arduino.readline().decode()))
-		interface_obj.setTemperature(float(arduino.readline().decode()))
-		interface_obj.setHumidity(float(arduino.readline().decode()))
-		
-		img_path = interface_obj.capture_photo()
+		interface_obj.setPlantData(arduino.readline().decode())
 
-		mqtt_interface.sendMsg(interface_obj.getPlantDataMsg(), "/edge_device/PlantData")
-		mqtt_interface.sendMsg(interface_obj.getCameraDataMsg(img_path), "/edge_device/Picture")
-		
+		print("plant data: %s" % (interface_obj.getPlantData()))
+
+		#send plant data
+		mqtt_interface.sendMsg(interface_obj.getPlantData(), "/edge_device/PlantData")
+
+		#img_path = interface_obj.capture_photo()
+		#mqtt_interface.sendMsg(interface_obj.getCameraDataMsg(img_path), "/edge_device/Picture")
+
