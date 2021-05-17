@@ -74,7 +74,7 @@ def flash_all_lights():
     return "Flash LIGHTS!"
 
 @app.route("/turn_on_valve/<device_id>", methods=['GET'])
-def get_device_details(device_id):
+def turn_on_valve(device_id):
     output_str = ""
 
     selected_device = None
@@ -86,14 +86,22 @@ def get_device_details(device_id):
                     selected_device = device
                     break
         
-    msg_details = getattr(device.fmqtt_interface, 'openValve')()
+    msg_details = getattr(selected_device.fmqtt_interface, 'openValve')()
     print(msg_details)
     device.sendMsg(msg_details["payload"], msg_details["topic"])
     
     return "Pump ON"
 
 @app.route("/get_device_details", methods=['GET'])
+def get_device_details():
+    output_str = ""
 
+    for device in connection_list:
+        if device.fmqtt_interface != None:
+            device_interface = device.fmqtt_interface
+            output_str = output_str + device_interface.fDeviceType + "," + str(device_interface.ftype_id) + "<br/>"
+    
+    return output_str
 
 #something about avaliable methods?
 
