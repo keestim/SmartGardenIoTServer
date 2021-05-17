@@ -81,15 +81,17 @@ def turn_on_valve(device_id):
 
     for device in connection_list:
         if device.fmqtt_interface != None:
+            print(device.fmqtt_interface)
             if (type(device.fmqtt_interface) is WaterSystemInterface):
                 if (device.fmqtt_interface.getDeviceID() == device_id):
                     selected_device = device
                     break
-        
-    msg_details = getattr(selected_device.fmqtt_interface, 'openValve')()
-    print(msg_details)
-    device.sendMsg(msg_details["payload"], msg_details["topic"])
     
+    if selected_device is not None:
+        msg_details = getattr(selected_device.fmqtt_interface, 'openValve')()
+        print(msg_details)
+        device.sendMsg(msg_details["payload"], msg_details["topic"])
+        
     return "Pump ON"
 
 @app.route("/get_device_details", methods=['GET'])
