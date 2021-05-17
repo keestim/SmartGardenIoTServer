@@ -60,16 +60,6 @@ void blinkLed()
   }
 }
 
-
-ISR(TIMER1_OVF_vect)        // interrupt service routine that wraps a user defined function supplied by attachInterrupt
-{
-  TCNT1 = 34286;            // preload timer
-  String waterVolumeJSON = "{\"total_volume\" : " + String(totalMilliLitres) + ", \"pump_state\" : " + String(valveOpen) + "}\n";
-  Serial.print(waterVolumeJSON);
-
-  blinkLed();
-}
-
 void initialiseFlowMeter()
 {
   pulseCount        = 0;
@@ -138,6 +128,11 @@ void loop()
     totalMilliLitres = 0;
     digitalWrite(relayPin, LOW);
   }  
+
+  String waterVolumeJSON = "{\"total_volume\" : " + String(totalMilliLitres) + ", \"pump_state\" : " + String(valveOpen) + "}\n";
+  Serial.print(waterVolumeJSON);
+
+  blinkLed();
 }
 
 void readSerialMsgs()
