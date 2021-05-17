@@ -118,6 +118,8 @@ class BiDirectionalMQTTComms:
             print("device type: " + str(device_type))
             if (device_type == "PlantMonitor"):
                 self.fmqtt_interface = PlantMonitorInterface()
+            elif (device_type == "WateringSystem"):
+                self.fmqtt_interface = WaterSystemInterface()
 
     def __onMessage(self, client, userData, msg):
         topic = msg.topic
