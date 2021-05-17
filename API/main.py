@@ -73,16 +73,26 @@ def flash_all_lights():
 
     return "Flash LIGHTS!"
 
-@app.route("/get_device_details", methods=['GET'])
-def get_device_details():
+@app.route("/turn_on_valve/<device_id>", methods=['GET'])
+def get_device_details(device_id):
     output_str = ""
+
+    selected_device = None
 
     for device in connection_list:
         if device.fmqtt_interface != None:
-            device_interface = device.fmqtt_interface
-            output_str = output_str + device_interface.fDeviceType + "," + str(device_interface.ftype_id) + "<br/>"
+            if (type(device.fmqtt_interface) is WaterSystemInterface):
+                if (device.fmqtt_interface.getDeviceID() == device_id):
+                    selected_device = device
+                    break
+        
+    msg_details = getattr(device.fmqtt_interface, 'openValve')()
+    print(msg_details)
+    device.sendMsg(msg_details["payload"], msg_details["topic"])
     
-    return output_str
+    return "Pump ON"
+
+@app.route("/get_device_details", methods=['GET'])
 
 
 #something about avaliable methods?

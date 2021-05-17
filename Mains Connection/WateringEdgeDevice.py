@@ -27,8 +27,12 @@ class CommunicationInterface():
     def onMessage(self, topic, payload):
         print(topic + "|" + payload)
 
-        if (payload == "blinkLED"):
+        if (payload == "blink_led"):
             self.farduino.write(b'{"blink_led": "true"}')
+        
+        if ("valve_state" in payload):
+            #fix this, try to pass payload straight in!
+            self.farduino.write(b'{"valve_state" : "open"}')
 
     def getArdiuno(self):
         return self.farduino
