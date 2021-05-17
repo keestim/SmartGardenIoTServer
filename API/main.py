@@ -41,7 +41,7 @@ class MQTTSniffer(threading.Thread):
                 print(mqtt_data)
                 print("Setting up MQTT Connection with IP: " + ip_data.src)
                 
-                connection_list.append(BiDirectionalMQTTComms(device_ip_address, ip_data.src))
+                connection_list.append(BiDirectionalMQTTComms(device_ip_address, ip_data.src, DeviceType.server))
 
             new_connection_lock.release()
 

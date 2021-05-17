@@ -15,6 +15,10 @@ class ConnectionStatus(Enum):
     attempting_connection = 2
     connected = 3
 
+class DeviceType(Enum):
+    server = 1
+    edge_device = 2
+
 class MQTTSubscriberThread(threading.Thread):
     def __init__(self, mqtt_client):
         super().__init__()
@@ -41,7 +45,7 @@ class MQTTConnectInitializer(threading.Thread):
             sleep(1)
 
 class BiDirectionalMQTTComms:
-    def __init__(self, device_ip_address, dest_ip_address, mqtt_interface = None, port = 1883, keepAlive = 60):
+    def __init__(self, device_ip_address, dest_ip_address, device_type, mqtt_interface = None, port = 1883, keepAlive = 60):
         self.fdest_ip_address = dest_ip_address
         self.fdevice_ip_address = device_ip_address
 
@@ -51,6 +55,7 @@ class BiDirectionalMQTTComms:
         self.fkeepAlive = keepAlive
 
         self.fmqtt_subscriber_thread = None
+        self.fdevice_type = device_type
 
         #initial topics for all connected 
         #MAKE THESE CONSTANTS!!!!

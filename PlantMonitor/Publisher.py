@@ -83,7 +83,7 @@ if __name__ == "__main__":
 						"/edge_device/PlantData",
 						"/edge_data/Picture"])
 
-	mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, interface_obj)
+	mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, DeviceType.edge_device, interface_obj)
 
 	arduino = serial.Serial('/dev/ttyACM2', 9600)
 

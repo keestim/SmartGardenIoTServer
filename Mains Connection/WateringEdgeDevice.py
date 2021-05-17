@@ -65,7 +65,7 @@ if __name__ == "__main__":
                         "/edge_device/setup_device", 
                         "/edge_device/topic_stream"])
     
-    mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, interface_obj)
+    mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, DeviceType.edge_device, interface_obj)
 
     while True:
         msg = interface_obj.readArdinoSerial()
