@@ -173,9 +173,10 @@ def water_set_volume(device_id, volume):
         msg_details = getattr(selected_device.fmqtt_interface, 'openValve')()
         print(msg_details)
         device.sendMsg(msg_details["payload"], msg_details["topic"])
-
+        
         while (device.fmqtt_interface.getWaterVolume() <= float(volume)):
             sleep(0.2)
+            print("Volume: " + str(device.fmqtt_interface.getWaterVolume()))
             continue
 
         msg_details = getattr(selected_device.fmqtt_interface, 'closeValve')()
