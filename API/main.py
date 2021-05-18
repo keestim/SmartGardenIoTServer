@@ -53,7 +53,6 @@ app.config["DEBUG"] = True
 def home():
     return "API Test"
 
-
 @app.route("/get_device_details", methods=['GET'])
 def get_device_details():
     output_str = ""
@@ -112,6 +111,17 @@ def flash_all_lights():
 
     return "Flash LIGHTS!"
 
+@app.route("/flash_light/<device, id>", methods=['GET'])
+def flash_light(device):
+    for device in connection_list:
+        if device.fmqtt_interface != None:
+            if str(device.fmqtt_interface.getDeviceID()) == str(device):
+                msg_details = getattr(device.fmqtt_interface, 'blinkLED')()
+                print(msg_details)
+                device.sendMsg(msg_details["payload"], msg_details["topic"])
+
+    return "Flash LIGHT for device " + str(device)
+
 @app.route("/change_valve_state/<device_id>/<state>", methods=['GET'])
 def turn_on_valve(device_id, state):
     selected_device = None
@@ -141,6 +151,7 @@ def turn_on_valve(device_id, state):
     return "Pump " + state
 
 #better to spawn a therad for this
+#test this out!
 @app.route("/water_set_volume/<device_id>/<volume>", methods=['GET'])
 def water_set_volume(device_id, volume):
     selected_device = None
