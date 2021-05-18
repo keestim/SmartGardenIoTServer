@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
         if len(msg) > 0:
             print(msg)
-            mqtt_interface.sendMsg(msg, "/edge_device/data")
+            mqtt_interface.sendMsg(msg, "/edge_device/water_info")
             print("_______________________")
 
         sleep(0.2)

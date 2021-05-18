@@ -142,7 +142,6 @@ class BiDirectionalMQTTComms:
 
                 self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
             else:
-                print("attempt to display msg!")
                 if self.fmqtt_interface is not None:
                     self.fmqtt_interface.onMessage(topic, payload)
         else:
