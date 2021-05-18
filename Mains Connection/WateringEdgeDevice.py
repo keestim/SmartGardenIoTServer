@@ -25,7 +25,7 @@ class CommunicationInterface():
         return self.fdevice_type
 
     def onMessage(self, topic, payload):
-        if (payload == "blink_led"):
+        if ("blink_led" in payload):
             #try pass through payload directly, just like with the valve state
             print(payload)
             print("BLINK LED")
