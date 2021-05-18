@@ -26,9 +26,6 @@ class CommunicationInterface():
 
     def onMessage(self, topic, payload):
         if ("blink_led" in payload):
-            #try pass through payload directly, just like with the valve state
-            print(payload)
-            print("BLINK LED")
             self.farduino.write(payload.encode('utf_8'))
         
         if ("valve_state" in payload):
@@ -74,6 +71,7 @@ if __name__ == "__main__":
 
         if len(msg) > 0:
             print(msg)
-            mqtt_interface.sendMsg(msg, "/edge_device/water_info")
+            mqtt_interface.sendMsg(msg, "/edge_device/data")
+            print("_______________________")
 
         sleep(0.2)

@@ -131,6 +131,8 @@ class BiDirectionalMQTTComms:
         topic = msg.topic
         payload = msg.payload.decode('ascii')
 
+        print("PAYLOAD: " + payload)
+
         if self.fdevice_status == ConnectionStatus.connected:
             if (payload == "initial message"):
                 self.sendMsg("initial message received", "/edge_device/setup_device")
