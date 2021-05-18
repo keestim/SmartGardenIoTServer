@@ -1,5 +1,4 @@
 import abc
-
 from flask import json
 
 num_edge_devices = 0
@@ -23,7 +22,7 @@ class DeviceInterface():
 
     def blinkLED(self):
         output_msg = {}
-        output_msg["topic"] = "/edge_devices/control_device"
+        output_msg["topic"] = "/edge_device/control_device"
         output_msg["payload"] = "blink_led"
         return output_msg
 

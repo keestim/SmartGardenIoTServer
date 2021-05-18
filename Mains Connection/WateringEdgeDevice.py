@@ -71,6 +71,7 @@ if __name__ == "__main__":
         msg = interface_obj.readArdinoSerial()
 
         if len(msg) > 0:
+            print(msg)
             mqtt_interface.sendMsg(msg, "/edge_device/water_info")
 
         sleep(0.2)
