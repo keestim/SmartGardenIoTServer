@@ -15,6 +15,9 @@ from serial import Serial as Serial
 class CommunicationInterface():
     def __init__(self, device_type, topics):
         self.ftopic_list = topics
+
+        #need to validate that array being passed in is valid
+        #(I FORGOT A COMMA BEFORE!!!!)
         
         print("_______________")
         print(self.ftopic_list)
@@ -64,7 +67,7 @@ if __name__ == "__main__":
     interface_obj = CommunicationInterface(
                         "WateringSystem", 
                         ["/edge_device/data", 
-                        "/edge_device/water_info"
+                        "/edge_device/water_info",
                         "/edge_device/control_device", 
                         "/edge_device/setup_device", 
                         "/edge_device/topic_stream"])
