@@ -34,10 +34,10 @@ created: 18/05/2021
 <h3>Device list</h3>
 <p>
 <ul>
-            <li>Device 1 <input type= "submit" value="Blink device"  id="submit"/></li>
-            <li>Device 2 <input type= "submit" value="Blink device"  id="submit"/></li>
-            <li>Device 3 <input type= "submit" value="Blink device"  id="submit"/></li>
-            <li>Device 4 <input type= "submit" value="Blink device"  id="submit"/></li>
+            <li>Device 1 <button onclick="location.href='localhost::';" type="button">Blink device</button></li>
+            <li>Device 2 <button onclick="location.href='localhost::';" type="button">Blink device</button></li>
+            <li>Device 3 <button onclick="location.href='localhost::';" type="button">Blink device</button></li>
+            <li>Device 4 <button onclick="location.href='localhost::';" type="button">Blink device</button></li>
 </ul>		
 </p>
 </section>
