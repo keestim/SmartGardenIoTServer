@@ -45,6 +45,6 @@ created: 18/05/2021
 </article>
 
 </body>
-<footer><h3>Camera's Are US Contact information: <a href="mailto:102564676@studnet.swin.edu.au">102564676@studnet.swin.edu.au</a>.<a href="#top">Back to top</a></h3>
+<footer><h3>Smart Garden Iot System <a href="#top">Back to top</a></h3>
   </footer>
 </html>
