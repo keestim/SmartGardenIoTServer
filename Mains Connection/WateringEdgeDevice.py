@@ -15,6 +15,11 @@ from serial import Serial as Serial
 class CommunicationInterface():
     def __init__(self, device_type, topics):
         self.ftopic_list = topics
+        
+        print("_______________")
+        print(self.ftopic_list)
+        print("_______________")
+
         self.fdevice_type = device_type
         self.farduino = Serial('/dev/ttyACM0', 9600)
 

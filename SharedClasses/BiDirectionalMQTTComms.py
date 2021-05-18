@@ -138,6 +138,10 @@ class BiDirectionalMQTTComms:
                 self.sendMsg("initial message received", "/edge_device/setup_device")
             elif ("topics" in payload):
                 self.ftopic_list = self.__encodeTopicsString(payload)
+                print("___________________")
+                print(self.ftopic_list)
+                print("___________________")
+
                 self.__assignDeviceInterface(payload)
 
                 self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
