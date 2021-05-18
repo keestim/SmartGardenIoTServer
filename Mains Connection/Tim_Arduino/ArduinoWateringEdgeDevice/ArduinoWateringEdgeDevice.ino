@@ -34,9 +34,7 @@ void setup() {
 }
 
 void acuateBlinkLed()
-{
-  Serial.write("BLINK LED");
-  
+{  
   if (blinkLED)
   {
     for (int i = 0; i < 10; i++)
