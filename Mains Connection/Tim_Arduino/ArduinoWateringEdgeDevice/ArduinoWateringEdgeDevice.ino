@@ -34,9 +34,7 @@ void setup() {
 }
 
 void acuateBlinkLed()
-{
-  Serial.write("BLINK LED");
-  
+{  
   if (blinkLED)
   {
     for (int i = 0; i < 10; i++)
@@ -143,10 +141,7 @@ void readSerialMsgs()
   // all serial communication should occur through JSON
   if (serialMsg.length() > 0)
   {
-    DynamicJsonDocument doc(200);
-    Serial.print(serialMsg);
-    Serial.println("");
-    
+    DynamicJsonDocument doc(200);    
     auto error = deserializeJson(doc, serialMsg);
     
     if (error) {
