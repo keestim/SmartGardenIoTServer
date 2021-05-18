@@ -66,10 +66,12 @@ def get_device_details():
         if device.fmqtt_interface != None:
             device_interface = device.fmqtt_interface
             output_str += "["
-            output_str += "[\"id\": " + int(device_interface.getDeviceID()) + ", "
+            output_str += "\"id\": " + str(device_interface.getDeviceID()) + ", "
             output_str += "\"device_type\" : \"" + device_interface.getDeviceType() + "\""
             output_str += "]"
         
+    print(output_str)
+
     return output_str + "}"
 
 @app.route("/get_device_of_type/<type>", methods=['GET'])
@@ -111,7 +113,7 @@ def flash_all_lights():
 
     return "Flash LIGHTS!"
 
-@app.route("/flash_light/<device, id>", methods=['GET'])
+@app.route("/flash_light/<device>", methods=['GET'])
 def flash_light(device):
     for device in connection_list:
         if device.fmqtt_interface != None:

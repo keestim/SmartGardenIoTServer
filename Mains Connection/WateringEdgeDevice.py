@@ -29,7 +29,8 @@ class CommunicationInterface():
 
         if (payload == "blink_led"):
             #try pass through payload directly, just like with the valve state
-            self.farduino.write(b'{"blink_led": "true"}')
+            print(payload)
+            self.farduino.write(payload.encode('utf_8'))
         
         if ("valve_state" in payload):
             #fix this, try to pass payload straight in!
