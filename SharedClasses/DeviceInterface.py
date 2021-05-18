@@ -23,7 +23,7 @@ class DeviceInterface():
     def blinkLED(self):
         output_msg = {}
         output_msg["topic"] = "/edge_device/control_device"
-        output_msg["payload"] = "blink_led"
+        output_msg["payload"] = "{\"blink_led\" : \"true\"}"
         return output_msg
 
     def getDeviceID(self):
