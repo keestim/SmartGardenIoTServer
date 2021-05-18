@@ -1,0 +1,66 @@
+/*
+author: Thomas Bibby
+created: 18/05/2021
+*/
+#NavProductE
+{
+    background-color: #293132;
+    color: #ffffff;
+}
+
+.section1
+{
+    float: left;
+    width: 100%;
+    text-align: justify;
+    margin: 1em 1em 1em 1em;
+    background-color: rgb(0, 196, 16);
+}
+
+form
+{
+    display: block;
+    font-weight: bold;
+    padding: .625em 3.5em;
+    text-decoration: none;
+    color: #000;
+    border-right: 1px solid #bababa;
+    background-color: rgb(0, 196, 16);
+}
+
+input:invalid 
+{
+    border: 1.5px solid rgb(236, 65, 65);
+}
+
+::placeholder
+{
+    color: rgb(207, 207, 207);
+}
+
+.Lens, #Strap, #BCase, #LCase, .Quality
+{
+    font-size: 85%;
+    background-color: rgb(4, 161, 17);
+}
+
+fieldset,  fieldset p, fieldset p label, legend
+{
+    background-color: rgb(4, 161, 17);
+}
+
+.outsidefield
+{
+    background-color: rgb(0, 196, 16);
+}
+
+.section1
+{
+    background-color: rgb(0, 196, 16);
+}
+
+h3
+{
+    background-color: rgb(4, 161, 17);
+}
+

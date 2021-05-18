@@ -1,0 +1,79 @@
+/*
+author: Thomas Bibby
+created: 18/05/2021
+*/
+@media screen and (max-width: 31.25em) /* tablet sized window */
+{
+    nav ul li 
+    {
+        width: 33%
+    }
+
+    .section1, .section2
+    {
+        width: 43%;
+    }
+
+    .section3
+    {
+        clear: both;
+        float: none;
+        width: 90%;
+        margin: 0 1em 1em 1.5em;
+    }
+
+    .section3 img
+    {
+        float: left;
+        width: 30%;
+        margin: 0.5em 1em 1em 0;
+    }
+
+    article
+    {
+        min-width: 600px;
+    }
+
+    header h1 
+    {
+        font-size: 50px;
+    }
+}
+
+@media screen and (max-width: 60em) /* smaller sized window */
+{
+    nav ul li 
+    {
+        width: 33%
+    }
+
+    .section1, .section2
+    {
+        width: 43%;
+    }
+
+    .section3
+    {
+        clear: both;
+        float: none;
+        width: 90%;
+        margin: 0 1em 1em 1.5em;
+    }
+
+    .section3 img
+    {
+        float: left;
+        width: 30%;
+        margin: 0.5em 1em 1em 0;
+    }
+
+    article
+    {
+        min-width: 600px;
+    }
+
+    header h1 
+    {
+        font-size: 50px;
+    }
+}
