@@ -22,7 +22,7 @@ class CommunicationInterface():
 		self.ftopic_list = topics
 		self.fdevice_type = device_type
 		self.fplantData = " "
-		self.farduino = serial.Serial('/dev/ttyACM2', 9600)
+		self.farduino = serial.Serial('/dev/ttyACM0', 9600)
 
 	def getTopicList(self):
 		return self.ftopic_list
@@ -32,7 +32,7 @@ class CommunicationInterface():
 
 	def onMessage(self, topic, payload):
 		print("sending..."+topic + "|" + payload)
-		self.getArduinoConnection().writeline(payload.encode())
+		self.getArduinoConnection().write(payload.encode('utf_8'))
 
 	def getArduinoConnection(self):
 		return self.farduino
