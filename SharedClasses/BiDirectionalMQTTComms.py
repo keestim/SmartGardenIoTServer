@@ -162,3 +162,7 @@ class BiDirectionalMQTTComms:
     def sendMsg(self, msgText, topic = "/edge_device/data"):
         print("sending msg: " + msgText + " | " + self.fdest_ip_address)
         publish.single(topic, msgText, hostname = self.fdest_ip_address)
+
+        if (self.fdevice_type == DeviceType.edge_device):
+            #send cli message to things board here!
+            return
