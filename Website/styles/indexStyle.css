@@ -21,3 +21,9 @@ ul li
 {
     text-align: left;
 }
+
+p ul p
+{
+    float: left;
+    text-align: left;
+}

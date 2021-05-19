@@ -142,3 +142,8 @@ div
     background-color: rgb(0, 196, 16);
 }
   
+p ul p
+{
+    float: left;
+    text-align: left;
+}

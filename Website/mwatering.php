@@ -27,7 +27,7 @@ created: 18/05/2021
     </div>
 
     <section id="section1">
-      <form method="post" action="payment.php" novalidate>
+      <form method="post" action="localhost:5000/water_set_volume/0/50" novalidate> <!-- water_set_volume/deviceid/amount in ml-->
         </p>
           <fieldset>
             <legend>Watering</legend>
@@ -38,7 +38,6 @@ created: 18/05/2021
                 <option value="Watering Device 2">Watering Device 2</option>		
                 <!-- this field changes depending on how many watering devices there are -->	
               </select>
-              
             </p>
             <input type= "submit" value="Blink device"  id="submit"/>
           </fieldset>

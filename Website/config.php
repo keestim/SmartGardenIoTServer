@@ -53,6 +53,9 @@ created: 18/05/2021
                 <!-- this field changes depending on how many watering devices there are -->	
               </select>     
             </p>
+            <p><label for="Moisture">Moisture (%):</label> 
+              <input type='text' name= "Moisture" id="MoistureA" pattern="\d{0,9}" placeholder="30"/>
+            </p>
             <input type= "submit" value="Bind devices"  id="submit" name="bindA"/>
             </fieldset>
 
@@ -81,6 +84,9 @@ created: 18/05/2021
                 <option value="Watering Device 2">Watering Device 2</option>		
                 <!-- this field changes depending on how many watering devices there are -->	
               </select>     
+            </p>
+            <p><label for="Moisture">Moisture (%):</label> 
+              <input type='text' name= "Moisture" id="MoistureB" pattern="\d{0,9}" placeholder="30"/>
             </p>
             <input type= "submit" value="Bind devices"  id="submit" name="bindB"/>
             </fieldset>

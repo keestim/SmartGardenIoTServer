@@ -16,6 +16,7 @@ created: 18/05/2021
   <link href="styles/responsive.css" rel="stylesheet">
   <script src="./scripts/jquery-3.6.0.min.js"></script>
   <script src="./scripts/loadhtml.js"></script>
+  <script src="./scripts/loaddevices.js"></script>
  </head>
 <body>
   <article>
@@ -23,19 +24,31 @@ created: 18/05/2021
     <div class="navbar" id="navbar">
     </div>
     
+    <?php 
+    $ch = curl_init("localhost:5000/get_device_details");
+            curl_setopt($ch, CURLOPT_HTTPGET, true);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $response_json = curl_exec($ch);
+            curl_close($ch);
+            $response=json_decode($response_json, true);
+            echo "<p>$response</p>";
+    ?>
+    
     <section id="MainSectionA">
       <section class="section1">
       <h3>Device list</h3>
-
-      <p>
+      <!-- Display all devices, name aka watering device and id -->
+      <p> 
         <ul>
-          <li>Device 1 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li>
-          <li>Device 2 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li>
-          <li>Device 3 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li>
-          <li>Device 4 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li>
+          <li>Device 1 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
+          <li>Device 2 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
+          <li>Device 3 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
+          <li>Device 4 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
+          <p><button onclick="location.href='localhost:5000/flash_all_lights';" type="button">Blink all device</button></p> <!-- Blinks all lights -->
         </ul>
-        <button onclick="location.href='localhost:5000/flash_all_lights';" type="button">Blink all device</button>
+        
       </p>
+      <!-- Display all devices, name aka watering device and id -->
       </section>
     </section>
   </article>
