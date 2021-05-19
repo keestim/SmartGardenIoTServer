@@ -47,7 +47,9 @@ class MQTTSniffer(threading.Thread):
             new_connection_lock.release()
 
 def findDeviceByID(device_id):
-    if (not device_id.is_integer()):
+    try: 
+        int(device_id)
+    except ValueError:
         return None
     
     for device in connection_list:
@@ -82,6 +84,14 @@ def home():
 def page_not_found(e):
     return ("Route Not Found", 404)
 
+def deviceJSONRepresentation(device_mqtt_interface):
+    output_str = ""
+    output_str += "\"id\": " + str(device_mqtt_interface.getDeviceID()) + ", "
+    output_str += "\"device_type\" : \"" + device_mqtt_interface.getDeviceType() + "\""
+
+    return "{" + output_str + "}"
+
+
 @app.route("/get_device_details", methods=['GET'])
 def get_device_details():
     output_str = ""
@@ -91,14 +101,9 @@ def get_device_details():
             output_str += ", "
 
         if device.fmqtt_interface != None:
-            device_interface = device.fmqtt_interface
-            output_str += "["
-            output_str += "\"id\": " + str(device_interface.getDeviceID()) + ", "
-            output_str += "\"device_type\" : \"" + device_interface.getDeviceType() + "\""
-            output_str += "]"
+            output_str += deviceJSONRepresentation(device.fmqtt_interface)
     
-    print(output_str)
-    return "{" + output_str + "}"
+    return "[" + output_str + "]"
 
 @app.route("/get_device_of_type/<device_type_name>", methods=['GET', 'POST'])
 def get_device_of_type(device_type_name):
@@ -110,13 +115,9 @@ def get_device_of_type(device_type_name):
 
         if device.fmqtt_interface != None:
             if (device.fmqtt_interface.getDeviceType() == device_type_name):
-                device_interface = device.fmqtt_interface
-                output_str += "["
-                output_str += "\"id\": " + int(device_interface.getDeviceID()) + ", " 
-                output_str += "\"device_type\" : \"" + device_interface.getDeviceType() + "\""
-                output_str += "]"
+                output_str += deviceJSONRepresentation(device.fmqtt_interface)
     
-    return "{" + output_str + "}"
+    return "[" + output_str + "]"
 
 @app.route("/flash_all_lights", methods=['GET', 'POST'])
 def flash_all_lights():
