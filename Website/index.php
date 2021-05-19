@@ -21,7 +21,7 @@ created: 18/05/2021
   <link href="styles/responsive.css" rel="stylesheet">
   <script src="./scripts/jquery-3.6.0.min.js"></script>
   <script src="./scripts/loadhtml.js"></script>
-  <script src="./scripts/loaddevices.js"></script>
+  <script src="./scripts/blinkdevices.js"></script>
  </head>
 <body>
   <article>
