@@ -18,3 +18,13 @@ function blinkdevice0 () {
   oReq.open("GET", "http://localhost:5000/flash_light/0");
   oReq.send();
   
+  function blinkdevice1 () {
+    console.log(this.responseText);
+    // document.getElementById("demo").innerHTML = this.responseText;
+  }
+  
+  var oReq = new XMLHttpRequest();
+  oReq.addEventListener("load", blinkdevice1);
+  oReq.open("GET", "http://localhost:5000/flash_light/1");
+  oReq.send();
+  

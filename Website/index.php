@@ -36,14 +36,9 @@ created: 18/05/2021
       <p> 
         <ul>
           <li>Watering Device 1 </li><button onclick="blinkdevice0()" type="button">Blink device</button> <!-- href is the url to blink that id -->
-          <li>Watering Device 2 <button onclick="location.href="http://localhost:5000/flash_light/1" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
-          <li>Device 3 <button onclick="location.href="http://localhost:5000/flash_light/2" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
-          <li>Device 4 <button onclick="location.href="http://localhost:5000/flash_light/3" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
+          <li>Watering Device 2<button onclick="blinkdevice1()" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
           <p><button type="button" onclick="flashalllights()">Blink all Devices</button></p> <!-- Blinks all lights -->
-          <div id="demo">
-</div>
-
-<script>
+          <div id="demo"></div>
         </ul>
         
       </p>
