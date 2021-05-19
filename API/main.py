@@ -78,7 +78,7 @@ def get_device_details():
     print(output_str)
     return "{" + output_str + "}"
 
-@app.route("/get_device_of_type/<type>", methods=['POST'])
+@app.route("/get_device_of_type/<type>", methods=['GET', 'POST'])
 def get_device_of_type(type):
     output_str = ""
 
@@ -96,7 +96,7 @@ def get_device_of_type(type):
     
     return "{" + output_str + "}"
 
-@app.route("/probe_devices", methods=['POST'])
+@app.route("/probe_devices", methods=['GET', 'POST'])
 def probe_devices():
     for device in connection_list:
         devices_str = devices_str + device.fdest_ip_address + ", "
@@ -104,7 +104,7 @@ def probe_devices():
 
     return ('', 204)
 
-@app.route("/flash_all_lights", methods=['POST'])
+@app.route("/flash_all_lights", methods=['GET', 'POST'])
 def flash_all_lights():
     for device in connection_list:
         if device.fmqtt_interface != None:
@@ -114,7 +114,7 @@ def flash_all_lights():
 
     return ('', 204)
 
-@app.route("/flash_light/<device>", methods=['POST'])
+@app.route("/flash_light/<device>", methods=['GET', 'POST'])
 def flash_light(device):
     for device in connection_list:
         if device.fmqtt_interface != None:
@@ -125,7 +125,7 @@ def flash_light(device):
 
     return ('', 204)
 
-@app.route("/change_valve_state/<device_id>/<state>", methods=['POST'])
+@app.route("/change_valve_state/<device_id>/<state>", methods=['GET', 'POST'])
 def turn_on_valve(device_id, state):
     selected_device = None
 
@@ -150,12 +150,12 @@ def turn_on_valve(device_id, state):
         
         print(msg_details)
         device.sendMsg(msg_details["payload"], msg_details["topic"])
-        
+
     return ('', 204)
 
 #better to spawn a therad for this
 #test this out!
-@app.route("/water_set_volume/<device_id>/<volume>", methods=['POST'])
+@app.route("/water_set_volume/<device_id>/<volume>", methods=['GET', 'POST'])
 def water_set_volume(device_id, volume):
     selected_device = None
 
@@ -191,7 +191,7 @@ def water_set_volume(device_id, volume):
 #this makes for a most readable URL
 #maybe something to add to note either client or server side
 #implement clean exit for script!
-@app.route("/water_plant_to_target_moisture/<plant_id>/<watering_id>/<target_moisture>", methods=['POST'])
+@app.route("/water_plant_to_target_moisture/<plant_id>/<watering_id>/<target_moisture>", methods=['GET', 'POST'])
 def water_plant_to_target_moisture():
     return "Watering plant"
 
