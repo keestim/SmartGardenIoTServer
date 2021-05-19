@@ -98,6 +98,7 @@ class BiDirectionalMQTTComms:
             elif (payload == "initial message received"):
                 self.fdevice_status = ConnectionStatus.connected
 
+                #need to do this more elegantly!
                 self.sendMsg("initial message received", SETUP_DEVICE_TOPIC)
 
                 if (self.fmqtt_interface is not None):
