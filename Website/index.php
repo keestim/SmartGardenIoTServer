@@ -41,19 +41,16 @@ created: 18/05/2021
 </div>
 
 <script>
-function loadXMLDoc() {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("demo").innerHTML =
-      this.responseText;
-    }
-  };
-  xhttp.open("GET", "127.0.0.1:5000/probe_devices", true);
-  xhttp.send();
+function loadXMLDoc () {
+  document.getElementById("demo").innerHTML =this.responseText;
 }
+
+var oReq = new XMLHttpRequest();
+oReq.addEventListener("load", loadXMLDoc);
+oReq.open("GET", "http://localhost/xampp/SmartGardenIoTServer/Website/test.html");
+oReq.send();
+
 </script>
-          </script>
         </ul>
         
       </p>
