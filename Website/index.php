@@ -39,7 +39,7 @@ created: 18/05/2021
           <li>Device 2 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
           <li>Device 3 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
           <li>Device 4 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
-          <p><button onclick="location.href='localhost:5000/flash_all_lights';" type="button">Blink all device</button></p> <!-- Blinks all lights -->
+          <p><button onclick="location.href='http://localhost:5000/flash_all_lights';" type="button">Blink all device</button></p> <!-- Blinks all lights -->
 
           <div id="demo">
 <button type="button" onclick="loadXMLDoc()">Change Content</button>
