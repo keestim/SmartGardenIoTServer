@@ -73,8 +73,6 @@ class WaterSystemInterface(DeviceInterface):
             self.fValueOpen = str(device_data["pump_state"]) == "1"
             self.fWaterVolume = float(device_data["total_volume"])
 
-            print("Updated Private Fields for Watering Device!")
-
     def getWaterVolume(self):
         return self.fWaterVolume
         
