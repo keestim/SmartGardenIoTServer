@@ -2,6 +2,11 @@
 author: Thomas Bibby
 created: 18/05/2021
 -->
+<?php
+  header("Access-Control-Allow-Origin", "*");
+  header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+?>
+
 <!DOCTYPE html> 
 <html lang="en">
 <head>
@@ -18,9 +23,6 @@ created: 18/05/2021
   <script src="./scripts/loadhtml.js"></script>
   <script src="./scripts/loaddevices.js"></script>
  </head>
- <?php
- header('Access-Control-Allow-Origin: *');
- ?>
 <body>
   <article>
     <header><h1>Smart Garden</h1></header>
@@ -45,12 +47,12 @@ created: 18/05/2021
 
 <script>
 function loadXMLDoc () {
-  document.getElementById("demo").innerHTML =this.responseText;
+  document.getElementById("demo").innerHTML = this.responseText;
 }
 
 var oReq = new XMLHttpRequest();
 oReq.addEventListener("load", loadXMLDoc);
-oReq.open("GET", "localhost:5000/probe_devices");
+oReq.open("GET", "http://localhost:5000/flash_all_lights");
 oReq.send();
 
 </script>
