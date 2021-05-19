@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
 	#try make this constant!
 	interface_obj = CommunicationInterface(
-						"PlantMonitor", 
+						PLANT_MONITOR_TYPE_NAME, 
 						[DEFAULT_DATA_TOPIC, 
 						CONTROL_DEVICE_TOPIC, 
 						SETUP_DEVICE_TOPIC, 

@@ -7,15 +7,9 @@ import json
 import sys
 import repackage
 repackage.up()
-from SharedClasses.DeviceInterface import * 
+from SharedClasses.DeviceInterface import PlantMonitorInterface, WaterSystemInterface, PLANT_MONITOR_TYPE_NAME, WATERING_SYSTEM_TYPE_NAME
 from SharedClasses.helper_functions import * 
-
-SETUP_DEVICE_TOPIC = "/edge_device/setup_device"
-CONTROL_DEVICE_TOPIC = "/edge_device/control_device"
-DEFAULT_DATA_TOPIC = "/edge_device/data"
-
-#For watering edge device
-WATERING_INFO_TOPIC = "/edge_device/water_info"
+from SharedClasses.SystemConstants import *
 
 class ConnectionStatus(Enum):
     init = 1
@@ -106,9 +100,9 @@ class BiDirectionalMQTTComms:
                     #store stuff like "topics" and "device_type" as CONSTANTS!"
 
                     self.sendMsg(
-                        str("{\"topics\": ") + str(topics_json) + ", " + 
-                            "\"device_type\": \"" + self.fmqtt_interface.getDeviceType() + "\"}", 
-                            SETUP_DEVICE_TOPIC)
+                        "{\"topics\": " + str(topics_json) + ", " + 
+                        "\"device_type\": \"" + str(self.fmqtt_interface.getDeviceType()) + "\"}", 
+                        SETUP_DEVICE_TOPIC)
 
     def __encodeTopicsString(self, payload):
         print(payload)
@@ -128,16 +122,18 @@ class BiDirectionalMQTTComms:
 
     def __assignDeviceInterface(self, payload):
         if self.fmqtt_interface is None:
-            print("ASSIGNING INTERFACE: " + self.fdest_ip_address)
             json_output = json.loads(payload)
-            device_type = json_output["device_type"]
+            device_type = json_output['device_type']
 
             #maybe use some kind of static enum?
-            print("device type: " + str(device_type))
-            if (device_type == "PlantMonitor"):
+            if (device_type == PLANT_MONITOR_TYPE_NAME):
                 self.fmqtt_interface = PlantMonitorInterface()
-            elif (device_type == "WateringSystem"):
+            elif (device_type == WATERING_SYSTEM_TYPE_NAME):
+                print("Adding Water System Interface")
                 self.fmqtt_interface = WaterSystemInterface()
+                print("Finished Adding")
+
+            print(self.fmqtt_interface)
 
     def __onMessage(self, client, userData, msg):
         topic = msg.topic
@@ -151,12 +147,7 @@ class BiDirectionalMQTTComms:
                 self.sendMsg("initial message received", SETUP_DEVICE_TOPIC)
             elif ("topics" in payload):
                 self.ftopic_list = self.__encodeTopicsString(payload)
-                print("___________________")
-                print(self.ftopic_list)
-                print("___________________")
-
                 self.__assignDeviceInterface(payload)
-
                 self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
             else:
                 if self.fmqtt_interface is not None:

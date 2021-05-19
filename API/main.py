@@ -9,6 +9,7 @@ repackage.up()
 from SharedClasses.DeviceInterface import * 
 from SharedClasses.helper_functions import * 
 from SharedClasses.BiDirectionalMQTTComms import * 
+from SharedClasses.SystemConstants import *
 
 connection_list = []
 mqtt_ip_addresses = []
@@ -37,10 +38,6 @@ class MQTTSniffer(threading.Thread):
                             
             if (ip_data.src not in mqtt_ip_addresses) and not(ip_data.src == device_ip_address):
                 mqtt_ip_addresses.append(ip_data.src)
-
-                print(mqtt_data)
-                print("Setting up MQTT Connection with IP: " + ip_data.src)
-                
                 connection_list.append(BiDirectionalMQTTComms(device_ip_address, ip_data.src, DeviceType.server))
 
             new_connection_lock.release()
@@ -69,6 +66,8 @@ def get_device_details():
         if output_str != "":
             output_str += ", "
 
+        print(device.fmqtt_interface)
+
         if device.fmqtt_interface != None:
             device_interface = device.fmqtt_interface
             output_str += "["
@@ -76,6 +75,7 @@ def get_device_details():
             output_str += "\"device_type\" : \"" + device_interface.getDeviceType() + "\""
             output_str += "]"
     
+    print(output_str)
     return "{" + output_str + "}"
 
 @app.route("/get_device_of_type/<type>", methods=['POST'])

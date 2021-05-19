@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
     #try make this constant!
     interface_obj = CommunicationInterface(
-                        "WateringSystem", 
+                        WATERING_SYSTEM_TYPE_NAME, 
                         [DEFAULT_DATA_TOPIC, 
                         CONTROL_DEVICE_TOPIC,
                         SETUP_DEVICE_TOPIC, 
@@ -69,6 +69,5 @@ if __name__ == "__main__":
         if len(msg) > 0:
             print(msg)
             mqtt_interface.sendMsg(msg, WATERING_INFO_TOPIC)
-            print("_______________________")
 
         sleep(0.2)

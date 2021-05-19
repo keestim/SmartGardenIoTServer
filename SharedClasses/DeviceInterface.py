@@ -2,12 +2,16 @@ import abc
 from flask import json
 import repackage
 repackage.up()
-from SharedClasses.BiDirectionalMQTTComms import * 
+from SharedClasses.SystemConstants import *
 
 num_edge_devices = 0
 
+PLANT_MONITOR_TYPE_NAME = "PlantMonitor" 
+WATERING_SYSTEM_TYPE_NAME = "WateringSystem"
+
 class DeviceInterface():
     global num_edge_devices
+
     def __init__(self, topics = ""):
         global num_edge_devices
 
@@ -41,7 +45,7 @@ class PlantMonitorInterface(DeviceInterface):
         self.fTemperature = 0
         self.fMoisture = 0
         self.fHumidity = 0
-        self.fDeviceType = "PlantMonitor"
+        self.fDeviceType = PLANT_MONITOR_TYPE_NAME
         
     def onMessage(self, topic, payload):
         print(topic + "|" + payload)
@@ -67,7 +71,7 @@ class WaterSystemInterface(DeviceInterface):
 
         self.fWaterVolume = 0
         self.fValueOpen = False
-        self.fDeviceType = "WaterSystem"
+        self.fDeviceType = WATERING_SYSTEM_TYPE_NAME
 
     def onMessage(self, topic, payload):
         print(topic + "|" + payload)
