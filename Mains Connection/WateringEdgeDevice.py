@@ -55,10 +55,10 @@ if __name__ == "__main__":
     #try make this constant!
     interface_obj = CommunicationInterface(
                         "WateringSystem", 
-                        ["/edge_device/data", 
-                        "/edge_device/water_info",
+                        [DEFAULT_DATA_TOPIC, 
                         CONTROL_DEVICE_TOPIC,
                         SETUP_DEVICE_TOPIC, 
+                        WATERING_INFO_TOPIC,
                         "/edge_device/topic_stream"])
     
     mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, DeviceType.edge_device, interface_obj)
@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
         if len(msg) > 0:
             print(msg)
-            mqtt_interface.sendMsg(msg, "/edge_device/water_info")
+            mqtt_interface.sendMsg(msg, WATERING_INFO_TOPIC)
             print("_______________________")
 
         sleep(0.2)

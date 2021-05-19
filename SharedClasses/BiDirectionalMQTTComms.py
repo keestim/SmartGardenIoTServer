@@ -14,6 +14,9 @@ SETUP_DEVICE_TOPIC = "/edge_device/setup_device"
 CONTROL_DEVICE_TOPIC = "/edge_device/control_device"
 DEFAULT_DATA_TOPIC = "/edge_device/data"
 
+#For watering edge device
+WATERING_INFO_TOPIC = "/edge_device/water_info"
+
 class ConnectionStatus(Enum):
     init = 1
     attempting_connection = 2
@@ -135,6 +138,7 @@ class BiDirectionalMQTTComms:
         payload = msg.payload.decode('ascii')
 
         print("PAYLOAD: " + payload)
+        print("NEW MSG: " + payload + " | " + topic)
 
         if self.fdevice_status == ConnectionStatus.connected:
             if (payload == "initial message"):
@@ -168,7 +172,7 @@ class BiDirectionalMQTTComms:
         return self.fdevice_status
 
     def sendMsg(self, msgText, topic = DEFAULT_DATA_TOPIC):
-        print("sending msg: " + msgText + " | " + self.fdest_ip_address)
+        print("sending msg: " + msgText + " | " + topic + " | " + self.fdest_ip_address)
         publish.single(topic, msgText, hostname = self.fdest_ip_address)
 
         if (self.fdevice_type == DeviceType.edge_device):

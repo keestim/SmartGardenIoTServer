@@ -71,7 +71,7 @@ class WaterSystemInterface(DeviceInterface):
 
     def onMessage(self, topic, payload):
         print(topic + "|" + payload)
-        if (topic == "/edge_device/water_info"):
+        if (topic == WATERING_INFO_TOPIC):
             device_data = json.loads(payload)
             self.fValueOpen = str(device_data["pump_state"]) == "1"
             self.fWaterVolume = float(device_data["total_volume"])
