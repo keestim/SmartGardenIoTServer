@@ -23,20 +23,18 @@ unsigned long oldTime;
 void setup() {
     // Initialize a serial connection for reporting values to the host
   Serial.begin(9600);
-  // put your setup code here, to run once:
-  
+
   pinMode(relayPin, OUTPUT);
   pinMode(sensorPin, INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
   digitalWrite(sensorPin, HIGH);
+  
   initialiseFlowMeter();
 }
 
 void acuateBlinkLed()
-{
-  Serial.write("BLINK LED");
-  
+{  
   if (blinkLED)
   {
     for (int i = 0; i < 10; i++)
@@ -130,24 +128,20 @@ void loop()
 void readSerialMsgs()
 {
   String serialMsg;
-  
-  // put your main code here, to run repeatedly:
 
   while(Serial.available()) {
     delay(3);
-    Serial.print("Reading MSG");
-    
+   
     if (Serial.available() > 0) {
       serialMsg += char(Serial.read());// read the incoming data as string
     }
   }
 
+  // if the string that's been read in is longer that 0 length, then try to parse the string as JSON
+  // all serial communication should occur through JSON
   if (serialMsg.length() > 0)
   {
-    DynamicJsonDocument doc(200);
-    Serial.print(serialMsg);
-    Serial.println("");
-    
+    DynamicJsonDocument doc(200);    
     auto error = deserializeJson(doc, serialMsg);
     
     if (error) {
@@ -156,14 +150,12 @@ void readSerialMsgs()
         return;
     }
 
-
     if (doc.containsKey("valve_state"))
     {
       String valveState = doc["valve_state"];
 
       valveOpen = (valveState == "open");
     }
-
 
     if (doc.containsKey("blink_led"))
     {
@@ -172,7 +164,6 @@ void readSerialMsgs()
     }
   }
 }
-
 
 /*
 Insterrupt Service Routine

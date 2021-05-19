@@ -80,15 +80,15 @@ if __name__ == "__main__":
 
 	#try make this constant!
 	interface_obj = CommunicationInterface(
-						"PlantMonitor",
-						["/edge_device/data",
-						"edge_devices/control_device",
-						"/edge_device/setup_device",
+						PLANT_MONITOR_TYPE_NAME, 
+						[DEFAULT_DATA_TOPIC, 
+						CONTROL_DEVICE_TOPIC, 
+						SETUP_DEVICE_TOPIC, 
 						"/edge_device/topic_stream",
 						"/edge_device/PlantData",
 						"/edge_data/Picture"])
 
-	mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, interface_obj)
+	mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, DeviceType.edge_device, interface_obj)
 
 
 	while True:
