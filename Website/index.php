@@ -29,11 +29,12 @@ created: 18/05/2021
 
       <p>
         <ul>
-          <li>Device 1 <button onclick="location.href='localhost::';" type="button">Blink device</button></li>
-          <li>Device 2 <button onclick="location.href='localhost::';" type="button">Blink device</button></li>
-          <li>Device 3 <button onclick="location.href='localhost::';" type="button">Blink device</button></li>
-          <li>Device 4 <button onclick="location.href='localhost::';" type="button">Blink device</button></li>
-        </ul>		
+          <li>Device 1 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li>
+          <li>Device 2 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li>
+          <li>Device 3 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li>
+          <li>Device 4 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li>
+        </ul>
+        <button onclick="location.href='localhost:5000/flash_all_lights';" type="button">Blink all device</button>
       </p>
       </section>
     </section>

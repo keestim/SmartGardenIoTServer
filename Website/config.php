@@ -27,25 +27,75 @@ created: 18/05/2021
     <section class="section1">
     <h3>System Configuration</h3>
     <fieldset>
-            <legend>Watering</legend>
-            <p><label for="Device">Device:</label> 
-              <select name="DeviceD" id="DeviceD">
+            <legend>Plant A</legend>
+            <p><label for="Device">Watering Device:</label> 
+              <select name="DeviceD" id="DeviceA">
                 <!-- this field changes depending on how many watering devices there are -->
                 <option value="Watering Device 1">Watering Device 1</option>
                 <option value="Watering Device 2">Watering Device 2</option>		
                 <!-- this field changes depending on how many watering devices there are -->	
-              </select>
-              <a><  ></a>
-              <select name="DeviceD" id="DeviceD">
+              </select>     
+            </p>
+            <p><label for="Device">Moisture Sensor:</label> 
+              <select name="DeviceD" id="DeviceA">
                 <!-- this field changes depending on how many watering devices there are -->
                 <option value="Watering Device 1">Watering Device 1</option>
                 <option value="Watering Device 2">Watering Device 2</option>		
                 <!-- this field changes depending on how many watering devices there are -->	
-              </select>
-              
+              </select>     
+            </p>
+            <p><label for="Device">Fire Sensor:</label> 
+              <select name="DeviceD" id="DeviceA">
+                <!-- this field changes depending on how many watering devices there are -->
+                <option value="Watering Device 1">Watering Device 1</option>
+                <option value="Watering Device 2">Watering Device 2</option>		
+                <!-- this field changes depending on how many watering devices there are -->	
+              </select>     
             </p>
             <input type= "submit" value="Bind devices"  id="submit"/>
-          </fieldset>
+            </fieldset>
+
+            <fieldset>
+            <legend>Plant B</legend>
+            <p><label for="Device">Watering Device:</label> 
+              <select name="DeviceD" id="DeviceA">
+                <!-- this field changes depending on how many watering devices there are -->
+                <option value="Watering Device 1">Watering Device 1</option>
+                <option value="Watering Device 2">Watering Device 2</option>		
+                <!-- this field changes depending on how many watering devices there are -->	
+              </select>     
+            </p>
+            <p><label for="Device">Moisture Sensor:</label> 
+              <select name="DeviceD" id="DeviceA">
+                <!-- this field changes depending on how many watering devices there are -->
+                <option value="Watering Device 1">Watering Device 1</option>
+                <option value="Watering Device 2">Watering Device 2</option>		
+                <!-- this field changes depending on how many watering devices there are -->	
+              </select>     
+            </p>
+            <p><label for="Device">Fire Sensor:</label> 
+              <select name="DeviceD" id="DeviceA">
+                <!-- this field changes depending on how many watering devices there are -->
+                <option value="Watering Device 1">Watering Device 1</option>
+                <option value="Watering Device 2">Watering Device 2</option>		
+                <!-- this field changes depending on how many watering devices there are -->	
+              </select>     
+            </p>
+            <input type= "submit" value="Bind devices"  id="submit"/>
+            </fieldset>
+            <script>
+// Check browser support
+if (typeof(Storage) !== "undefined") {
+  // Store
+  localStorage.setItem(getElementById(DeviceD), "Smith");
+  // Retrieve
+  document.getElementById("result").innerHTML = localStorage.getItem("lastname");
+} else {
+  document.getElementById("result").innerHTML = "Sorry, your browser does not support Web Storage...";
+}
+</script>
+
+          
     </section>
   </section>
 </article>
