@@ -5,6 +5,26 @@ created: 18/05/2021
 <?php
   header("Access-Control-Allow-Origin", "*");
   header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+  //https://weichie.com/blog/curl-api-calls-with-php/
+  // create & initialize a curl session
+  $curl = curl_init();
+
+  // set our url with curl_setopt()
+  curl_setopt($curl, CURLOPT_URL, "http://localhost:5000/get_device_details");
+
+  // return the transfer as a string, also with setopt()
+  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+  // curl_exec() executes the started curl session
+  // $output contains the output string
+  $output = curl_exec($curl);
+
+  // close curl resource to free up system resources
+  // (deletes the variable made by curl_init)
+  curl_close($curl);
+
+  $devices_json_obj = json_decode($output);
 ?>
 
 <!DOCTYPE html> 
@@ -35,8 +55,13 @@ created: 18/05/2021
       <!-- Display all devices, name aka watering device and id -->
       <p> 
         <ul>
-          <li>Watering Device 1 </li><button onclick="blinkdevice0()" type="button">Blink device</button> <!-- href is the url to blink that id -->
-          <li>Watering Device 2<button onclick="blinkdevice1()" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
+          <?php 
+            foreach ($devices_json_obj as $device) {
+              print("<li>" . $device->device_type . " " . $device->id . " <button onclick='blinkdevice(" . $device->id . ")'>Blink Device LED</button></li>");
+            }
+
+          ?>
+
           <p><button type="button" onclick="flashalllights()">Blink all Devices</button></p> <!-- Blinks all lights -->
           <div id="demo"></div>
         </ul>

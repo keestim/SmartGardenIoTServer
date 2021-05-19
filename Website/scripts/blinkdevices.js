@@ -1,30 +1,12 @@
 function flashalllights () {
-    console.log(this.responseText);
-    // document.getElementById("demo").innerHTML = this.responseText;
-  }
-  
   var oReq = new XMLHttpRequest();
-  oReq.addEventListener("load", flashalllights);
   oReq.open("GET", "http://localhost:5000/flash_all_lights");
   oReq.send();
+}
 
-function blinkdevice0 () {
-    console.log(this.responseText);
-    // document.getElementById("demo").innerHTML = this.responseText;
-  }
-  
+function blinkdevice(device_id) {
   var oReq = new XMLHttpRequest();
-  oReq.addEventListener("load", blinkdevice0);
-  oReq.open("GET", "http://localhost:5000/flash_light/0");
+  oReq.open("GET", "http://localhost:5000/flash_light/" + device_id);
   oReq.send();
   
-  function blinkdevice1 () {
-    console.log(this.responseText);
-    // document.getElementById("demo").innerHTML = this.responseText;
-  }
-  
-  var oReq = new XMLHttpRequest();
-  oReq.addEventListener("load", blinkdevice1);
-  oReq.open("GET", "http://localhost:5000/flash_light/1");
-  oReq.send();
-  
+}
