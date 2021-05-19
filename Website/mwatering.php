@@ -27,7 +27,7 @@ created: 18/05/2021
     </div>
 
     <section id="section1">
-      <form method="post" action="localhost:5000/water_set_volume/0/50" novalidate> <!-- water_set_volume/deviceid/amount in ml-->
+      <form method="post" novalidate> <!-- water_set_volume/deviceid/amount in ml-->
         </p>
           <fieldset>
             <legend>Watering</legend>
@@ -39,7 +39,7 @@ created: 18/05/2021
                 <!-- this field changes depending on how many watering devices there are -->	
               </select>
             </p>
-            <input type= "submit" value="Blink device"  id="submit"/>
+            <button type="button" onclick="blinkdevice()">Blink device</button>
           </fieldset>
 
           <fieldset>
@@ -49,7 +49,7 @@ created: 18/05/2021
             </p>
           </fieldset>
         <p></p>
-        <button type="button" onclick="loadXMLDoc()">Change Content</button>
+        <button type="button" onclick="loadXMLDoc()">Water plants</button>
         <input type= "reset" value="Reset Form"/>
 
         <script>
@@ -61,6 +61,19 @@ var $volume = document.getElementById("DeviceD");;
 var oReq = new XMLHttpRequest();
 oReq.addEventListener("load", loadXMLDoc);
 oReq.open("GET", "http://localhost:5000/water_set_volume/"$deviceID"/"$volume"");
+oReq.send();
+
+</script>
+
+<script>
+function blinkdevice () {
+  console.log(this.responseText);
+}
+var $deviceID = 0;
+$deviceID = document.getElementById("DeviceD");
+var oReq = new XMLHttpRequest();
+oReq.addEventListener("load", loadXMLDoc);
+oReq.open("GET", "http://localhost:5000/flash_light/"$deviceID"");
 oReq.send();
 
 </script>
