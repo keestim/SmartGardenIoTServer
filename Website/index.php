@@ -24,19 +24,9 @@ created: 18/05/2021
     <div class="navbar" id="navbar">
     </div>
     
-    <?php 
-    $ch = curl_init("localhost:5000/get_device_details");
-            curl_setopt($ch, CURLOPT_HTTPGET, true);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            $response_json = curl_exec($ch);
-            curl_close($ch);
-            $response=json_decode($response_json, true);
-            echo "<p>$response</p>";
-    ?>
-    
     <section id="MainSectionA">
       <section class="section1">
-      <h3>Device list</h3>
+      <h3 id="demo">Device list</h3>
       <!-- Display all devices, name aka watering device and id -->
       <p> 
         <ul>
@@ -45,6 +35,25 @@ created: 18/05/2021
           <li>Device 3 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
           <li>Device 4 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
           <p><button onclick="location.href='localhost:5000/flash_all_lights';" type="button">Blink all device</button></p> <!-- Blinks all lights -->
+
+          <div id="demo">
+<button type="button" onclick="loadXMLDoc()">Change Content</button>
+</div>
+
+<script>
+function loadXMLDoc() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("demo").innerHTML =
+      this.responseText;
+    }
+  };
+  xhttp.open("GET", "127.0.0.1:5000/probe_devices", true);
+  xhttp.send();
+}
+</script>
+          </script>
         </ul>
         
       </p>
