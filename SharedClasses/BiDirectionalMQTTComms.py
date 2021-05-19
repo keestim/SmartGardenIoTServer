@@ -10,6 +10,10 @@ repackage.up()
 from SharedClasses.DeviceInterface import * 
 from SharedClasses.helper_functions import * 
 
+SETUP_DEVICE_TOPIC = "/edge_device/setup_device"
+CONTROL_DEVICE_TOPIC = "/edge_device/control_device"
+DEFAULT_DATA_TOPIC = "/edge_device/data"
+
 class ConnectionStatus(Enum):
     init = 1
     attempting_connection = 2
@@ -33,12 +37,11 @@ class MQTTConnectInitializer(threading.Thread):
         self.fmqtt_bi_comms = mqtt_bi_comms
         
     def run(self):
-        print("run start messaging!")
         while True:
             if self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.init:
-                self.fmqtt_bi_comms.sendMsg("broadcast", "/edge_device/setup_device")
+                self.fmqtt_bi_comms.sendMsg("broadcast", SETUP_DEVICE_TOPIC)
             elif self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.attempting_connection:
-                self.fmqtt_bi_comms.sendMsg("initial message", "/edge_device/setup_device")
+                self.fmqtt_bi_comms.sendMsg("initial message", SETUP_DEVICE_TOPIC)
             elif self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.connected:
                 exit()
 
@@ -59,9 +62,9 @@ class BiDirectionalMQTTComms:
 
         #initial topics for all connected 
         #MAKE THESE CONSTANTS!!!!
-        self.ftopic_list = [("/edge_device/data", 0), 
-                            ("/edge_device/setup_device", 0), 
-                            ("/edge_device/control_device", 0)]
+        self.ftopic_list = [(DEFAULT_DATA_TOPIC, 0), 
+                            (SETUP_DEVICE_TOPIC, 0), 
+                            (CONTROL_DEVICE_TOPIC, 0)]
 
         self.client = None
         self.fdevice_status = ConnectionStatus.init
@@ -86,7 +89,7 @@ class BiDirectionalMQTTComms:
     def __registerDevice(self, topic, payload):
         if self.fdevice_status == ConnectionStatus.attempting_connection:
             if (payload == "initial message"):
-                self.sendMsg("initial message received", "/edge_device/setup_device")
+                self.sendMsg("initial message received", SETUP_DEVICE_TOPIC)
             elif (payload == "initial message received"):
                 self.fdevice_status = ConnectionStatus.connected
 
@@ -96,7 +99,7 @@ class BiDirectionalMQTTComms:
                     self.sendMsg(
                         str("{\"topics\": ") + str(topics_json) + ", " + 
                             "\"device_type\": \"" + self.fmqtt_interface.getDeviceType() + "\"}", 
-                            "/edge_device/setup_device")
+                            SETUP_DEVICE_TOPIC)
 
     def __encodeTopicsString(self, payload):
         print(payload)
@@ -135,7 +138,7 @@ class BiDirectionalMQTTComms:
 
         if self.fdevice_status == ConnectionStatus.connected:
             if (payload == "initial message"):
-                self.sendMsg("initial message received", "/edge_device/setup_device")
+                self.sendMsg("initial message received", SETUP_DEVICE_TOPIC)
             elif ("topics" in payload):
                 self.ftopic_list = self.__encodeTopicsString(payload)
                 print("___________________")
@@ -164,7 +167,7 @@ class BiDirectionalMQTTComms:
     def getDeviceStatus(self):
         return self.fdevice_status
 
-    def sendMsg(self, msgText, topic = "/edge_device/data"):
+    def sendMsg(self, msgText, topic = DEFAULT_DATA_TOPIC):
         print("sending msg: " + msgText + " | " + self.fdest_ip_address)
         publish.single(topic, msgText, hostname = self.fdest_ip_address)
 

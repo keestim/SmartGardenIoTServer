@@ -40,9 +40,9 @@ if __name__ == "__main__":
     #try make this constant!
     interface_obj = CommunicationInterface(
                         "PlantMonitor", 
-                        ["/edge_device/data", 
-                        "/edge_device/control_device", 
-                        "/edge_device/setup_device", 
+                        [DEFAULT_DATA_TOPIC, 
+                        CONTROL_DEVICE_TOPIC, 
+                        SETUP_DEVICE_TOPIC, 
                         "/edge_device/topic_stream"])
     
     mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, interface_obj)

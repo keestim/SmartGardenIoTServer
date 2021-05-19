@@ -1,5 +1,8 @@
 import abc
 from flask import json
+import repackage
+repackage.up()
+from SharedClasses.BiDirectionalMQTTComms import * 
 
 num_edge_devices = 0
 
@@ -22,7 +25,7 @@ class DeviceInterface():
 
     def blinkLED(self):
         output_msg = {}
-        output_msg["topic"] = "/edge_device/control_device"
+        output_msg["topic"] = CONTROL_DEVICE_TOPIC
         output_msg["payload"] = "{\"blink_led\" : \"true\"}"
         return output_msg
 
@@ -81,12 +84,12 @@ class WaterSystemInterface(DeviceInterface):
 
     def openValve(self):
         output_msg = {}
-        output_msg["topic"] = "/edge_device/control_device"
+        output_msg["topic"] = CONTROL_DEVICE_TOPIC
         output_msg["payload"] = "{\"valve_state\" : \"open\"}"
         return output_msg
 
     def closeValve(self):
         output_msg = {}
-        output_msg["topic"] = "/edge_device/control_device"
+        output_msg["topic"] = CONTROL_DEVICE_TOPIC
         output_msg["payload"] = "{\"valve_state\" : \"closed\"}"
         return output_msg
