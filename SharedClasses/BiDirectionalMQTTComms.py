@@ -34,6 +34,8 @@ class MQTTSubscriberThread(threading.Thread):
     def run(self):
         self.fmqtt_client.loop_forever()
 
+#potentially add a new enum to enforce that "initial message received" is sent before enum!
+
 class MQTTConnectInitializer(threading.Thread):
     def __init__(self, mqtt_bi_comms):
         super().__init__()
@@ -95,6 +97,8 @@ class BiDirectionalMQTTComms:
                 self.sendMsg("initial message received", SETUP_DEVICE_TOPIC)
             elif (payload == "initial message received"):
                 self.fdevice_status = ConnectionStatus.connected
+
+                self.sendMsg("initial message received", SETUP_DEVICE_TOPIC)
 
                 if (self.fmqtt_interface is not None):
                     topics_json = json.dumps(self.fmqtt_interface.getTopicList())
