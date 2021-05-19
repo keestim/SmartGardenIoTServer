@@ -35,8 +35,8 @@ created: 18/05/2021
       <!-- Display all devices, name aka watering device and id -->
       <p> 
         <ul>
-          <li>Device 1 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
-          <li>Device 2 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
+          <li>Watering Device 1 <button onclick="location.href='http://localhost:5000/';" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
+          <li>Watering Device 2 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
           <li>Device 3 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
           <li>Device 4 <button onclick="location.href='localhost:5000/';" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
           <p><button onclick="location.href='http://localhost:5000/flash_all_lights';" type="button">Blink all device</button></p> <!-- Blinks all lights -->
@@ -52,7 +52,7 @@ function loadXMLDoc () {
 
 var oReq = new XMLHttpRequest();
 oReq.addEventListener("load", loadXMLDoc);
-oReq.open("GET", "http://localhost:5000/flash_all_lights");
+oReq.open("GET", "http://localhost:5000/probe_devices");
 oReq.send();
 
 </script>

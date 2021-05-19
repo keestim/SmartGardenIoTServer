@@ -34,8 +34,8 @@ created: 18/05/2021
             <p><label for="Device">Device:</label> 
               <select name="DeviceD" id="DeviceD">
                 <!-- this field changes depending on how many watering devices there are -->
-                <option value="Watering Device 1">Watering Device 1</option>
-                <option value="Watering Device 2">Watering Device 2</option>		
+                <option value="0">Watering Device 1</option>
+                <option value="1">Watering Device 2</option>		
                 <!-- this field changes depending on how many watering devices there are -->	
               </select>
             </p>
@@ -49,8 +49,22 @@ created: 18/05/2021
             </p>
           </fieldset>
         <p></p>
-        <input type= "submit" value="Confirm"  id="submit"/>
+        <button type="button" onclick="loadXMLDoc()">Change Content</button>
         <input type= "reset" value="Reset Form"/>
+
+        <script>
+function loadXMLDoc () {
+  console.log(this.responseText);
+}
+var $deviceID = document.getElementById("DeviceD");
+var $volume = document.getElementById("DeviceD");;
+var oReq = new XMLHttpRequest();
+oReq.addEventListener("load", loadXMLDoc);
+oReq.open("GET", "http://localhost:5000/water_set_volume/"$deviceID"/"$volume"");
+oReq.send();
+
+</script>
+
       </form> 
     </section>
   
