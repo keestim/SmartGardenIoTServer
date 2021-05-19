@@ -49,11 +49,8 @@ created: 18/05/2021
                     if (isset($_POST['statusupdatebtn']))
                     {
                         //CHANGES THE STATUS OF THE ORDER TO THE VALUE OF THE OPTION
-
                         echo "here";
                     }
-
-                    
 
                 $sql_table="orders";
         
