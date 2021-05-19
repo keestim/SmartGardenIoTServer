@@ -1,6 +1,10 @@
-from flask import Flask, request, jsonify
+from flask import Flask
+from flask_cors import CORS
+
 import threading
 import pyshark
+
+
 from time import sleep  
 import sys
 
@@ -42,9 +46,29 @@ class MQTTSniffer(threading.Thread):
 
             new_connection_lock.release()
 
+def findDeviceByID(device_id):
+    if (not device_id.is_integer()):
+        return None
+    
+    for device in connection_list:
+        if device.fmqtt_interface != None:
+            if str(device.fmqtt_interface.getDeviceID()) == str(device_id):
+                return device
+
+def findDeviceByIDAndType(device_id, device_type):
+    potential_device = findDeviceByID(device_id)
+    if (type(potential_device.fmqtt_interface) is device_type):
+        return potential_device
+    else:
+        return None
+
 #https://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
+#https://restfulapi.net/http-status-codes/
+
 app = Flask(__name__)
-app.config["DEBUG"] = True
+CORS(app)
+
+#app.config["DEBUG"] = True
 
 #IF NOT RETURNING ANY DATA:
 #https://stackoverflow.com/questions/38804385/flask-to-return-nothing-but-only-run-script
@@ -52,11 +76,11 @@ app.config["DEBUG"] = True
 
 @app.route('/', methods=['GET'])
 def home():
-    return "API Test"
+    return "Welcome to Smart Garden API"
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return "Route Not Found", 404
+    return ("Route Not Found", 404)
 
 @app.route("/get_device_details", methods=['GET'])
 def get_device_details():
@@ -65,8 +89,6 @@ def get_device_details():
     for device in connection_list:
         if output_str != "":
             output_str += ", "
-
-        print(device.fmqtt_interface)
 
         if device.fmqtt_interface != None:
             device_interface = device.fmqtt_interface
@@ -78,8 +100,8 @@ def get_device_details():
     print(output_str)
     return "{" + output_str + "}"
 
-@app.route("/get_device_of_type/<type>", methods=['GET', 'POST'])
-def get_device_of_type(type):
+@app.route("/get_device_of_type/<device_type_name>", methods=['GET', 'POST'])
+def get_device_of_type(device_type_name):
     output_str = ""
 
     for device in connection_list:
@@ -87,7 +109,7 @@ def get_device_of_type(type):
             output_str += ", "
 
         if device.fmqtt_interface != None:
-            if (device.fmqtt_interface.getDeviceType() == type):
+            if (device.fmqtt_interface.getDeviceType() == device_type_name):
                 device_interface = device.fmqtt_interface
                 output_str += "["
                 output_str += "\"id\": " + int(device_interface.getDeviceID()) + ", " 
@@ -95,14 +117,6 @@ def get_device_of_type(type):
                 output_str += "]"
     
     return "{" + output_str + "}"
-
-@app.route("/probe_devices", methods=['GET', 'POST'])
-def probe_devices():
-    for device in connection_list:
-        devices_str = devices_str + device.fdest_ip_address + ", "
-        device.sendMsg("The bois")
-
-    return ('', 204)
 
 @app.route("/flash_all_lights", methods=['GET', 'POST'])
 def flash_all_lights():
@@ -114,14 +128,15 @@ def flash_all_lights():
 
     return ('', 204)
 
-@app.route("/flash_light/<device>", methods=['GET', 'POST'])
-def flash_light(device):
-    for device in connection_list:
-        if device.fmqtt_interface != None:
-            if str(device.fmqtt_interface.getDeviceID()) == str(device):
-                msg_details = getattr(device.fmqtt_interface, 'blinkLED')()
-                print(msg_details)
-                device.sendMsg(msg_details["payload"], msg_details["topic"])
+@app.route("/flash_light/<device_id>", methods=['GET', 'POST'])
+def flash_light_for_id(device_id):
+    selected_device = findDeviceByID(device_id)
+
+    if selected_device is None:
+        return ('No Device Exists for Input ID', 400)
+    else:
+        msg_details = getattr(selected_device.fmqtt_interface, 'blinkLED')()
+        selected_device.sendMsg(msg_details["payload"], msg_details["topic"])
 
     return ('', 204)
 
@@ -129,7 +144,8 @@ def flash_light(device):
 def turn_on_valve(device_id, state):
     selected_device = None
 
-    #validate that id is an in
+    if (not device_id.is_integer()):
+        return ('', 400)
 
     if state not in ["open", "closed"]:
         return "invalid state provided"

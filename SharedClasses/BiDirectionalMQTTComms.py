@@ -59,8 +59,6 @@ class BiDirectionalMQTTComms:
         self.fmqtt_subscriber_thread = None
         self.fdevice_type = device_type
 
-        #initial topics for all connected 
-        #MAKE THESE CONSTANTS!!!!
         self.ftopic_list = [(DEFAULT_DATA_TOPIC, 0), 
                             (SETUP_DEVICE_TOPIC, 0), 
                             (CONTROL_DEVICE_TOPIC, 0)]
@@ -125,7 +123,6 @@ class BiDirectionalMQTTComms:
             json_output = json.loads(payload)
             device_type = json_output['device_type']
 
-            #maybe use some kind of static enum?
             if (device_type == PLANT_MONITOR_TYPE_NAME):
                 self.fmqtt_interface = PlantMonitorInterface()
             elif (device_type == WATERING_SYSTEM_TYPE_NAME):
