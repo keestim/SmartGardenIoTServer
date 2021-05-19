@@ -35,39 +35,15 @@ created: 18/05/2021
       <!-- Display all devices, name aka watering device and id -->
       <p> 
         <ul>
-          <li>Watering Device 1 <button onclick="blinkdevice0()" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
-          <li>Watering Device 2 <button onclick="location.href="http://localhost:5000//flash_light/1" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
-          <li>Device 3 <button onclick="location.href="http://localhost:5000//flash_light/2" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
-          <li>Device 4 <button onclick="location.href="http://localhost:5000//flash_light/3" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
-          <p><button type="button" onclick="loadXMLDoc()">Blink all Devices</button></p> <!-- Blinks all lights -->
+          <li>Watering Device 1 </li><button onclick="blinkdevice0()" type="button">Blink device</button> <!-- href is the url to blink that id -->
+          <li>Watering Device 2 <button onclick="location.href="http://localhost:5000/flash_light/1" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
+          <li>Device 3 <button onclick="location.href="http://localhost:5000/flash_light/2" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
+          <li>Device 4 <button onclick="location.href="http://localhost:5000/flash_light/3" type="button">Blink device</button></li> <!-- href is the url to blink that id -->
+          <p><button type="button" onclick="flashalllights()">Blink all Devices</button></p> <!-- Blinks all lights -->
           <div id="demo">
 </div>
 
 <script>
-function loadXMLDoc () {
-  console.log(this.responseText);
-  // document.getElementById("demo").innerHTML = this.responseText;
-}
-
-var oReq = new XMLHttpRequest();
-oReq.addEventListener("load", loadXMLDoc);
-oReq.open("GET", "http://localhost:5000/flash_all_lights");
-oReq.send();
-
-</script>
-
-<script>
-function blinkdevice0 () {
-  console.log(this.responseText);
-  // document.getElementById("demo").innerHTML = this.responseText;
-}
-
-var oReq = new XMLHttpRequest();
-oReq.addEventListener("load", loadXMLDoc);
-oReq.open("GET", "http://localhost:5000//flash_light/0");
-oReq.send();
-
-</script>
         </ul>
         
       </p>
