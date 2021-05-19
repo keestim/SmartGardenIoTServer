@@ -18,6 +18,9 @@ created: 18/05/2021
   <script src="./scripts/loadhtml.js"></script>
   <script src="./scripts/loaddevices.js"></script>
  </head>
+ <?php
+ header('Access-Control-Allow-Origin: *');
+ ?>
 <body>
   <article>
     <header><h1>Smart Garden</h1></header>
@@ -47,7 +50,7 @@ function loadXMLDoc () {
 
 var oReq = new XMLHttpRequest();
 oReq.addEventListener("load", loadXMLDoc);
-oReq.open("GET", "http://localhost/xampp/SmartGardenIoTServer/Website/test.html");
+oReq.open("GET", "localhost:5000/probe_devices");
 oReq.send();
 
 </script>
