@@ -50,7 +50,6 @@ class PlantMonitorInterface(DeviceInterface):
         self.fHumidityRaw = 0
         self.fHumidityPercent = 0
         self.fDeviceType = PLANT_MONITOR_TYPE_NAME
-        self.fCoupledPlantInterface = None
         
     def onMessage(self, topic, payload):
         if (topic == "/edge_device/PlantData"):
@@ -72,9 +71,6 @@ class PlantMonitorInterface(DeviceInterface):
     def getHumidity(self):
         return self.fHumidity
 
-    def geCoupledPlantInterface(self):
-        return self.fCoupledPlantInterface
-
 class WaterSystemInterface(DeviceInterface):
     def __init__(self):
         super().__init__()
@@ -82,6 +78,9 @@ class WaterSystemInterface(DeviceInterface):
         self.fWaterVolume = 0
         self.fValueOpen = False
         self.fDeviceType = WATERING_SYSTEM_TYPE_NAME
+        
+        self.fCoupledPlantInterface = None
+        self.fTriggerMoistureLevel = 0
 
     def onMessage(self, topic, payload):
         if (topic == WATERING_INFO_TOPIC):
@@ -107,3 +106,14 @@ class WaterSystemInterface(DeviceInterface):
         output_msg[PAYLOAD_MSG_KEY] = "{\"valve_state\" : \"closed\"}"
         return output_msg
 
+    def getCoupledPlantInterface(self):
+        return self.fCoupledPlantInterface
+
+    def setCoupledPlantInterface(self, input_interface):
+        self.fCoupledPlantInterface = input_interface
+
+    def getTriggerMoistureLevel(self):
+        return self.fTriggerMoistureLevel
+
+    def setTriggerMoistureLevel(self, input_value):
+        self.fTriggerMoistureLevel = input_value

@@ -243,6 +243,28 @@ def water_plant_to_target_moisture():
 
     return ('', 204)
 
+#same get variables as API route above
+@app.route("/bind_watering_to_plant/", methods=['GET', 'POST'])
+def link_watering_to_plant():
+    plant_monitor_id = request.args.get("plant_id")
+    watering_system_id = request.args.get("watering_id")
+    target_moisture = request.args.get("target_moisture")
+
+    selected_plant_monitor = findDeviceByIDAndType(plant_monitor_id, PlantMonitorInterface)
+    selected_watering_system = findDeviceByIDAndType(watering_system_id, WaterSystemInterface)
+
+    if (selected_plant_monitor is None) or (selected_watering_system is None):
+        return ('', 400)
+
+    selected_watering_system.fmqtt_interface.setTriggerMoistureLevel(int(target_moisture))
+    selected_watering_system.fmqtt_interface.setCoupledPlantInterface(selected_plant_monitor.fmqtt_interface)
+
+    new_moisture_watch_thread = CoupledPlantMoistureWatcher(selected_watering_system)
+    new_moisture_watch_thread.start()
+    selected_watering_system.setMoistureWatcherThread(new_moisture_watch_thread)
+
+    return ('', 204)
+
 #SCRIPT ENTRY POINT
 if __name__ == "__main__":
     try:

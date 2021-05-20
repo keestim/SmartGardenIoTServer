@@ -7,7 +7,7 @@ import json
 import sys
 import repackage
 repackage.up()
-from SharedClasses.DeviceInterface import PlantMonitorInterface, WaterSystemInterface, PLANT_MONITOR_TYPE_NAME, WATERING_SYSTEM_TYPE_NAME
+from SharedClasses.DeviceInterface import PlantMonitorInterface, WaterSystemInterface, PLANT_MONITOR_TYPE_NAME, WATERING_SYSTEM_TYPE_NAME, PAYLOAD_MSG_KEY, TOPIC_MSG_KEY
 from SharedClasses.helper_functions import * 
 from SharedClasses.SystemConstants import *
 
@@ -37,9 +37,7 @@ class MQTTSubscriberThread(threading.Thread):
             sleep(0.1)
 
 #TODO: potentially add a new enum to enforce that "initial message received" is sent before enum!
-
 #http://www.steves-internet-guide.com/multiple-client-connections-python-mqtt/
-
 
 class MQTTConnectInitializer(threading.Thread):
     def __init__(self, mqtt_bi_comms):
@@ -56,6 +54,37 @@ class MQTTConnectInitializer(threading.Thread):
                 exit()
 
             sleep(1)
+
+class CoupledPlantMoistureWatcher(threading.Thread):
+    def __init__(self, mqtt_bi_comms):
+        super().__init__()
+        self.fmqtt_bi_comms = mqtt_bi_comms
+
+    def waterPlantToSetLevel(self):
+        mqtt_interface_obj = self.fmqtt_bi_comms.getInterfaceObj()
+
+        msg_details = getattr(mqtt_interface_obj, 'openValve')()
+        self.fmqtt_bi_comms.sendMsg(msg_details[PAYLOAD_MSG_KEY], msg_details["topic"])
+
+        while (mqtt_interface_obj.getCoupledPlantInterface().getMoisturePercentage() <= mqtt_interface_obj.getTriggerMoistureLevel()):
+            sleep(0.5)
+            continue
+
+        msg_details = getattr(mqtt_interface_obj, 'closeValve')()
+        self.fmqtt_bi_comms.sendMsg(msg_details[PAYLOAD_MSG_KEY], msg_details["topic"])
+
+    def run(self):
+        while True:
+            mqtt_interface_obj = self.fmqtt_bi_comms.getInterfaceObj()
+            print(mqtt_interface_obj.getCoupledPlantInterface().getMoisturePercentage())
+            print(mqtt_interface_obj.getTriggerMoistureLevel())
+            print(mqtt_interface_obj.getCoupledPlantInterface().getMoisturePercentage() <= mqtt_interface_obj.getTriggerMoistureLevel())
+            print("")
+
+            if (mqtt_interface_obj.getCoupledPlantInterface().getMoisturePercentage() <= mqtt_interface_obj.getTriggerMoistureLevel()):
+                self.waterPlantToSetLevel()
+
+            sleep(0.5)
 
 class BiDirectionalMQTTComms():
     def __init__(self, device_ip_address, dest_ip_address, device_type, mqtt_interface = None, port = 1883, keepAlive = 60):
@@ -87,6 +116,20 @@ class BiDirectionalMQTTComms():
         self.mqtt_connection_initalizer = MQTTConnectInitializer(self)
         self.mqtt_connection_initalizer.start()
         self.fdevice_status = ConnectionStatus.attempting_connection
+
+        self.fmoisture_watcher_thread = None
+
+    def getInterfaceObj(self):
+        return self.fmqtt_interface
+
+    def getMoistureWatcherThread(self):
+        return self.fmoisture_watcher_thread
+
+    def setMoistureWatcherThread(self, input_thread):
+        if (self.fmoisture_watcher_thread is not None):
+            self.fmoisture_watcher_thread.join()
+
+        self.fmoisture_watcher_thread = input_thread
 
     def getDestinationIPAddress(self):
         return self.fdest_ip_address
