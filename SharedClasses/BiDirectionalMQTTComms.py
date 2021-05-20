@@ -103,7 +103,6 @@ class BiDirectionalMQTTComms:
                         SETUP_DEVICE_TOPIC)
 
     def __encodeTopicsString(self, payload):
-        print(payload)
         json_output = json.loads(payload)
         topics = json_output["topics"]
 
@@ -112,7 +111,6 @@ class BiDirectionalMQTTComms:
         for topic in topics:
             result_arr.append((topic, 0))
 
-        print(result_arr)
         return result_arr   
 
     def __onConnect(self, client, userData, flags, responseCode):
@@ -126,18 +124,13 @@ class BiDirectionalMQTTComms:
             if (device_type == PLANT_MONITOR_TYPE_NAME):
                 self.fmqtt_interface = PlantMonitorInterface()
             elif (device_type == WATERING_SYSTEM_TYPE_NAME):
-                print("Adding Water System Interface")
                 self.fmqtt_interface = WaterSystemInterface()
-                print("Finished Adding")
 
             print(self.fmqtt_interface)
 
     def __onMessage(self, client, userData, msg):
         topic = msg.topic
         payload = msg.payload.decode('ascii')
-
-        print("PAYLOAD: " + payload)
-        print("NEW MSG: " + payload + " | " + topic)
 
         if self.fdevice_status == ConnectionStatus.connected:
             if (payload == "initial message"):
@@ -166,7 +159,6 @@ class BiDirectionalMQTTComms:
         return self.fdevice_status
 
     def sendMsg(self, msgText, topic = DEFAULT_DATA_TOPIC):
-        print("sending msg: " + msgText + " | " + topic + " | " + self.fdest_ip_address)
         publish.single(topic, msgText, hostname = self.fdest_ip_address)
 
         if (self.fdevice_type == DeviceType.edge_device):

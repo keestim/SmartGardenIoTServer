@@ -50,8 +50,6 @@ class PlantMonitorInterface(DeviceInterface):
         self.fCoupledPlantInterface = None
         
     def onMessage(self, topic, payload):
-        print(topic + "|" + payload)
-
         if (topic == "/edge_device/PlantData"):
             device_data = json.loads(payload)
             self.fHumidity = int(device_data["humidity"]) 
@@ -83,7 +81,6 @@ class WaterSystemInterface(DeviceInterface):
         self.fDeviceType = WATERING_SYSTEM_TYPE_NAME
 
     def onMessage(self, topic, payload):
-        print(topic + "|" + payload)
         if (topic == WATERING_INFO_TOPIC):
             device_data = json.loads(payload)
             self.fValueOpen = str(device_data["pump_state"]) == "1"
