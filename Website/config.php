@@ -45,6 +45,19 @@ created: 18/05/2021
         "http://localhost:5000/bind_watering_to_plant/?watering_id=" + watering_id + "&plant_id=" + plant_id + "&target_moisture=" + target_moisture_level);
       oReq.send();
     }
+
+    function removeAnyDeviceBinding(trigger_obj)
+    {
+      var parent_obj = $(trigger_obj).parent().parent();
+      var plant_id = parent_obj.attr("id");
+
+      var oReq = new XMLHttpRequest();
+
+      oReq.open(
+        "GET", 
+        "http://localhost:5000/remove_bind_watering_to_plant/" + plant_id);
+      oReq.send();
+    }
   </script>
  </head>
 <body>
@@ -77,7 +90,9 @@ created: 18/05/2021
         print("<p>Potentially add bindings for Fire Sensor");
         print("<br/>");
 
-        print('<button value="Bind devices"  id="submit" onclick="setDeviceBinding(this)">Bind Devices</button>');
+        print('<button value="Bind devices"  id="bind_devices" onclick="setDeviceBinding(this)">Bind Devices</button>');
+        print('<button value="Remove Any Bindings"  id="remove_any_binding" onclick="removeAnyDeviceBinding(this)">Remove Any Bindings</button>');
+
 
         print("</fieldset>");
       } 
