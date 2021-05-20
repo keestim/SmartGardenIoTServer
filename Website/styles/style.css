@@ -44,6 +44,12 @@ header h1
     
 }
 
+nav 
+{
+    width: 100%;
+    display: block;
+}
+
 nav ul 
 {
     margin: 0;

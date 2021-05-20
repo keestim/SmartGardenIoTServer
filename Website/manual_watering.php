@@ -2,6 +2,7 @@
 author: Thomas Bibby
 created: 18/05/2021
 -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,13 +23,16 @@ created: 18/05/2021
 <body>
   <a name="top"></a>
   <article>
-    <header><h1>Smart Garden</h1></header>
     <div class="navbar" id="navbar">
     </div>
 
     <section id="section1">
       <form method="post" novalidate> <!-- water_set_volume/deviceid/amount in ml-->
-        </p>
+        <label>Water By Volume: <input type="radio" name="watering_type" value="set_volume_watering"/></label>
+        <label>Water By Moisture: <input type="radio" name="watering_type"  value="set_moisture_watering"/></label>
+
+
+        <p>
           <fieldset>
             <legend>Watering</legend>
             <p><label for="Device">Device:</label> 
@@ -52,12 +56,12 @@ created: 18/05/2021
         <button type="button" onclick="loadXMLDoc()">Water plants</button>
         <input type= "reset" value="Reset Form"/>
 
-        <script>
+<script>
 function loadXMLDoc () {
   console.log(this.responseText);
 }
 var $deviceID = document.getElementById("DeviceD");
-var $volume = document.getElementById("DeviceD");;
+var $volume = document.getElementById("DeviceD");
 var oReq = new XMLHttpRequest();
 oReq.addEventListener("load", loadXMLDoc);
 oReq.open("GET", "http://localhost:5000/water_set_volume/"$deviceID"/"$volume"");

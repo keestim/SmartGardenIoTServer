@@ -3,28 +3,11 @@ author: Thomas Bibby
 created: 18/05/2021
 -->
 <?php
-  header("Access-Control-Allow-Origin", "*");
-  header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  include("./helper_functions.php");
 
-  //https://weichie.com/blog/curl-api-calls-with-php/
-  // create & initialize a curl session
-  $curl = curl_init();
+  $api_output = curl_api_request("http://localhost:5000/get_all_devices_sensor_data");
 
-  // set our url with curl_setopt()
-  curl_setopt($curl, CURLOPT_URL, "http://localhost:5000/get_device_details");
-
-  // return the transfer as a string, also with setopt()
-  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-
-  // curl_exec() executes the started curl session
-  // $output contains the output string
-  $output = curl_exec($curl);
-
-  // close curl resource to free up system resources
-  // (deletes the variable made by curl_init)
-  curl_close($curl);
-
-  $devices_json_obj = json_decode($output);
+  $devices_json_obj = json_decode($api_output);  
 ?>
 
 <!DOCTYPE html> 
@@ -45,7 +28,6 @@ created: 18/05/2021
  </head>
 <body>
   <article>
-    <header><h1>Smart Garden</h1></header>
     <div class="navbar" id="navbar">
     </div>
     
@@ -57,12 +39,19 @@ created: 18/05/2021
         <ul>
           <?php 
             foreach ($devices_json_obj as $device) {
-              print("<li>" . $device->device_type . " " . $device->id . " <button onclick='blinkdevice(" . $device->id . ")'>Blink Device LED</button></li>");
-            }
+              print("<li>" . $device->device_type . " " . $device->id);
 
+              foreach($device as $key=>$value) {
+                if (!in_array($key, ["id", "device_type"]))
+                {
+                  print("<p>" . $key . ": " . $value . "</p>");
+                }
+              }
+
+              print("</li>");
+            }
           ?>
 
-          <p><button type="button" onclick="flashalllights()">Blink all Devices</button></p> <!-- Blinks all lights -->
           <div id="demo"></div>
         </ul>
         

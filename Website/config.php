@@ -20,7 +20,6 @@ created: 18/05/2021
 <body>
   <a name="top"></a>
 <article>
-  <header><h1>Smart Garden</h1></header>
   <div class="navbar" id="navbar">
   </div>
   <section id="MainSectionA">
