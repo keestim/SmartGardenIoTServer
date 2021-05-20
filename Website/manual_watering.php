@@ -48,6 +48,12 @@ created: 18/05/2021
         blinkdevice(device_id);
       }
 
+      function blinkSelectedPlantSystem()
+      {
+        var device_id = getSelectedPlantDeviceID();
+        blinkdevice(device_id);
+      }
+
       function showSelectedWateringType(trigger_obj)
       {
         for (var obj of $(".watering_type"))
@@ -72,7 +78,7 @@ created: 18/05/2021
         var checked_radio_btn = $("#watering_type:checked");
         var oReq = new XMLHttpRequest();
 
-        var device_id = getSelectedWateringDeviceID();
+        var watering_id = getSelectedWateringDeviceID();
 
         console.log($(checked_radio_btn));
         var checked_radio_btn_val = $(checked_radio_btn).attr("value");
@@ -84,17 +90,18 @@ created: 18/05/2021
           case "set_volume_watering":
             var water_volume = $("#Waterml").val();
 
-            console.log(water_volume);
-
             oReq.open(
               "GET", 
-              "http://localhost:5000/water_set_volume/" + device_id + "/" + water_volume);
+              "http://localhost:5000/water_set_volume/" + watering_id + "/" + water_volume);
             break;
           
           case "set_moisture_watering":
-            var plant_id = 
+            var plant_id = getSelectedPlantDeviceID();
+            var target_moisture = $("#MoistureAmt").val();
 
-            oReq.open("GET", "http://localhost:5000/water_plant_to_target_moisture/" + device_id);
+            oReq.open(
+              "GET", 
+              "http://localhost:5000/water_plant_to_target_moisture/?watering_id=" + watering_id + "&plant_id=" + plant_id + "&target_moisture=" + target_moisture);
             break;
         }
 
@@ -147,17 +154,17 @@ created: 18/05/2021
             <select name="selected_plant_monitor" id="selected_plant_monitor">
               <?php
                 foreach ($plant_devices_json_obj as $device) {
-                  print("<option value=" . $device->id  . ">" . "Watering Device " . $device->id .  "</option>");
+                  print("<option value=" . $device->id  . ">" . "Plant Monitor " . $device->id .  "</option>");
                 }
               ?> 
             </select>
           </p>
 
           <p><label for="MoistureAmt">Moisture (%):</label> 
-              <input type='text' name= "Waterml" id="Waterml" pattern="\d{0,9}" placeholder="50" required="required"/>
+              <input type='text' name= "MoistureAmt" id="MoistureAmt" pattern="\d{0,9}" placeholder="20" required="required"/>
           </p>
 
-          <button type="button" onclick="blinkSelectedWaterSystem()">Blink Selected Device</button>
+          <button type="button" onclick="blinkSelectedPlantSystem()">Blink Selected Device</button>
         </fieldset>
         </div>
 
