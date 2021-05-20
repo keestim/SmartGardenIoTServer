@@ -4,7 +4,6 @@ from flask_cors import CORS
 import threading
 import pyshark
 
-
 from time import sleep  
 import sys
 
@@ -64,13 +63,34 @@ def findDeviceByIDAndType(device_id, device_type):
     else:
         return None
 
+def deviceJSONFormat(device_mqtt_interface):
+    output_str = ""
+    output_str += "\"id\": " + str(device_mqtt_interface.getDeviceID()) + ", "
+    output_str += "\"device_type\" : \"" + device_mqtt_interface.getDeviceType() + "\""
+
+    return "{" + output_str + "}"
+
+def deviceSensorDataJSON(device_mqtt_interface):
+    core_output_str = deviceJSONFormat(device_mqtt_interface)
+    output_str = core_output_str.replace("{", "").replace("}", "")
+
+    if (type(device_mqtt_interface) is WaterSystemInterface):
+        output_str += "\"moisture\": " + str(device_mqtt_interface.getMoisture()) + ", "
+        output_str += "\"humidity\": " + str(device_mqtt_interface.getHumidity()) + ", "
+        output_str += "\"temperature\": " + str(device_mqtt_interface.getTemperature())
+
+    if (type(device_mqtt_interface) is PlantMonitorInterface): 
+        output_str += "\"pump_state\": " + str(device_mqtt_interface.getValveState()) + ", "
+        output_str += "\"total_volume\": " + str(device_mqtt_interface.getWaterVolume())
+
+    return "{" + output_str + "}"
+
 #https://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
 #https://restfulapi.net/http-status-codes/
 
 app = Flask(__name__)
 CORS(app)
-
-#app.config["DEBUG"] = True
+app.config["DEBUG"] = True
 
 #IF NOT RETURNING ANY DATA:
 #https://stackoverflow.com/questions/38804385/flask-to-return-nothing-but-only-run-script
@@ -84,16 +104,10 @@ def home():
 def page_not_found(e):
     return ("Route Not Found", 404)
 
-def deviceJSONRepresentation(device_mqtt_interface):
-    output_str = ""
-    output_str += "\"id\": " + str(device_mqtt_interface.getDeviceID()) + ", "
-    output_str += "\"device_type\" : \"" + device_mqtt_interface.getDeviceType() + "\""
+#add new route for device information
 
-    return "{" + output_str + "}"
-
-
-@app.route("/get_device_details", methods=['GET'])
-def get_device_details():
+@app.route("/get_all_devices_info", methods=['GET'])
+def get_all_devices_info():
     output_str = ""
 
     for device in connection_list:
@@ -101,12 +115,23 @@ def get_device_details():
             output_str += ", "
 
         if device.fmqtt_interface != None:
-            output_str += deviceJSONRepresentation(device.fmqtt_interface)
+            output_str += deviceJSONFormat(device.fmqtt_interface)
     
     return "[" + output_str + "]"
 
-@app.route("/get_device_of_type/<device_type_name>", methods=['GET', 'POST'])
-def get_device_of_type(device_type_name):
+@app.route("/get_all_devices_sensor_data", methods=['GET'])
+def get_all_devices_sensor_data():
+    for device in connection_list:
+        if output_str != "":
+            output_str += ", "
+
+        if device.fmqtt_interface != None:
+            output_str += deviceSensorDataJSON(device.fmqtt_interface)
+    
+    return "[" + output_str + "]"   
+
+@app.route("/get_devices_of_type_info/<device_type_name>", methods=['GET', 'POST'])
+def get_devices_of_type_info(device_type_name):
     output_str = ""
 
     for device in connection_list:
@@ -115,7 +140,7 @@ def get_device_of_type(device_type_name):
 
         if device.fmqtt_interface != None:
             if (device.fmqtt_interface.getDeviceType() == device_type_name):
-                output_str += deviceJSONRepresentation(device.fmqtt_interface)
+                output_str += deviceJSONFormat(device.fmqtt_interface)
     
     return "[" + output_str + "]"
 
