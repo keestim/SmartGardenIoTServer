@@ -9,6 +9,9 @@ num_edge_devices = 0
 PLANT_MONITOR_TYPE_NAME = "PlantMonitor" 
 WATERING_SYSTEM_TYPE_NAME = "WateringSystem"
 
+PAYLOAD_MSG_KEY = "payload"
+TOPIC_MSG_KEY = "topic"
+
 class DeviceInterface():
     global num_edge_devices
 
@@ -18,7 +21,7 @@ class DeviceInterface():
         self.ftopic_list = topics
         self.fDeviceType = ""
         self.fdevice_id = num_edge_devices
-        num_edge_devices = num_edge_devices + 1
+        num_edge_devices += 1
 
     def getTopicList(self):
         return self.ftopic_list
@@ -30,7 +33,7 @@ class DeviceInterface():
     def blinkLED(self):
         output_msg = {}
         output_msg["topic"] = CONTROL_DEVICE_TOPIC
-        output_msg["payload"] = "{\"blink_led\" : \"true\"}"
+        output_msg[PAYLOAD_MSG_KEY] = "{\"blink_led\" : \"true\"}"
         return output_msg
 
     def getDeviceID(self):
@@ -47,7 +50,6 @@ class PlantMonitorInterface(DeviceInterface):
         self.fHumidityRaw = 0
         self.fHumidityPercent = 0
         self.fDeviceType = PLANT_MONITOR_TYPE_NAME
-        self.fCoupledPlantInterface = None
         
     def onMessage(self, topic, payload):
         if (topic == "/edge_device/PlantData"):
@@ -69,9 +71,6 @@ class PlantMonitorInterface(DeviceInterface):
     def getHumidity(self):
         return self.fHumidity
 
-    def geCoupledPlantInterface(self):
-        return self.fCoupledPlantInterface
-
 class WaterSystemInterface(DeviceInterface):
     def __init__(self):
         super().__init__()
@@ -79,6 +78,9 @@ class WaterSystemInterface(DeviceInterface):
         self.fWaterVolume = 0
         self.fValueOpen = False
         self.fDeviceType = WATERING_SYSTEM_TYPE_NAME
+        
+        self.fCoupledPlantInterface = None
+        self.fTriggerMoistureLevel = 0
 
     def onMessage(self, topic, payload):
         if (topic == WATERING_INFO_TOPIC):
@@ -95,11 +97,23 @@ class WaterSystemInterface(DeviceInterface):
     def openValve(self):
         output_msg = {}
         output_msg["topic"] = CONTROL_DEVICE_TOPIC
-        output_msg["payload"] = "{\"valve_state\" : \"open\"}"
+        output_msg[PAYLOAD_MSG_KEY] = "{\"valve_state\" : \"open\"}"
         return output_msg
 
     def closeValve(self):
         output_msg = {}
         output_msg["topic"] = CONTROL_DEVICE_TOPIC
-        output_msg["payload"] = "{\"valve_state\" : \"closed\"}"
+        output_msg[PAYLOAD_MSG_KEY] = "{\"valve_state\" : \"closed\"}"
         return output_msg
+
+    def getCoupledPlantInterface(self):
+        return self.fCoupledPlantInterface
+
+    def setCoupledPlantInterface(self, input_interface):
+        self.fCoupledPlantInterface = input_interface
+
+    def getTriggerMoistureLevel(self):
+        return self.fTriggerMoistureLevel
+
+    def setTriggerMoistureLevel(self, input_value):
+        self.fTriggerMoistureLevel = input_value

@@ -1,6 +1,7 @@
 import socket
 
 #Source: https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
+#gets the device's local ip address
 def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
