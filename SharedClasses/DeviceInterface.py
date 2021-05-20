@@ -53,7 +53,7 @@ class PlantMonitorInterface(DeviceInterface):
         self.fDeviceType = PLANT_MONITOR_TYPE_NAME
         
     def onMessage(self, topic, payload):
-        if (topic == "/edge_device/PlantData"):
+        if (topic == PLANT_INFO_TOPIC):
             device_data = json.loads(payload)
             self.fHumidity = int(device_data["humidity"]) 
             self.fMoistureRaw = device_data["moisture"]
@@ -126,7 +126,7 @@ class SmokeSensorInterface(DeviceInterface):
         self.fDeviceType = SMOKE_MONITOR_TYPE_NAME
         
     def onMessage(self, topic, payload):
-        if (topic == "/edge_device/SmokeData"):
+        if (topic == SMOKE_INFO_TOPIC):
             device_data = json.loads(payload)
             self.fSmokeValue = int(device_data["smoke_reading"]) 
 

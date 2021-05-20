@@ -29,7 +29,6 @@ class CommunicationInterface():
 		return self.fdevice_type
 
 	def onMessage(self, topic, payload):
-		print("sending..."+topic + "|" + payload)
 		#fix handling here!
 		self.getArduinoConnection().write(payload.encode('utf_8'))
 
@@ -63,7 +62,7 @@ if __name__ == "__main__":
 						CONTROL_DEVICE_TOPIC, 
 						SETUP_DEVICE_TOPIC, 
 						"/edge_device/topic_stream",
-						"/edge_device/SmokeData"])
+						SMOKE_INFO_TOPIC])
 
 	mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, DeviceType.edge_device, interface_obj)
 
@@ -76,4 +75,4 @@ if __name__ == "__main__":
 		print("Smoke Data: %s" % (interface_obj.getSmokeData()))
 
 		#send plant data
-		mqtt_interface.sendMsg(interface_obj.getSmokeData(), "/edge_device/SmokeData")
+		mqtt_interface.sendMsg(interface_obj.getSmokeData(), SMOKE_INFO_TOPIC)

@@ -86,7 +86,7 @@ if __name__ == "__main__":
 						CONTROL_DEVICE_TOPIC, 
 						SETUP_DEVICE_TOPIC, 
 						"/edge_device/topic_stream",
-						"/edge_device/PlantData",
+						PLANT_INFO_TOPIC,
 						"/edge_data/Picture"])
 
 	mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, DeviceType.edge_device, interface_obj)
@@ -98,7 +98,7 @@ if __name__ == "__main__":
 	while True:
 		mqtt_interface.sendMsg(
 			"{\"temperature" + "\" : " + str(temperature) + ", \"moisture\": " + str(moisture) + ", \"humidity\": " + str(humidity) + "}", 
-			"/edge_device/PlantData")
+			PLANT_INFO_TOPIC)
 		moisture += 1
 		sleep(0.2)
 

@@ -86,7 +86,7 @@ if __name__ == "__main__":
 						CONTROL_DEVICE_TOPIC, 
 						SETUP_DEVICE_TOPIC, 
 						"/edge_device/topic_stream",
-						"/edge_device/PlantData",
+						PLANT_INFO_TOPIC,
 						"/edge_data/Picture"])
 
 	mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, DeviceType.edge_device, interface_obj)
@@ -102,7 +102,7 @@ if __name__ == "__main__":
 		print("plant data: %s" % (interface_obj.getPlantData()))
 
 		#send plant data
-		mqtt_interface.sendMsg(interface_obj.getPlantData(), "/edge_device/PlantData")
+		mqtt_interface.sendMsg(interface_obj.getPlantData(), PLANT_INFO_TOPIC)
 
 		#img_path = interface_obj.capture_photo()
 		#mqtt_interface.sendMsg(interface_obj.getCameraDataMsg(img_path), "/edge_device/Picture")
