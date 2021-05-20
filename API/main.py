@@ -72,15 +72,15 @@ def deviceJSONFormat(device_mqtt_interface):
 
 def deviceSensorDataJSON(device_mqtt_interface):
     core_output_str = deviceJSONFormat(device_mqtt_interface)
-    output_str = core_output_str.replace("{", "").replace("}", "")
+    output_str = core_output_str.replace("{", "").replace("}", "") + ", "
 
-    if (type(device_mqtt_interface) is WaterSystemInterface):
+    if (type(device_mqtt_interface) is PlantMonitorInterface):
         output_str += "\"moisture\": " + str(device_mqtt_interface.getMoisture()) + ", "
         output_str += "\"humidity\": " + str(device_mqtt_interface.getHumidity()) + ", "
         output_str += "\"temperature\": " + str(device_mqtt_interface.getTemperature())
 
-    if (type(device_mqtt_interface) is PlantMonitorInterface): 
-        output_str += "\"pump_state\": " + str(device_mqtt_interface.getValveState()) + ", "
+    if (type(device_mqtt_interface) is WaterSystemInterface): 
+        output_str += "\"pump_state\": \"" + str(device_mqtt_interface.getValveState()) + "\", "
         output_str += "\"total_volume\": " + str(device_mqtt_interface.getWaterVolume())
 
     return "{" + output_str + "}"
@@ -121,6 +121,8 @@ def get_all_devices_info():
 
 @app.route("/get_all_devices_sensor_data", methods=['GET'])
 def get_all_devices_sensor_data():
+    output_str = ""
+
     for device in connection_list:
         if output_str != "":
             output_str += ", "
