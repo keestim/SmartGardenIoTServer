@@ -76,10 +76,6 @@ class CoupledPlantMoistureWatcher(threading.Thread):
     def run(self):
         while True:
             mqtt_interface_obj = self.fmqtt_bi_comms.getInterfaceObj()
-            print(mqtt_interface_obj.getCoupledPlantInterface().getMoisturePercentage())
-            print(mqtt_interface_obj.getTriggerMoistureLevel())
-            print(mqtt_interface_obj.getCoupledPlantInterface().getMoisturePercentage() <= mqtt_interface_obj.getTriggerMoistureLevel())
-            print("")
 
             if (mqtt_interface_obj.getCoupledPlantInterface().getMoisturePercentage() <= mqtt_interface_obj.getTriggerMoistureLevel()):
                 self.waterPlantToSetLevel()
@@ -128,6 +124,9 @@ class BiDirectionalMQTTComms():
     def setMoistureWatcherThread(self, input_thread):
         if (self.fmoisture_watcher_thread is not None):
             self.fmoisture_watcher_thread.join()
+
+            msg_details = getattr(self.fmqtt_interface, 'closeValve')()
+            self.sendMsg(msg_details[PAYLOAD_MSG_KEY], msg_details["topic"])
 
         self.fmoisture_watcher_thread = input_thread
 

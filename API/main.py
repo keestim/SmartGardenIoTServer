@@ -59,6 +59,16 @@ def findDeviceByID(device_id):
             if str(device.fmqtt_interface.getDeviceID()) == str(device_id):
                 return device
 
+def findDevicesByType(device_type):
+    devices_of_type = []
+
+    for device in connection_list:
+        if device.fmqtt_interface != None:
+            if (type(device.fmqtt_interface) is device_type):
+                devices_of_type.append(device)
+    
+    return devices_of_type
+
 def findDeviceByIDAndType(device_id, device_type):
     potential_device = findDeviceByID(device_id)
     if (type(potential_device.fmqtt_interface) is device_type):
@@ -144,6 +154,7 @@ def get_devices_of_type_info(device_type_name):
                 output_str += deviceJSONFormat(device.fmqtt_interface)
     
     return "[" + output_str + "]"
+
 
 @app.route("/flash_all_lights", methods=['GET', 'POST'])
 def flash_all_lights():
@@ -234,7 +245,6 @@ def water_plant_to_target_moisture():
         selected_watering_system.sendMsg(msg_details[PAYLOAD_MSG_KEY], msg_details["topic"])
 
         while (selected_plant_monitor.fmqtt_interface.getMoisturePercentage() <= float(target_moisture)):
-            print(selected_plant_monitor.fmqtt_interface.getMoisturePercentage())
             sleep(0.2)
             continue
 
@@ -264,6 +274,34 @@ def link_watering_to_plant():
     selected_watering_system.setMoistureWatcherThread(new_moisture_watch_thread)
 
     return ('', 204)
+
+@app.route("/remove_bind_watering_to_plant/<plant_id>", methods=['GET', 'POST'])
+def remove_bind_watering_to_plant(plant_id):
+    selected_plant_monitor = findDeviceByIDAndType(plant_id, PlantMonitorInterface)
+
+    if (selected_plant_monitor is None):
+        return ('', 400)
+
+    watering_devices = findDevicesByType(WaterSystemInterface)
+
+    for device in watering_devices:
+        if (device.fmqtt_interface.getCoupledPlantInterface() is not None):
+            print(device.fmqtt_interface.getCoupledPlantInterface())
+            print(device.fmqtt_interface.getCoupledPlantInterface().getDeviceID())
+            print(selected_plant_monitor.fmqtt_interface.getDeviceID())
+
+            if (device.fmqtt_interface.getCoupledPlantInterface().getDeviceID() == selected_plant_monitor.fmqtt_interface.getDeviceID()):
+                msg_details = getattr(device.fmqtt_interface, 'closeValve')()
+                print(msg_details)
+                device.sendMsg(msg_details[PAYLOAD_MSG_KEY], msg_details["topic"])
+
+                device.fmoisture_watcher_thread.join()
+
+                sleep(0.5)
+                device.fmoisture_watcher_thread = None
+
+                return ('', 400)
+    return ('', 400)
 
 #SCRIPT ENTRY POINT
 if __name__ == "__main__":
