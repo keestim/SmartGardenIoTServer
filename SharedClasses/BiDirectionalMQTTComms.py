@@ -6,6 +6,7 @@ import paho.mqtt.publish as publish
 import json
 import sys
 import repackage
+import subprocess
 repackage.up()
 from SharedClasses.DeviceInterface import PlantMonitorInterface, WaterSystemInterface, PLANT_MONITOR_TYPE_NAME, WATERING_SYSTEM_TYPE_NAME
 from SharedClasses.helper_functions import * 
@@ -171,4 +172,7 @@ class BiDirectionalMQTTComms:
 
         if (self.fdevice_type == DeviceType.edge_device):
             #send cli message to things board here!
+            ACCESS_TOKEN = "AQ3efa1BhBDCcMWqUrLN"
+            command = 'curl -v -X POST -d "{\"temperature\": 25}" https://demo.thingsboard.io/api/v1/%S/telemetry --header "Content-Type:application/json"' %(ACCESS_TOKEN)
+            subprocess.Popen(command, shell = True)
             return
