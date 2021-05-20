@@ -1,25 +1,31 @@
-int redLed = 12;
-int greenLed = 11;
-int buzzer = 10;
-int smokeA0 = A5;
+#include <ArduinoJson.h>
+//code from :https://www.instructables.com/How-to-Use-Water-Flow-Sensor-Arduino-Tutorial/
+
+const int redLed = 12;
+const int greenLed = 11;
+const int buzzer = 10;
+const int smokeA0 = A5;
 // Your threshold value
-int sensorThres = 400;
+const int sensorThres = 400;
 
 void setup() {
+  Serial.begin(9600);
+
   pinMode(redLed, OUTPUT);
   pinMode(greenLed, OUTPUT);
   pinMode(buzzer, OUTPUT);
   pinMode(smokeA0, INPUT);
-  Serial.begin(9600);
 }
 
 void loop() {
-  int analogSensor = analogRead(smokeA0);
+  readSerialMsgs();
+
+  int smokeValue = analogRead(smokeA0);
 
   Serial.print("Pin A0: ");
-  Serial.println(analogSensor);
+  Serial.println(smokeValue);
   // Checks if it has reached the threshold value
-  if (analogSensor > sensorThres)
+  if (smokeValue > sensorThres)
   {
     digitalWrite(redLed, HIGH);
     digitalWrite(greenLed, LOW);
@@ -31,5 +37,59 @@ void loop() {
     digitalWrite(greenLed, HIGH);
     noTone(buzzer);
   }
-  delay(100);
+
+  String smokeDataJSON = "{\"smoke_reading\" : " + String(smokeValue) + "}\n";
+  Serial.print(smokeDataJSON);
+
+  acuateBlinkLed();
+  delay(500);
+}
+
+void acuateBlinkLed()
+{  
+  if (blinkLED)
+  {
+    for (int i = 0; i < 10; i++)
+    {
+      digitalWrite(LED_BUILTIN, HIGH);
+      delay(100);
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(100);
+    }
+
+    blinkLED = false;
+  }
+}
+
+void readSerialMsgs()
+{
+  String serialMsg;
+
+  while(Serial.available()) {
+    delay(3);
+   
+    if (Serial.available() > 0) {
+      serialMsg += char(Serial.read());// read the incoming data as string
+    }
+  }
+
+  // if the string that's been read in is longer that 0 length, then try to parse the string as JSON
+  // all serial communication should occur through JSON
+  if (serialMsg.length() > 0)
+  {
+    DynamicJsonDocument doc(200);    
+    auto error = deserializeJson(doc, serialMsg);
+    
+    if (error) {
+        Serial.print(F("deserializeJson() failed with code "));
+        Serial.println(error.c_str());
+        return;
+    }
+
+    if (doc.containsKey("blink_led"))
+    {
+      String ledState = doc["blink_led"];
+      blinkLED = (ledState == "true");
+    }
+  }
 }

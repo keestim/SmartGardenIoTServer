@@ -8,6 +8,7 @@ num_edge_devices = 0
 
 PLANT_MONITOR_TYPE_NAME = "PlantMonitor" 
 WATERING_SYSTEM_TYPE_NAME = "WateringSystem"
+SMOKE_MONITOR_TYPE_NAME = "SmokeMonitor"
 
 PAYLOAD_MSG_KEY = "payload"
 TOPIC_MSG_KEY = "topic"
@@ -117,3 +118,17 @@ class WaterSystemInterface(DeviceInterface):
 
     def setTriggerMoistureLevel(self, input_value):
         self.fTriggerMoistureLevel = input_value
+
+class SmokeSensorInterface(DeviceInterface):
+    def __init__(self): 
+        super().__init__()
+        self.fSmokeValue = 0
+        self.fDeviceType = SMOKE_MONITOR_TYPE_NAME
+        
+    def onMessage(self, topic, payload):
+        if (topic == "/edge_device/SmokeData"):
+            device_data = json.loads(payload)
+            self.fSmokeValue = int(device_data["smoke_reading"]) 
+
+    def getSmokeValue(self):
+        return self.fSmokeValue

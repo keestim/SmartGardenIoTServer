@@ -7,7 +7,7 @@ import json
 import sys
 import repackage
 repackage.up()
-from SharedClasses.DeviceInterface import PlantMonitorInterface, WaterSystemInterface, PLANT_MONITOR_TYPE_NAME, WATERING_SYSTEM_TYPE_NAME, PAYLOAD_MSG_KEY, TOPIC_MSG_KEY
+from SharedClasses.DeviceInterface import PlantMonitorInterface, SMOKE_MONITOR_TYPE_NAME, SmokeSensorInterface, WaterSystemInterface, PLANT_MONITOR_TYPE_NAME, WATERING_SYSTEM_TYPE_NAME, PAYLOAD_MSG_KEY, TOPIC_MSG_KEY
 from SharedClasses.helper_functions import * 
 from SharedClasses.SystemConstants import *
 
@@ -188,6 +188,8 @@ class BiDirectionalMQTTComms():
                 self.fmqtt_interface = PlantMonitorInterface()
             elif (device_type == WATERING_SYSTEM_TYPE_NAME):
                 self.fmqtt_interface = WaterSystemInterface()
+            elif (device_type == SMOKE_MONITOR_TYPE_NAME):
+                self.fmqtt_interface = SmokeSensorInterface()
 
             print("New Connection Added")
             print(self.fmqtt_interface)
