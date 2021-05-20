@@ -32,6 +32,7 @@ class CommunicationInterface():
 
 	def onMessage(self, topic, payload):
 		print("sending..."+topic + "|" + payload)
+		#fix handling here!
 		self.getArduinoConnection().write(payload.encode('utf_8'))
 
 	def getArduinoConnection(self):
