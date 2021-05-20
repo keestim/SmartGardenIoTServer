@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
 
 import threading
@@ -75,7 +75,7 @@ def deviceSensorDataJSON(device_mqtt_interface):
     output_str = core_output_str.replace("{", "").replace("}", "") + ", "
 
     if (type(device_mqtt_interface) is PlantMonitorInterface):
-        output_str += "\"moisture\": " + str(device_mqtt_interface.getMoisture()) + ", "
+        output_str += "\"moisture\": " + str(device_mqtt_interface.getMoisturePercentage()) + ", "
         output_str += "\"humidity\": " + str(device_mqtt_interface.getHumidity()) + ", "
         output_str += "\"temperature\": " + str(device_mqtt_interface.getTemperature())
 
@@ -92,19 +92,16 @@ app = Flask(__name__)
 CORS(app)
 app.config["DEBUG"] = True
 
-#IF NOT RETURNING ANY DATA:
-#https://stackoverflow.com/questions/38804385/flask-to-return-nothing-but-only-run-script
-#just return a 204 response code
-
 @app.route('/', methods=['GET'])
 def home():
     return "Welcome to Smart Garden API"
 
+#IF NOT RETURNING ANY DATA:
+#https://stackoverflow.com/questions/38804385/flask-to-return-nothing-but-only-run-script
+#just return a 204 response code
 @app.errorhandler(404)
 def page_not_found(e):
     return ("Route Not Found", 404)
-
-#add new route for device information
 
 @app.route("/get_all_devices_info", methods=['GET'])
 def get_all_devices_info():
@@ -124,10 +121,10 @@ def get_all_devices_sensor_data():
     output_str = ""
 
     for device in connection_list:
-        if output_str != "":
-            output_str += ", "
-
         if device.fmqtt_interface != None:
+            if output_str != "":
+                output_str += ", "
+
             output_str += deviceSensorDataJSON(device.fmqtt_interface)
     
     return "[" + output_str + "]"   
@@ -137,11 +134,10 @@ def get_devices_of_type_info(device_type_name):
     output_str = ""
 
     for device in connection_list:
-        if output_str != "":
-            output_str += ", "
-
         if device.fmqtt_interface != None:
             if (device.fmqtt_interface.getDeviceType() == device_type_name):
+                if output_str != "":
+                    output_str += ", "
                 output_str += deviceJSONFormat(device.fmqtt_interface)
     
     return "[" + output_str + "]"
@@ -172,20 +168,11 @@ def flash_light_for_id(device_id):
 def turn_on_valve(device_id, state):
     selected_device = None
 
-    if (not device_id.is_integer()):
-        return ('', 400)
-
     if state not in ["open", "closed"]:
         return "invalid state provided"
 
-    for device in connection_list:
-        if device.fmqtt_interface != None:
-            print(device.fmqtt_interface)
-            if (type(device.fmqtt_interface) is WaterSystemInterface):
-                if (str(device.fmqtt_interface.getDeviceID()) == str(device_id)):
-                    selected_device = device
-                    break
-    
+    selected_device = findDeviceByIDAndType(device_id, WaterSystemInterface)
+
     if selected_device is not None:
         if state == "open":
             msg_details = getattr(selected_device.fmqtt_interface, 'openValve')()
@@ -193,7 +180,9 @@ def turn_on_valve(device_id, state):
             msg_details = getattr(selected_device.fmqtt_interface, 'closeValve')()
         
         print(msg_details)
-        device.sendMsg(msg_details["payload"], msg_details["topic"])
+        selected_device.sendMsg(msg_details["payload"], msg_details["topic"])
+    else:
+        return ('', 400)
 
     return ('', 204)
 
@@ -203,29 +192,20 @@ def turn_on_valve(device_id, state):
 def water_set_volume(device_id, volume):
     selected_device = None
 
-    #validate that id is an interger
+    selected_device = findDeviceByIDAndType(device_id, WaterSystemInterface)
 
-    for device in connection_list:
-        if device.fmqtt_interface != None:
-            print(device.fmqtt_interface)
-            if (type(device.fmqtt_interface) is WaterSystemInterface):
-                if (str(device.fmqtt_interface.getDeviceID()) == str(device_id)):
-                    #make sure this is by reference!
-                    selected_device = device
-                    break
-    
     if selected_device is not None:
         msg_details = getattr(selected_device.fmqtt_interface, 'openValve')()
         print(msg_details)
-        device.sendMsg(msg_details["payload"], msg_details["topic"])
+        selected_device.sendMsg(msg_details["payload"], msg_details["topic"])
         
-        while (device.fmqtt_interface.getWaterVolume() <= float(volume)):
+        while (selected_device.fmqtt_interface.getWaterVolume() <= float(volume)):
             sleep(0.2)
-            print("Volume: " + str(device.fmqtt_interface.getWaterVolume()))
+            print("Volume: " + str(selected_device.fmqtt_interface.getWaterVolume()))
             continue
 
         msg_details = getattr(selected_device.fmqtt_interface, 'closeValve')()
-        device.sendMsg(msg_details["payload"], msg_details["topic"])
+        selected_device.sendMsg(msg_details["payload"], msg_details["topic"])
 
     return ('', 204)
 
@@ -235,9 +215,36 @@ def water_set_volume(device_id, volume):
 #this makes for a most readable URL
 #maybe something to add to note either client or server side
 #implement clean exit for script!
-@app.route("/water_plant_to_target_moisture/<plant_id>/<watering_id>/<target_moisture>", methods=['GET', 'POST'])
+
+
+#example URL:
+#/water_plant_to_target_moisture?plant_id=0&watering_id&target_moisture=20
+#moisture represented as a whole number percentage
+
+@app.route("/water_plant_to_target_moisture/", methods=['GET', 'POST'])
 def water_plant_to_target_moisture():
-    return "Watering plant"
+    plant_monitor_id = request.args.get("plant_id")
+    watering_system_id = request.args.get("watering_id")
+    target_moisture = request.args.get("target_moisture")
+
+    selected_plant_monitor = findDeviceByIDAndType(plant_monitor_id, PlantMonitorInterface)
+    selected_watering_system = findDeviceByIDAndType(watering_system_id, WaterSystemInterface)
+
+    if (selected_plant_monitor is None) or (selected_watering_system is None):
+        return ('', 400)
+
+    msg_details = getattr(selected_watering_system.fmqtt_interface, 'openValve')()
+
+    selected_watering_system.sendMsg(msg_details["payload"], msg_details["topic"])
+
+    while (selected_plant_monitor.fmqtt_interface.getMoisturePercentage() <= float(target_moisture)):
+        sleep(0.2)
+        continue
+
+    msg_details = getattr(selected_watering_system.fmqtt_interface, 'closeValve')()
+    selected_watering_system.sendMsg(msg_details["payload"], msg_details["topic"])
+
+    return ('', 204)
 
 #SCRIPT ENTRY POINT
 if __name__ == "__main__":
