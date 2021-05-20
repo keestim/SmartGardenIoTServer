@@ -9,6 +9,9 @@ num_edge_devices = 0
 PLANT_MONITOR_TYPE_NAME = "PlantMonitor" 
 WATERING_SYSTEM_TYPE_NAME = "WateringSystem"
 
+PAYLOAD_MSG_KEY = "payload"
+TOPIC_MSG_KEY = "topic"
+
 class DeviceInterface():
     global num_edge_devices
 
@@ -18,7 +21,7 @@ class DeviceInterface():
         self.ftopic_list = topics
         self.fDeviceType = ""
         self.fdevice_id = num_edge_devices
-        num_edge_devices = num_edge_devices + 1
+        num_edge_devices += 1
 
     def getTopicList(self):
         return self.ftopic_list
@@ -30,7 +33,7 @@ class DeviceInterface():
     def blinkLED(self):
         output_msg = {}
         output_msg["topic"] = CONTROL_DEVICE_TOPIC
-        output_msg["payload"] = "{\"blink_led\" : \"true\"}"
+        output_msg[PAYLOAD_MSG_KEY] = "{\"blink_led\" : \"true\"}"
         return output_msg
 
     def getDeviceID(self):
@@ -95,11 +98,12 @@ class WaterSystemInterface(DeviceInterface):
     def openValve(self):
         output_msg = {}
         output_msg["topic"] = CONTROL_DEVICE_TOPIC
-        output_msg["payload"] = "{\"valve_state\" : \"open\"}"
+        output_msg[PAYLOAD_MSG_KEY] = "{\"valve_state\" : \"open\"}"
         return output_msg
 
     def closeValve(self):
         output_msg = {}
         output_msg["topic"] = CONTROL_DEVICE_TOPIC
-        output_msg["payload"] = "{\"valve_state\" : \"closed\"}"
+        output_msg[PAYLOAD_MSG_KEY] = "{\"valve_state\" : \"closed\"}"
         return output_msg
+

@@ -19,6 +19,7 @@ mqtt_ip_addresses = []
 device_ip_address = get_ip()
 new_connection_lock = threading.Lock()
 
+#contains is a thread that runs a packet sniffer, investigating any incoming packets
 class MQTTSniffer(threading.Thread):
     def __init__(self, interfacename):
         global new_connection_lock
@@ -32,6 +33,7 @@ class MQTTSniffer(threading.Thread):
             except:
                 continue
 
+            #if the packet doesn't contain IP and MQTT layers, an exception will be thrown
             try:
                 ip_data = item.ip
                 mqtt_data = item.mqtt
@@ -41,7 +43,8 @@ class MQTTSniffer(threading.Thread):
                             
             if (ip_data.src not in mqtt_ip_addresses) and not(ip_data.src == device_ip_address):
                 mqtt_ip_addresses.append(ip_data.src)
-                connection_list.append(BiDirectionalMQTTComms(device_ip_address, ip_data.src, DeviceType.server))
+                new_mqtt_connection = BiDirectionalMQTTComms(device_ip_address, ip_data.src, DeviceType.server)
+                connection_list.append(new_mqtt_connection)
 
             new_connection_lock.release()
 
@@ -148,7 +151,7 @@ def flash_all_lights():
         if device.fmqtt_interface != None:
             msg_details = getattr(device.fmqtt_interface, 'blinkLED')()
             print(msg_details)
-            device.sendMsg(msg_details["payload"], msg_details["topic"])
+            device.sendMsg(msg_details[PAYLOAD_MSG_KEY], msg_details["topic"])
 
     return ('', 204)
 
@@ -160,7 +163,7 @@ def flash_light_for_id(device_id):
         return ('No Device Exists for Input ID', 400)
     else:
         msg_details = getattr(selected_device.fmqtt_interface, 'blinkLED')()
-        selected_device.sendMsg(msg_details["payload"], msg_details["topic"])
+        selected_device.sendMsg(msg_details[PAYLOAD_MSG_KEY], msg_details["topic"])
 
     return ('', 204)
 
@@ -180,14 +183,13 @@ def turn_on_valve(device_id, state):
             msg_details = getattr(selected_device.fmqtt_interface, 'closeValve')()
         
         print(msg_details)
-        selected_device.sendMsg(msg_details["payload"], msg_details["topic"])
+        selected_device.sendMsg(msg_details[PAYLOAD_MSG_KEY], msg_details["topic"])
     else:
         return ('', 400)
 
     return ('', 204)
 
-#better to spawn a therad for this
-#test this out!
+#TODO: see how this performs when trying to water two devices at once!
 @app.route("/water_set_volume/<device_id>/<volume>", methods=['GET', 'POST'])
 def water_set_volume(device_id, volume):
     selected_device = None
@@ -197,7 +199,7 @@ def water_set_volume(device_id, volume):
     if selected_device is not None:
         msg_details = getattr(selected_device.fmqtt_interface, 'openValve')()
         print(msg_details)
-        selected_device.sendMsg(msg_details["payload"], msg_details["topic"])
+        selected_device.sendMsg(msg_details[PAYLOAD_MSG_KEY], msg_details["topic"])
         
         while (selected_device.fmqtt_interface.getWaterVolume() <= float(volume)):
             sleep(0.2)
@@ -205,22 +207,15 @@ def water_set_volume(device_id, volume):
             continue
 
         msg_details = getattr(selected_device.fmqtt_interface, 'closeValve')()
-        selected_device.sendMsg(msg_details["payload"], msg_details["topic"])
+        selected_device.sendMsg(msg_details[PAYLOAD_MSG_KEY], msg_details["topic"])
 
     return ('', 204)
 
-#something about avaliable methods?
-
-#probably swap to GET variables approach
-#this makes for a most readable URL
-#maybe something to add to note either client or server side
-#implement clean exit for script!
-
+#TODO: route to return all avaliable methods?
 
 #example URL:
 #/water_plant_to_target_moisture?plant_id=0&watering_id&target_moisture=20
 #moisture represented as a whole number percentage
-
 @app.route("/water_plant_to_target_moisture/", methods=['GET', 'POST'])
 def water_plant_to_target_moisture():
     plant_monitor_id = request.args.get("plant_id")
@@ -233,16 +228,18 @@ def water_plant_to_target_moisture():
     if (selected_plant_monitor is None) or (selected_watering_system is None):
         return ('', 400)
 
-    msg_details = getattr(selected_watering_system.fmqtt_interface, 'openValve')()
+    if (selected_plant_monitor.fmqtt_interface.getMoisturePercentage() <= float(target_moisture)):
+        msg_details = getattr(selected_watering_system.fmqtt_interface, 'openValve')()
 
-    selected_watering_system.sendMsg(msg_details["payload"], msg_details["topic"])
+        selected_watering_system.sendMsg(msg_details[PAYLOAD_MSG_KEY], msg_details["topic"])
 
-    while (selected_plant_monitor.fmqtt_interface.getMoisturePercentage() <= float(target_moisture)):
-        sleep(0.2)
-        continue
+        while (selected_plant_monitor.fmqtt_interface.getMoisturePercentage() <= float(target_moisture)):
+            print(selected_plant_monitor.fmqtt_interface.getMoisturePercentage())
+            sleep(0.2)
+            continue
 
-    msg_details = getattr(selected_watering_system.fmqtt_interface, 'closeValve')()
-    selected_watering_system.sendMsg(msg_details["payload"], msg_details["topic"])
+        msg_details = getattr(selected_watering_system.fmqtt_interface, 'closeValve')()
+        selected_watering_system.sendMsg(msg_details[PAYLOAD_MSG_KEY], msg_details["topic"])
 
     return ('', 204)
 
@@ -253,7 +250,7 @@ if __name__ == "__main__":
     except:
         print("You must enter the network interface that you're connected through")
         exit()
-
+    
     mqtt_sniffer = MQTTSniffer(server_network_interface)
     mqtt_sniffer.start()
     app.run()
