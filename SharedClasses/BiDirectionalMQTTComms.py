@@ -203,6 +203,7 @@ class BiDirectionalMQTTComms():
                 self.sendMsg(INIT_RECEIVED_MSG_TXT, SETUP_DEVICE_TOPIC)
             elif ("topics" in payload):
                 self.ftopic_list = self.__encodeTopicsString(payload)
+                self.fclient.subscribe(self.ftopic_list)
                 self.__assignDeviceInterface(payload)
                 
                 self.fmqtt_subscriber_thread.terminate()
@@ -215,6 +216,7 @@ class BiDirectionalMQTTComms():
                 
                 self.fmqtt_subscriber_thread = MQTTSubscriberThread(self)
                 self.fmqtt_subscriber_thread.start()
+
 
             else:
                 if self.fmqtt_interface is not None:
