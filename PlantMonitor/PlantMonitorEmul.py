@@ -6,7 +6,7 @@ from time import sleep
 import threading
 import sys
 import serial
-from picamera import PiCamera
+#from picamera import PiCamera
 from time import sleep
 import datetime
 
@@ -22,7 +22,7 @@ class CommunicationInterface():
 		self.ftopic_list = topics
 		self.fdevice_type = device_type
 		self.fplantData = " "
-		self.farduino = serial.Serial('/dev/ttyACM0', 9600)
+		#self.farduino = serial.Serial('/dev/ttyACM0', 9600)
 
 	def getTopicList(self):
 		return self.ftopic_list
@@ -97,7 +97,7 @@ if __name__ == "__main__":
 
 	while True:
 		mqtt_interface.sendMsg(
-			"{\"temperature" + "\" : " + temperature + ", \"moisture\": " + moisture + ", \"humidity\": " + humidity + "}", 
+			"{\"temperature" + "\" : " + str(temperature) + ", \"moisture\": " + str(moisture) + ", \"humidity\": " + str(humidity) + "}", 
 			"/edge_device/PlantData")
 		moisture += 1
 		sleep(0.2)
