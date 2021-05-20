@@ -121,10 +121,10 @@ def get_all_devices_sensor_data():
     output_str = ""
 
     for device in connection_list:
-        if output_str != "":
-            output_str += ", "
-
         if device.fmqtt_interface != None:
+            if output_str != "":
+                output_str += ", "
+
             output_str += deviceSensorDataJSON(device.fmqtt_interface)
     
     return "[" + output_str + "]"   
@@ -134,11 +134,10 @@ def get_devices_of_type_info(device_type_name):
     output_str = ""
 
     for device in connection_list:
-        if output_str != "":
-            output_str += ", "
-
         if device.fmqtt_interface != None:
             if (device.fmqtt_interface.getDeviceType() == device_type_name):
+                if output_str != "":
+                    output_str += ", "
                 output_str += deviceJSONFormat(device.fmqtt_interface)
     
     return "[" + output_str + "]"
@@ -235,12 +234,11 @@ def water_plant_to_target_moisture():
         return ('', 400)
 
     msg_details = getattr(selected_watering_system.fmqtt_interface, 'openValve')()
-    print(msg_details)
+
     selected_watering_system.sendMsg(msg_details["payload"], msg_details["topic"])
-    
+
     while (selected_plant_monitor.fmqtt_interface.getMoisturePercentage() <= float(target_moisture)):
         sleep(0.2)
-        print("Volume: " + str(selected_watering_system.fmqtt_interface.getWaterVolume()))
         continue
 
     msg_details = getattr(selected_watering_system.fmqtt_interface, 'closeValve')()
