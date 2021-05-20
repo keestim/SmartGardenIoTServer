@@ -37,28 +37,25 @@ created: 18/05/2021
   <body>
     <div class="navbar" id="navbar"></div>
 
-    <article>
-      <section id="MainSectionA">
-        <section class="section1">
-          <h3 id="demo">Device list</h3>
-          <!-- Display all devices, name aka watering device and id -->
-          <p> 
-            <ul>
-              <?php 
-                foreach ($devices_json_obj as $device) {
-                  print("<li>" . $device->device_type . " " . $device->id . " <button onclick='blinkdevice(" . $device->id . ")'>Blink Device LED</button></li>");
-                }
-              ?>
+    <div class="content">
+      <h3 id="demo">Device list</h3>
+      <!-- Display all devices, name aka watering device and id -->
+      <p> 
+        <ul>
+          <?php 
+            foreach ($devices_json_obj as $device) {
+              print("<li>" . $device->device_type . " " . $device->id . 
+                " <button onclick='blinkdevice(" . $device->id . ")'>Blink Device LED</button></li>");
+            }
+          ?>
 
-              <p><button type="button" onclick="flashalllights()">Blink all Devices</button></p> <!-- Blinks all lights -->
-              <div id="demo"></div>
-            </ul>
-            
-          </p>
-          <!-- Display all devices, name aka watering device and id -->
-        </section>
-      </section>
-    </article>
+          <p><button type="button" onclick="flashalllights()">Blink all Devices</button></p> <!-- Blinks all lights -->
+          <div id="demo"></div>
+        </ul>
+        
+      </p>
+      <!-- Display all devices, name aka watering device and id -->
+    </div>
 
     <div class="footer" id="footer"></div>
   </body>

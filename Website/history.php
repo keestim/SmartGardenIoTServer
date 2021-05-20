@@ -21,10 +21,7 @@ created: 18/05/2021
     <div class="navbar" id="navbar">
     </div>
         
-    <article>
-
-    <section id="MainSectionA">
-      <section class="section1">
+    <div class="content">
       <h3>History</h3>
       <p>
       <?php
@@ -134,9 +131,8 @@ created: 18/05/2021
       ?>
       
       </p>
-      </section>
-      </section>
-    </article>
+    
+    </div>
 
     <div class="footer" id="footer"></div>
   </body>

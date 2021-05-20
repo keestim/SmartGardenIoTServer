@@ -27,12 +27,10 @@ created: 18/05/2021
   <script src="./scripts/blinkdevices.js"></script>
  </head>
 <body>
-  <article>
     <div class="navbar" id="navbar">
     </div>
     
-    <section id="MainSectionA">
-      <section class="section1">
+    <div class="content">
       <h3 id="demo">Device list</h3>
       <!-- Display all devices, name aka watering device and id -->
       <p> 
@@ -57,9 +55,7 @@ created: 18/05/2021
         
       </p>
       <!-- Display all devices, name aka watering device and id -->
-      </section>
-    </section>
-  </article>
+      </div>
 
   <div class="footer" id="footer"></div>
 

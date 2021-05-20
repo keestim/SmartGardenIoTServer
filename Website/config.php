@@ -22,8 +22,9 @@ created: 18/05/2021
 <article>
   <div class="navbar" id="navbar">
   </div>
-  <section id="MainSectionA">
-    <section class="section1">
+
+  <div class="content">
+
     <h3>System Configuration</h3>
     <form onSubmit="return alert('Plant devices bound') ">
     <fieldset>
@@ -90,10 +91,7 @@ created: 18/05/2021
             <input type= "submit" value="Bind devices"  id="submit" name="bindB"/>
             </fieldset>
             </form>
-          
-    </section>
-  </section>
-</article>
+  </div>
 
 <div class="footer" id="footer"></div>
 

@@ -5,46 +5,56 @@ created: 18/05/2021
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <title>Enquire</title>
-  <meta charset="utf-8" />
-  <meta name="description" content="manual watering" />
-  <meta name="keywords" content="smart, garden, Iot, things, plants, watering" />
-  <meta name="author" content="Thomas Bibby"  /> 
-  <link href="styles/style.css" rel="stylesheet">
-  <link href="styles/mwateringStyle.css" rel="stylesheet">
-  <link href="styles/responsive.css" rel="stylesheet">
-  <script src="./scripts/jquery-3.6.0.min.js"></script>
-  <script src="./scripts/loadhtml.js"></script>
-  <script type="text/javascript" src="scripts/part2.js"></script>
-  
- </head>
+  <head>
+    <title>Enquire</title>
+    <meta charset="utf-8" />
+    <meta name="description" content="manual watering" />
+    <meta name="keywords" content="smart, garden, Iot, things, plants, watering" />
+    <meta name="author" content="Thomas Bibby"  /> 
+    <link href="styles/style.css" rel="stylesheet">
+    <link href="styles/mwateringStyle.css" rel="stylesheet">
+    <link href="styles/responsive.css" rel="stylesheet">
+    <script src="./scripts/jquery-3.6.0.min.js"></script>
+    <script src="./scripts/loadhtml.js"></script>
+    
+  </head>
 
-<body>
-  <a name="top"></a>
-  <article>
+  <body>
     <div class="navbar" id="navbar">
     </div>
 
-    <section id="section1">
+    <div class="content"> 
+    <h3 id="demo">Manual Watering Options</h3>
       <form method="post" novalidate> <!-- water_set_volume/deviceid/amount in ml-->
+
+        <fieldset>
+          <legend>Watering</legend>
+          <p><label for="Device">Device:</label> 
+            <select name="DeviceD" id="DeviceD">
+              <!-- this field changes depending on how many watering devices there are -->
+              <option value="0">Watering Device 1</option>
+              <option value="1">Watering Device 2</option>		
+              <!-- this field changes depending on how many watering devices there are -->	
+            </select>
+          </p>
+          <button type="button" onclick="blinkdevice()">Blink device</button>
+        </fieldset>
+
+
         <label>Water By Volume: <input type="radio" name="watering_type" value="set_volume_watering"/></label>
         <label>Water By Moisture: <input type="radio" name="watering_type"  value="set_moisture_watering"/></label>
 
-
-        <p>
+        <div id="water_by_volume">
           <fieldset>
-            <legend>Watering</legend>
-            <p><label for="Device">Device:</label> 
-              <select name="DeviceD" id="DeviceD">
-                <!-- this field changes depending on how many watering devices there are -->
-                <option value="0">Watering Device 1</option>
-                <option value="1">Watering Device 2</option>		
-                <!-- this field changes depending on how many watering devices there are -->	
-              </select>
-            </p>
-            <button type="button" onclick="blinkdevice()">Blink device</button>
           </fieldset>
+        </div>
+
+        <div id="water_by_moisture">
+          <fieldset>
+          </fieldset>
+        </div>
+
+
 
           <fieldset>
             <legend>Amount:</legend>
@@ -56,38 +66,9 @@ created: 18/05/2021
         <button type="button" onclick="loadXMLDoc()">Water plants</button>
         <input type= "reset" value="Reset Form"/>
 
-<script>
-function loadXMLDoc () {
-  console.log(this.responseText);
-}
-var $deviceID = document.getElementById("DeviceD");
-var $volume = document.getElementById("DeviceD");
-var oReq = new XMLHttpRequest();
-oReq.addEventListener("load", loadXMLDoc);
-oReq.open("GET", "http://localhost:5000/water_set_volume/"$deviceID"/"$volume"");
-oReq.send();
-
-</script>
-
-<script>
-function blinkdevice () {
-  console.log(this.responseText);
-}
-var $deviceID = 0;
-$deviceID = document.getElementById("DeviceD");
-var oReq = new XMLHttpRequest();
-oReq.addEventListener("load", loadXMLDoc);
-oReq.open("GET", "http://localhost:5000/flash_light/"$deviceID"");
-oReq.send();
-
-</script>
-
       </form> 
-    </section>
-  
-  </article>
+    </div>
 
-  <div class="footer" id="footer"></div>
-
-</body>
+    <div class="footer" id="footer"></div>
+  </body>
 </html>

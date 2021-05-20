@@ -9,21 +9,13 @@ created: 18/05/2021
 
 body 
 {
-    font-family: arial;
-    
+    font-family: arial;    
 }
 
 h3, p
 {
     background-color: rgb(0, 196, 16);
     font-size: 20px;
-}
-
-article 
-{
-    max-width: 1220px;
-    margin: 0 auto;
-    background-color: rgb(0, 196, 16);
 }
 
 header 
@@ -44,51 +36,55 @@ header h1
     
 }
 
-nav 
+.nav{
+    border-width:1px 0;
+    list-style:none;
+    margin:0;
+    padding:0;
+    text-align:center;
+    background-color:transparent; 
+}
+
+.nav li{
+    display:inline;
+}
+
+.nav a{
+    display:inline-block;
+    background-color: #44a703;
+    padding: 0.5%;
+}
+
+.nav a:hover
 {
-    width: 100%;
+    background-color: #293132;
+    color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.content
+{
     display: block;
-}
-
-nav ul 
-{
-    margin: 0;
-    padding: 0;
-    
-}
-
-nav ul li
-{
-    list-style: none;
-    float: left;
-    font-size: 93%;
+    clear: both;
+    max-width: 75%;
+    margin: 0 auto;
     background-color: rgb(0, 196, 16);
 }
 
-nav ul li a
+.navbar
 {
     display: block;
-    font-weight: bold;
-    padding: .625em 7em;
-    text-decoration: none;
-    color: #000;
-    border-right: 1px solid #bababa;
-    background-color: rgb(0, 196, 16);
-    float: center;
+    clear: both;
+}
+
+.current-link {
+    background-color: #293132;
+    color: #ffffff;
 }
 
 img 
 {
     max-width: 100%;
-}
-
-.section1, .section2
-{
-    float: left;
-    width: 45%;
-    text-align: justify;
-    margin: 1em 1em 1em 1em;
-    background-color: rgb(0, 196, 16);
 }
 
 footer, footer a
@@ -111,13 +107,6 @@ footer h3
 p a 
 {
     background-color: rgb(0, 196, 16);
-}
-
-#NavHome:hover, #NavProductD:hover, #NavProductE:hover, #NavAbout:hover, #NavEnchancements:hover, #NavManage:hover /* changes menu colour when mouse hovers over it */
-{
-    background-color: #293132;
-    color: #ffffff;
-    transition: all 0.3s ease;
 }
 
 aside
