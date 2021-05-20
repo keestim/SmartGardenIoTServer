@@ -4,9 +4,7 @@ created: 18/05/2021
 -->
 <?php
   include("./helper_functions.php");
-
   $api_output = curl_api_request("http://localhost:5000/get_all_devices_sensor_data");
-
   $devices_json_obj = json_decode($api_output);  
 ?>
 

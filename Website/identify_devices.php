@@ -12,9 +12,7 @@ created: 18/05/2021
   header(
     "Access-Control-Allow-Headers", 
     "Origin, X-Requested-With, Content-Type, Accept");
-
-
-
+  
   $devices_json_obj = json_decode($output);
 ?>
 
