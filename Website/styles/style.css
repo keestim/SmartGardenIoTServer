@@ -1,0 +1,144 @@
+/*
+author: Thomas Bibby
+created: 18/05/2021
+*/
+*
+{
+    background-color: #44a703;
+}
+
+body 
+{
+    font-family: arial;    
+}
+
+h3, p
+{
+    background-color: rgb(0, 196, 16);
+    font-size: 20px;
+}
+
+header 
+{
+    background-repeat: repeat-x;
+    background-position: bottom;
+    height: 230px;
+    width: 100%;
+}
+
+header h1
+{
+    font-family: 'Muli', sans-serif;
+    letter-spacing: 4px;
+    font-size: 100px;
+    padding-top: .5em;
+    padding-top: .5em;
+    
+}
+
+.nav{
+    border-width:1px 0;
+    list-style:none;
+    margin:0;
+    padding:0;
+    text-align:center;
+    background-color:transparent; 
+}
+
+.nav li{
+    display:inline;
+}
+
+.nav a{
+    display:inline-block;
+    background-color: #44a703;
+    padding: 0.5%;
+}
+
+.nav a:hover
+{
+    background-color: #293132;
+    color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.content
+{
+    display: block;
+    clear: both;
+    max-width: 75%;
+    margin: 0 auto;
+    background-color: rgb(0, 196, 16);
+}
+
+.navbar
+{
+    display: block;
+    clear: both;
+}
+
+.current-link {
+    background-color: #293132;
+    color: #ffffff;
+}
+
+img 
+{
+    max-width: 100%;
+}
+
+footer, footer a
+{
+    clear: both;
+    text-align: center;
+    font-size: small;
+}
+
+footer h3
+{
+    font-family: 'Muli', sans-serif;
+    background-color: #44a703;
+    padding: .5em 0 .5em .5em;
+    background-repeat: repeat-x;
+    background-position: bottom;
+    font-size: small;
+}
+
+p a 
+{
+    background-color: rgb(0, 196, 16);
+}
+
+aside
+{
+    float: right;
+}
+
+ul li, ul, ol, ol li
+{
+    background-color: rgb(0, 196, 16);
+}
+
+footer::first-letter /* Changes first letter */
+{
+    font-weight: bolder;
+}
+
+/* Popup container */
+.popup 
+{
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+  }
+
+div 
+{
+    background-color: rgb(0, 196, 16);
+}
+  
+p ul p
+{
+    float: left;
+    text-align: left;
+}

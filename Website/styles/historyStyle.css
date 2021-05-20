@@ -1,0 +1,89 @@
+/*
+author: Thomas Bibby
+created: 18/05/2021
+*/
+#NavAbout
+{
+    background-color: #293132;
+    color: #ffffff;
+}
+
+p
+{
+  float: center;
+}
+
+.section1
+{
+    float: left;
+    width: 98%;
+    text-align: center;
+    margin: 1em 1em 1em 1em;
+    background-color: rgb(0, 196, 16);
+}
+
+dl dt, dl dd, dl, figure, figure figcaption
+{
+    background-color: #00B2FF;
+    text-align: center;
+    float: center;
+}
+
+figure
+{
+    border-style: double;
+    padding: 20px;
+    float: center;
+}
+
+table, th, tr, tbody, td, thead, caption
+{
+    background-color: #293132;
+    color: #ffffff;
+    border-color: #006AFF;
+    border-style: double;
+    float: center;
+
+}
+
+table caption
+{
+    font-size: large;
+}
+
+  /* The actual popup (appears on top) */
+  .popup .popuptext {
+    visibility: hidden;
+    width: 160px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 0;
+    position: relative;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -80px;
+  }
+  
+  /* Toggle this class when clicking on the popup container (hide and show the popup) */
+  .popup .show 
+  {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s
+  }
+  
+  /* Add animation (fade in the popup) */
+  @-webkit-keyframes fadeIn 
+  {
+    from {opacity: 0;}
+    to {opacity: 1;}
+  }
+  
+  @keyframes fadeIn 
+  {
+    from {opacity: 0;}
+    to {opacity:1 ;}
+  }
