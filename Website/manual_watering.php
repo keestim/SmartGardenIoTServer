@@ -28,34 +28,79 @@ created: 18/05/2021
     <script src="./scripts/blinkdevices.js"></script>
     
     <script>
-      function blinkSelectedWaterSystem()
+      function getSelectedWateringDeviceID()
       {
         var selected_option = $('#selected_water_system').find(":selected");
-        var device_id = selected_option.attr("value");        
+        var device_id = selected_option.attr("value");   
+        return device_id;
+      }
+
+      function getSelectedPlantDeviceID()
+      {
+        var selected_option = $('#selected_plant_monitor').find(":selected");
+        var device_id = selected_option.attr("value");   
+        return device_id;
+      }
+
+      function blinkSelectedWaterSystem()
+      {
+        var device_id = getSelectedWateringDeviceID();
         blinkdevice(device_id);
       }
 
       function showSelectedWateringType(trigger_obj)
       {
-        selected_objs = $(".watering_type");
-        console.log(selected_objs);
-
-        for (var obj of selected_objs)
+        for (var obj of $(".watering_type"))
         {
           $(obj).hide();
         }
 
-        console.log($(trigger_obj).val());
         switch($(trigger_obj).val())
         {
           case "set_moisture_watering":
             $("#water_by_moisture").show();
             break;
+          
           case "set_volume_watering":
             $("#water_by_volume").show();
             break;
         }
       }
+
+      function acuateWaterSystem()
+      {
+        var checked_radio_btn = $("#watering_type:checked");
+        var oReq = new XMLHttpRequest();
+
+        var device_id = getSelectedWateringDeviceID();
+
+        console.log($(checked_radio_btn));
+        var checked_radio_btn_val = $(checked_radio_btn).attr("value");
+        
+        console.log(checked_radio_btn_val);
+
+        switch(checked_radio_btn_val)
+        {
+          case "set_volume_watering":
+            var water_volume = $("#Waterml").val();
+
+            console.log(water_volume);
+
+            oReq.open(
+              "GET", 
+              "http://localhost:5000/water_set_volume/" + device_id + "/" + water_volume);
+            break;
+          
+          case "set_moisture_watering":
+            var plant_id = 
+
+            oReq.open("GET", "http://localhost:5000/water_plant_to_target_moisture/" + device_id);
+            break;
+        }
+
+        oReq.send();
+      }
+
     </script>
 
   </head>
@@ -83,8 +128,8 @@ created: 18/05/2021
           <button type="button" onclick="blinkSelectedWaterSystem()">Blink Selected Device</button>
         </fieldset>
 
-        <label>Water By Volume: <input type="radio" onclick="showSelectedWateringType(this)" name="watering_type" value="set_volume_watering" checked="true"/></label>
-        <label>Water By Moisture: <input type="radio" onclick="showSelectedWateringType(this)" name="watering_type"  value="set_moisture_watering"/></label>
+        <label>Water By Volume: <input type="radio" onclick="showSelectedWateringType(this)" id="watering_type" name="watering_type" value="set_volume_watering" checked="true"/></label>
+        <label>Water By Moisture: <input type="radio" onclick="showSelectedWateringType(this)" id="watering_type" name="watering_type"  value="set_moisture_watering"/></label>
 
         <div id="water_by_volume" class="watering_type">
           <fieldset>
@@ -99,7 +144,7 @@ created: 18/05/2021
         <fieldset>
           <legend>Selected Plant</legend>
           <p><label for="Device">Device:</label> 
-            <select name="selected_water_system" id="selected_water_system">
+            <select name="selected_plant_monitor" id="selected_plant_monitor">
               <?php
                 foreach ($plant_devices_json_obj as $device) {
                   print("<option value=" . $device->id  . ">" . "Watering Device " . $device->id .  "</option>");
@@ -116,8 +161,7 @@ created: 18/05/2021
         </fieldset>
         </div>
 
-        <p>FIX ONCLICK FN</p>
-        <button type="button" onclick="loadXMLDoc()">Water plants</button>
+        <button type="button" id="acuate_system" onclick="acuateWaterSystem()">Water plants</button>
 
       </form> 
     </div>
