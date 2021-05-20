@@ -73,9 +73,11 @@ class BiDirectionalMQTTComms():
         #Construct a list of topics that all devices use
         self.ftopic_list = [(DEFAULT_DATA_TOPIC, 0), 
                             (SETUP_DEVICE_TOPIC, 0), 
-                            (CONTROL_DEVICE_TOPIC, 0)]
+                            (CONTROL_DEVICE_TOPIC, 0),
+                            ("/edge_device/water_info", 0),
+                            ("/edge_device/PlantData", 0)]
 
-        self.client = None
+        self.fclient = None
         self.fdevice_status = ConnectionStatus.init
 
         self.fdevice_type = ""
@@ -125,17 +127,17 @@ class BiDirectionalMQTTComms():
         return result_arr   
 
     def __setupReader(self):
-        self.client = mqtt.Client()
-        self.client.on_connect = self.__onConnect
-        self.client.on_message = self.__onMessage
+        self.fclient = mqtt.Client()
+        self.fclient.on_connect = self.__onConnect
+        self.fclient.on_message = self.__onMessage
 
-        self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
+        self.fclient.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
 
         self.fmqtt_subscriber_thread = MQTTSubscriberThread(self)
         self.fmqtt_subscriber_thread.start()
 
     def __onConnect(self, client, userData, flags, responseCode):
-        self.client.subscribe(self.ftopic_list)
+        self.fclient.subscribe(self.ftopic_list)
 
     def __assignDeviceInterface(self, payload):
         if self.fmqtt_interface is None:
@@ -155,9 +157,6 @@ class BiDirectionalMQTTComms():
 
         topic = msg.topic
         payload = msg.payload.decode('ascii')
-
-        print(topic + " | " + payload)
-
         
         if self.fdevice_status == ConnectionStatus.connected:
             if (payload == INIT_MSG_TXT):
@@ -165,21 +164,33 @@ class BiDirectionalMQTTComms():
             elif ("topics" in payload):
                 self.ftopic_list = self.__encodeTopicsString(payload)
                 self.__assignDeviceInterface(payload)
-                self.client.disconnect()
+                
+                self.fmqtt_subscriber_thread.terminate()
+
+                self.fclient.disconnect()
                 sleep(0.5)
-                self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
+                print("re-connect")
+
+                self.fclient.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
+                
+                self.fmqtt_subscriber_thread = MQTTSubscriberThread(self)
+                self.fmqtt_subscriber_thread.start()
+
             else:
                 if self.fmqtt_interface is not None:
                     self.fmqtt_interface.onMessage(topic, payload)
                     
         else:
             self.__registerDevice(topic, payload)      
+
+    def __onPublish(client, userdata, mid):
+        sleep(0.5)
         
     def getDeviceStatus(self):
         return self.fdevice_status
 
     def getClient(self):
-        return self.client
+        return self.fclient
 
     def sendMsg(self, msgText, topic = DEFAULT_DATA_TOPIC):
         publish.single(topic, msgText, hostname = self.fdest_ip_address)
