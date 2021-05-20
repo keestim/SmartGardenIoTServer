@@ -46,9 +46,9 @@ class PlantMonitorInterface(DeviceInterface):
     def __init__(self): 
         super().__init__()
         self.fTemperature = 0
-        self.fMoisture = 0
-        self.fHumidityRaw = 0
-        self.fHumidityPercent = 0
+        self.fHumidity = 0
+        self.fMoistureRaw = 0
+        self.fMoisturePercentage = 0
         self.fDeviceType = PLANT_MONITOR_TYPE_NAME
         
     def onMessage(self, topic, payload):
