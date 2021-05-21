@@ -258,4 +258,5 @@ class BiDirectionalMQTTComms():
         if (self.fdevice_type == DeviceType.edge_device):
             if (self.fThingsBoardKey != ""):
                 command = 'curl -v -X POST -d "' + msgText + '" https://demo.thingsboard.io/api/v1/' + self.fThingsBoardKey + '/telemetry --header "Content-Type:application/json"'
+                print(str(command))
                 subprocess.Popen(command, shell = True)
