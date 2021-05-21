@@ -5,15 +5,10 @@ created: 18/05/2021
 
 <?php
   //move this to shared function file for all php!
-  header(
-    "Access-Control-Allow-Origin", 
-    "*");
+  include("./helper_functions.php");
+  $api_output = curl_api_request("http://localhost:5000/get_all_devices_info");
+  $devices_json_obj = json_decode($api_output);  
 
-  header(
-    "Access-Control-Allow-Headers", 
-    "Origin, X-Requested-With, Content-Type, Accept");
-  
-  $devices_json_obj = json_decode($output);
 ?>
 
 <!DOCTYPE html> 

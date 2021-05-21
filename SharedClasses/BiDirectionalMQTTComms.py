@@ -8,9 +8,14 @@ import sys
 import repackage
 import subprocess
 repackage.up()
-from SharedClasses.DeviceInterface import PlantMonitorInterface, WaterSystemInterface, PLANT_MONITOR_TYPE_NAME, WATERING_SYSTEM_TYPE_NAME
+from SharedClasses.DeviceInterface import PlantMonitorInterface, SMOKE_MONITOR_TYPE_NAME, SmokeSensorInterface, WaterSystemInterface, PLANT_MONITOR_TYPE_NAME, WATERING_SYSTEM_TYPE_NAME, PAYLOAD_MSG_KEY, TOPIC_MSG_KEY
 from SharedClasses.helper_functions import * 
 from SharedClasses.SystemConstants import *
+
+BROADCAST_MSG_TXT = "broadcast"
+INIT_MSG_TXT = "initial message"
+INIT_RECEIVED_MSG_TXT = "initial message received"
+
 
 class ConnectionStatus(Enum):
     init = 1
@@ -22,14 +27,18 @@ class DeviceType(Enum):
     edge_device = 2
 
 class MQTTSubscriberThread(threading.Thread):
-    def __init__(self, mqtt_client):
+    def __init__(self, mqtt_connection):
         super().__init__()
-        self.fmqtt_client = mqtt_client
+        self.fmqtt_connection = mqtt_connection
+        print("new sub thread!")
 
     def run(self):
-        self.fmqtt_client.loop_forever()
+        while True:
+            self.fmqtt_connection.getClient().loop(0.01) #check for messages
+            sleep(0.1)
 
-#potentially add a new enum to enforce that "initial message received" is sent before enum!
+#TODO: potentially add a new enum to enforce that "initial message received" is sent before enum!
+#http://www.steves-internet-guide.com/multiple-client-connections-python-mqtt/
 
 class MQTTConnectInitializer(threading.Thread):
     def __init__(self, mqtt_bi_comms):
@@ -39,15 +48,42 @@ class MQTTConnectInitializer(threading.Thread):
     def run(self):
         while True:
             if self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.init:
-                self.fmqtt_bi_comms.sendMsg("broadcast", SETUP_DEVICE_TOPIC)
+                self.fmqtt_bi_comms.sendMsg(BROADCAST_MSG_TXT, SETUP_DEVICE_TOPIC)
             elif self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.attempting_connection:
-                self.fmqtt_bi_comms.sendMsg("initial message", SETUP_DEVICE_TOPIC)
+                self.fmqtt_bi_comms.sendMsg(INIT_MSG_TXT, SETUP_DEVICE_TOPIC)
             elif self.fmqtt_bi_comms.getDeviceStatus() == ConnectionStatus.connected:
                 exit()
 
             sleep(1)
 
-class BiDirectionalMQTTComms:
+class CoupledPlantMoistureWatcher(threading.Thread):
+    def __init__(self, mqtt_bi_comms):
+        super().__init__()
+        self.fmqtt_bi_comms = mqtt_bi_comms
+
+    def waterPlantToSetLevel(self):
+        mqtt_interface_obj = self.fmqtt_bi_comms.getInterfaceObj()
+
+        msg_details = getattr(mqtt_interface_obj, 'openValve')()
+        self.fmqtt_bi_comms.sendMsg(msg_details[PAYLOAD_MSG_KEY], msg_details["topic"])
+
+        while (mqtt_interface_obj.getCoupledPlantInterface().getMoisturePercentage() <= mqtt_interface_obj.getTriggerMoistureLevel()):
+            sleep(0.5)
+            continue
+
+        msg_details = getattr(mqtt_interface_obj, 'closeValve')()
+        self.fmqtt_bi_comms.sendMsg(msg_details[PAYLOAD_MSG_KEY], msg_details["topic"])
+
+    def run(self):
+        while True:
+            mqtt_interface_obj = self.fmqtt_bi_comms.getInterfaceObj()
+
+            if (mqtt_interface_obj.getCoupledPlantInterface().getMoisturePercentage() <= mqtt_interface_obj.getTriggerMoistureLevel()):
+                self.waterPlantToSetLevel()
+
+            sleep(0.5)
+
+class BiDirectionalMQTTComms():
     def __init__(self, device_ip_address, dest_ip_address, device_type, mqtt_interface = None, port = 1883, keepAlive = 60):
         self.fdest_ip_address = dest_ip_address
         self.fdevice_ip_address = device_ip_address
@@ -60,11 +96,12 @@ class BiDirectionalMQTTComms:
         self.fmqtt_subscriber_thread = None
         self.fdevice_type = device_type
 
+        #Construct a list of topics that all devices use
         self.ftopic_list = [(DEFAULT_DATA_TOPIC, 0), 
                             (SETUP_DEVICE_TOPIC, 0), 
                             (CONTROL_DEVICE_TOPIC, 0)]
 
-        self.client = None
+        self.fclient = None
         self.fdevice_status = ConnectionStatus.init
 
         self.fdevice_type = ""
@@ -74,6 +111,23 @@ class BiDirectionalMQTTComms:
         self.mqtt_connection_initalizer = MQTTConnectInitializer(self)
         self.mqtt_connection_initalizer.start()
         self.fdevice_status = ConnectionStatus.attempting_connection
+
+        self.fmoisture_watcher_thread = None
+
+    def getInterfaceObj(self):
+        return self.fmqtt_interface
+
+    def getMoistureWatcherThread(self):
+        return self.fmoisture_watcher_thread
+
+    def setMoistureWatcherThread(self, input_thread):
+        if (self.fmoisture_watcher_thread is not None):
+            self.fmoisture_watcher_thread.join()
+
+            msg_details = getattr(self.fmqtt_interface, 'closeValve')()
+            self.sendMsg(msg_details[PAYLOAD_MSG_KEY], msg_details["topic"])
+
+        self.fmoisture_watcher_thread = input_thread
 
     def getDestinationIPAddress(self):
         return self.fdest_ip_address
@@ -86,17 +140,16 @@ class BiDirectionalMQTTComms:
 
     def __registerDevice(self, topic, payload):
         if self.fdevice_status == ConnectionStatus.attempting_connection:
-            if (payload == "initial message"):
-                self.sendMsg("initial message received", SETUP_DEVICE_TOPIC)
-            elif (payload == "initial message received"):
+            if (payload == INIT_MSG_TXT):
+                self.sendMsg(INIT_RECEIVED_MSG_TXT, SETUP_DEVICE_TOPIC)
+            elif (payload == INIT_RECEIVED_MSG_TXT):
                 self.fdevice_status = ConnectionStatus.connected
 
-                #need to do this more elegantly!
-                self.sendMsg("initial message received", SETUP_DEVICE_TOPIC)
+                #TODO: need to do this more elegantly!
+                self.sendMsg(INIT_RECEIVED_MSG_TXT, SETUP_DEVICE_TOPIC)
 
                 if (self.fmqtt_interface is not None):
                     topics_json = json.dumps(self.fmqtt_interface.getTopicList())
-                    #store stuff like "topics" and "device_type" as CONSTANTS!"
 
                     self.sendMsg(
                         "{\"topics\": " + str(topics_json) + ", " + 
@@ -104,7 +157,6 @@ class BiDirectionalMQTTComms:
                         SETUP_DEVICE_TOPIC)
 
     def __encodeTopicsString(self, payload):
-        print(payload)
         json_output = json.loads(payload)
         topics = json_output["topics"]
 
@@ -113,11 +165,20 @@ class BiDirectionalMQTTComms:
         for topic in topics:
             result_arr.append((topic, 0))
 
-        print(result_arr)
         return result_arr   
 
+    def __setupReader(self):
+        self.fclient = mqtt.Client()
+        self.fclient.on_connect = self.__onConnect
+        self.fclient.on_message = self.__onMessage
+
+        self.fclient.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
+
+        self.fmqtt_subscriber_thread = MQTTSubscriberThread(self)
+        self.fmqtt_subscriber_thread.start()
+
     def __onConnect(self, client, userData, flags, responseCode):
-        self.client.subscribe(self.ftopic_list)
+        self.fclient.subscribe(self.ftopic_list)
 
     def __assignDeviceInterface(self, payload):
         if self.fmqtt_interface is None:
@@ -127,50 +188,60 @@ class BiDirectionalMQTTComms:
             if (device_type == PLANT_MONITOR_TYPE_NAME):
                 self.fmqtt_interface = PlantMonitorInterface()
             elif (device_type == WATERING_SYSTEM_TYPE_NAME):
-                print("Adding Water System Interface")
                 self.fmqtt_interface = WaterSystemInterface()
-                print("Finished Adding")
+            elif (device_type == SMOKE_MONITOR_TYPE_NAME):
+                self.fmqtt_interface = SmokeSensorInterface()
 
+            print("New Connection Added")
             print(self.fmqtt_interface)
 
     def __onMessage(self, client, userData, msg):
+        sleep(0.1)
+
         topic = msg.topic
         payload = msg.payload.decode('ascii')
-
-        print("PAYLOAD: " + payload)
-        print("NEW MSG: " + payload + " | " + topic)
-
+        
         if self.fdevice_status == ConnectionStatus.connected:
-            if (payload == "initial message"):
-                self.sendMsg("initial message received", SETUP_DEVICE_TOPIC)
+            if (payload == INIT_MSG_TXT):
+                self.sendMsg(INIT_RECEIVED_MSG_TXT, SETUP_DEVICE_TOPIC)
             elif ("topics" in payload):
                 self.ftopic_list = self.__encodeTopicsString(payload)
+                self.fclient.subscribe(self.ftopic_list)
                 self.__assignDeviceInterface(payload)
-                self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
+                
+                self.fmqtt_subscriber_thread.terminate()
+
+                self.fclient.disconnect()
+                sleep(0.5)
+                print("re-connect")
+
+                self.fclient.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
+                
+                self.fmqtt_subscriber_thread = MQTTSubscriberThread(self)
+                self.fmqtt_subscriber_thread.start()
+
+
             else:
                 if self.fmqtt_interface is not None:
                     self.fmqtt_interface.onMessage(topic, payload)
+                    
         else:
             self.__registerDevice(topic, payload)      
+
+    def __onPublish(client, userdata, mid):
+        sleep(0.5)
         
-    def __setupReader(self):
-        self.client = mqtt.Client()
-        self.client.on_connect = self.__onConnect
-        self.client.on_message = self.__onMessage
-
-        self.client.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
-
-        self.fmqtt_subscriber_thread = MQTTSubscriberThread(self.client)
-        self.fmqtt_subscriber_thread.start()
-
     def getDeviceStatus(self):
         return self.fdevice_status
 
+    def getClient(self):
+        return self.fclient
+
     def sendMsg(self, msgText, topic = DEFAULT_DATA_TOPIC):
-        print("sending msg: " + msgText + " | " + topic + " | " + self.fdest_ip_address)
         publish.single(topic, msgText, hostname = self.fdest_ip_address)
 
         if (self.fdevice_type == DeviceType.edge_device):
+
             #send cli message to things board here!
             ACCESS_TOKEN = "AQ3efa1BhBDCcMWqUrLN"
             command = 'curl -v -X POST -d "{\"temperature\": 25}" https://demo.thingsboard.io/api/v1/%S/telemetry --header "Content-Type:application/json"' %(ACCESS_TOKEN)

@@ -6,7 +6,7 @@ from time import sleep
 import threading
 import sys
 import serial
-from picamera import PiCamera
+#from picamera import PiCamera
 from time import sleep
 import datetime
 
@@ -22,7 +22,7 @@ class CommunicationInterface():
 		self.ftopic_list = topics
 		self.fdevice_type = device_type
 		self.fplantData = " "
-		self.farduino = serial.Serial('/dev/ttyACM0', 9600)
+		#self.farduino = serial.Serial('/dev/ttyACM0', 9600)
 
 	def getTopicList(self):
 		return self.ftopic_list
@@ -33,7 +33,7 @@ class CommunicationInterface():
 	def onMessage(self, topic, payload):
 		print("sending..."+topic + "|" + payload)
 		#fix handling here!
-		self.getArduinoConnection().write(payload.encode('utf_8'))
+		#self.getArduinoConnection().write(payload.encode('utf_8'))
 
 	def getArduinoConnection(self):
 		return self.farduino
@@ -90,20 +90,15 @@ if __name__ == "__main__":
 						"/edge_data/Picture"])
 
 	mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, DeviceType.edge_device, interface_obj)
-
+	
+	temperature = 20
+	moisture = 0
+	humidity = 20
 
 	while True:
-
-		interface_obj.getArduinoConnection().flush()
-
-		#data read in
-		interface_obj.setPlantData(interface_obj.getArduinoConnection().readline().decode())
-
-		print("plant data: %s" % (interface_obj.getPlantData()))
-
-		#send plant data
-		mqtt_interface.sendMsg(interface_obj.getPlantData(), PLANT_INFO_TOPIC)
-
-		#img_path = interface_obj.capture_photo()
-		#mqtt_interface.sendMsg(interface_obj.getCameraDataMsg(img_path), "/edge_device/Picture")
+		mqtt_interface.sendMsg(
+			"{\"temperature" + "\" : " + str(temperature) + ", \"moisture\": " + str(moisture) + ", \"humidity\": " + str(humidity) + "}", 
+			PLANT_INFO_TOPIC)
+		moisture += 1
+		sleep(0.2)
 

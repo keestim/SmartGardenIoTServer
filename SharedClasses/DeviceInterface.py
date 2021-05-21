@@ -8,6 +8,10 @@ num_edge_devices = 0
 
 PLANT_MONITOR_TYPE_NAME = "PlantMonitor" 
 WATERING_SYSTEM_TYPE_NAME = "WateringSystem"
+SMOKE_MONITOR_TYPE_NAME = "SmokeMonitor"
+
+PAYLOAD_MSG_KEY = "payload"
+TOPIC_MSG_KEY = "topic"
 
 class DeviceInterface():
     global num_edge_devices
@@ -18,7 +22,7 @@ class DeviceInterface():
         self.ftopic_list = topics
         self.fDeviceType = ""
         self.fdevice_id = num_edge_devices
-        num_edge_devices = num_edge_devices + 1
+        num_edge_devices += 1
 
     def getTopicList(self):
         return self.ftopic_list
@@ -30,7 +34,7 @@ class DeviceInterface():
     def blinkLED(self):
         output_msg = {}
         output_msg["topic"] = CONTROL_DEVICE_TOPIC
-        output_msg["payload"] = "{\"blink_led\" : \"true\"}"
+        output_msg[PAYLOAD_MSG_KEY] = "{\"blink_led\" : \"true\"}"
         return output_msg
 
     def getDeviceID(self):
@@ -43,24 +47,27 @@ class PlantMonitorInterface(DeviceInterface):
     def __init__(self): 
         super().__init__()
         self.fTemperature = 0
-        self.fMoisture = 0
         self.fHumidity = 0
+        self.fMoistureRaw = 0
+        self.fMoisturePercentage = 0
         self.fDeviceType = PLANT_MONITOR_TYPE_NAME
         
     def onMessage(self, topic, payload):
-        print(topic + "|" + payload)
-
-        if (topic == "/edge_device/PlantData"):
+        if (topic == PLANT_INFO_TOPIC):
             device_data = json.loads(payload)
-            self.fHumidity = device_data["humidity"]
-            self.fMoisture = device_data["moisture"]
+            self.fHumidity = int(device_data["humidity"]) 
+            self.fMoistureRaw = device_data["moisture"]
+            self.fMoisturePercentage = (self.fMoistureRaw / 850) * 100
             self.fTemperature = device_data["temperature"]
 
     def getTemperature(self):
         return self.fTemperature
 
-    def getMoisture(self):
-        return self.fMoisture
+    def getMoistureRaw(self):
+        return self.fMoistureRaw
+
+    def getMoisturePercentage(self):
+        return self.fMoisturePercentage
 
     def getHumidity(self):
         return self.fHumidity
@@ -72,9 +79,11 @@ class WaterSystemInterface(DeviceInterface):
         self.fWaterVolume = 0
         self.fValueOpen = False
         self.fDeviceType = WATERING_SYSTEM_TYPE_NAME
+        
+        self.fCoupledPlantInterface = None
+        self.fTriggerMoistureLevel = 0
 
     def onMessage(self, topic, payload):
-        print(topic + "|" + payload)
         if (topic == WATERING_INFO_TOPIC):
             device_data = json.loads(payload)
             self.fValueOpen = str(device_data["pump_state"]) == "1"
@@ -89,11 +98,37 @@ class WaterSystemInterface(DeviceInterface):
     def openValve(self):
         output_msg = {}
         output_msg["topic"] = CONTROL_DEVICE_TOPIC
-        output_msg["payload"] = "{\"valve_state\" : \"open\"}"
+        output_msg[PAYLOAD_MSG_KEY] = "{\"valve_state\" : \"open\"}"
         return output_msg
 
     def closeValve(self):
         output_msg = {}
         output_msg["topic"] = CONTROL_DEVICE_TOPIC
-        output_msg["payload"] = "{\"valve_state\" : \"closed\"}"
+        output_msg[PAYLOAD_MSG_KEY] = "{\"valve_state\" : \"closed\"}"
         return output_msg
+
+    def getCoupledPlantInterface(self):
+        return self.fCoupledPlantInterface
+
+    def setCoupledPlantInterface(self, input_interface):
+        self.fCoupledPlantInterface = input_interface
+
+    def getTriggerMoistureLevel(self):
+        return self.fTriggerMoistureLevel
+
+    def setTriggerMoistureLevel(self, input_value):
+        self.fTriggerMoistureLevel = input_value
+
+class SmokeSensorInterface(DeviceInterface):
+    def __init__(self): 
+        super().__init__()
+        self.fSmokeValue = 0
+        self.fDeviceType = SMOKE_MONITOR_TYPE_NAME
+        
+    def onMessage(self, topic, payload):
+        if (topic == SMOKE_INFO_TOPIC):
+            device_data = json.loads(payload)
+            self.fSmokeValue = int(device_data["smoke_reading"]) 
+
+    def getSmokeValue(self):
+        return self.fSmokeValue
