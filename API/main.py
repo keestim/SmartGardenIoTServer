@@ -96,6 +96,9 @@ def deviceSensorDataJSON(device_mqtt_interface):
         output_str += "\"pump_state\": \"" + str(device_mqtt_interface.getValveState()) + "\", "
         output_str += "\"total_volume\": " + str(device_mqtt_interface.getWaterVolume())
 
+    if (type(device_mqtt_interface) is SmokeSensorInterface):
+        output_str += "\"smoke_reading\": " +  str(device_mqtt_interface.getSmokeValue()) + ", "
+
     return "{" + output_str + "}"
 
 #https://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
