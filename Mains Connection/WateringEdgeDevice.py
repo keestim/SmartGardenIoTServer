@@ -17,7 +17,7 @@ class CommunicationInterface():
         self.ftopic_list = topics
 
         self.fdevice_type = device_type
-        self.farduino = Serial('/dev/ttyACM1', 9600)
+        self.farduino = Serial('/dev/ttyACM0', 9600)
 
     def getTopicList(self):
         return self.ftopic_list
@@ -78,5 +78,4 @@ if __name__ == "__main__":
             interface_obj.getArdiuno().flushOutput()
             interface_obj.getArdiuno().flushInput()
 
-
-        sleep(0.2)
+        sleep(0.02)
