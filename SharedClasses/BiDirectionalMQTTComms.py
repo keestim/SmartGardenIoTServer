@@ -15,7 +15,6 @@ BROADCAST_MSG_TXT = "broadcast"
 INIT_MSG_TXT = "initial message"
 INIT_RECEIVED_MSG_TXT = "initial message received"
 
-
 class ConnectionStatus(Enum):
     init = 1
     attempting_connection = 2
@@ -208,7 +207,7 @@ class BiDirectionalMQTTComms():
                 self.fclient.subscribe(self.ftopic_list)
                 self.__assignDeviceInterface(payload)
                 
-                self.fmqtt_subscriber_thread.terminate()
+                #self.fmqtt_subscriber_thread.join()
 
                 self.fclient.disconnect()
                 sleep(0.5)

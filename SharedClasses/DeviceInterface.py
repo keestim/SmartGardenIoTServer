@@ -54,7 +54,12 @@ class PlantMonitorInterface(DeviceInterface):
         
     def onMessage(self, topic, payload):
         if (topic == PLANT_INFO_TOPIC):
-            device_data = json.loads(payload)
+            try:
+                device_data = json.loads(payload)
+            except:
+                print("json error")
+                return
+            
             self.fHumidity = int(device_data["humidity"]) 
             self.fMoistureRaw = device_data["moisture"]
             self.fMoisturePercentage = (self.fMoistureRaw / 850) * 100
@@ -85,7 +90,12 @@ class WaterSystemInterface(DeviceInterface):
 
     def onMessage(self, topic, payload):
         if (topic == WATERING_INFO_TOPIC):
-            device_data = json.loads(payload)
+            try:
+                device_data = json.loads(payload)
+            except:
+                print("json error")
+                return
+     
             self.fValueOpen = str(device_data["pump_state"]) == "1"
             self.fWaterVolume = float(device_data["total_volume"])
 
@@ -127,7 +137,12 @@ class SmokeSensorInterface(DeviceInterface):
         
     def onMessage(self, topic, payload):
         if (topic == SMOKE_INFO_TOPIC):
-            device_data = json.loads(payload)
+            try:
+                device_data = json.loads(payload)
+            except:
+                print("json error")
+                return
+            
             self.fSmokeValue = int(device_data["smoke_reading"]) 
 
     def getSmokeValue(self):
