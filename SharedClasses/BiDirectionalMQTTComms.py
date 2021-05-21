@@ -38,6 +38,7 @@ class MQTTSubscriberThread(threading.Thread):
                 sleep(0.1)
             except:
                 print("message loop problem")
+                continue
 
 #TODO: potentially add a new enum to enforce that "initial message received" is sent before enum!
 #http://www.steves-internet-guide.com/multiple-client-connections-python-mqtt/
