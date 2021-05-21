@@ -85,7 +85,7 @@ if __name__ == "__main__":
 
 	mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, DeviceType.edge_device, interface_obj)
 
-	arduino = serial.Serial('/dev/ttyACM2', 9600)
+	arduino = serial.Serial('/dev/ttyACM0', 9600)
 
 	while True:
 
