@@ -225,6 +225,8 @@ class BiDirectionalMQTTComms():
                     if self.fmqtt_interface is not None:
                         self.sendMsg("{\"unique_thingsboard_id\": \"" + self.fmqtt_interface.getUniqueThingsBoardID() + "\"}")
             elif ("unique_thingsboard_id" in payload):
+                print(topic + " | " + payload)
+
                 try:
                     device_data = json.loads(payload)
                 except:
