@@ -72,8 +72,11 @@ if __name__ == "__main__":
         msg = interface_obj.readArdinoSerial()
 
         if len(msg) > 0:
+            print("Arduino Msg:")
             print(msg)
             mqtt_interface.sendMsg(msg, WATERING_INFO_TOPIC)
-            interface_obj.getArdiuno().flush()
+            interface_obj.getArdiuno().flushOutput()
+            interface_obj.getArdiuno().flushInput()
+
 
         sleep(0.2)
