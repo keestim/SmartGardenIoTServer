@@ -35,6 +35,13 @@ class CommunicationInterface():
 	def getArduinoConnection(self):
 		return self.farduino
 
+	def readArdinoSerial(self):
+		try:
+			avaliable_msg = self.farduino.inWaiting()
+			return self.farduino.read(avaliable_msg).decode()
+		except:
+			return ""
+
 	def getDate(self):
 		return datetime.datetime.now().strftime('%m-%d-%Y_%H.%M.%S')
 
@@ -67,12 +74,15 @@ if __name__ == "__main__":
 	mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, DeviceType.edge_device, interface_obj)
 
 	while True:
-		interface_obj.getArduinoConnection().flush()
+		msg = interface_obj.readArdinoSerial()
 
-		#data read in
-		interface_obj.setSmokeData(interface_obj.getArduinoConnection().readline().decode())
+		if len(msg) > 0:
+			print(msg)
+			interface_obj.setSmokeData(msg)
 
-		print("Smoke Data: %s" % (interface_obj.getSmokeData()))
+			print("Smoke Data: %s" % (interface_obj.getSmokeData()))
 
-		#send plant data
-		mqtt_interface.sendMsg(interface_obj.getSmokeData(), SMOKE_INFO_TOPIC)
+			mqtt_interface.sendMsg(interface_obj.getSmokeData(), SMOKE_INFO_TOPIC)
+
+			interface_obj.getArduinoConnection().flush()
+		sleep(0.2)
