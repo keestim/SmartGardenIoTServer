@@ -7,6 +7,7 @@ const int buzzer = 10;
 const int smokeA0 = A5;
 // Your threshold value
 const int sensorThres = 400;
+bool blinkLED = false;
 
 void setup() {
   Serial.begin(9600);
@@ -20,12 +21,10 @@ void setup() {
 void loop() {
   readSerialMsgs();
 
-  int smokeValue = analogRead(smokeA0);
-
-  Serial.print("Pin A0: ");
-  Serial.println(smokeValue);
+  int smokeValue = int(analogRead(smokeA0));
+  
   // Checks if it has reached the threshold value
-  if (smokeValue > sensorThres)
+  if (int(smokeValue) > 400)
   {
     digitalWrite(redLed, HIGH);
     digitalWrite(greenLed, LOW);
@@ -37,7 +36,7 @@ void loop() {
     digitalWrite(greenLed, HIGH);
     noTone(buzzer);
   }
-
+  
   String smokeDataJSON = "{\"smoke_reading\" : " + String(smokeValue) + "}\n";
   Serial.print(smokeDataJSON);
 
@@ -47,7 +46,7 @@ void loop() {
 
 void acuateBlinkLed()
 {  
-  if (blinkLED)
+  if(blinkLED)
   {
     for (int i = 0; i < 10; i++)
     {
@@ -56,10 +55,9 @@ void acuateBlinkLed()
       digitalWrite(LED_BUILTIN, LOW);
       delay(100);
     }
-
-    blinkLED = false;
   }
 }
+
 
 void readSerialMsgs()
 {
