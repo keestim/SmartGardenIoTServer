@@ -6,6 +6,7 @@ import paho.mqtt.publish as publish
 import json
 import sys
 import repackage
+import subprocess
 repackage.up()
 from SharedClasses.DeviceInterface import PlantMonitorInterface, SMOKE_MONITOR_TYPE_NAME, SmokeSensorInterface, WaterSystemInterface, PLANT_MONITOR_TYPE_NAME, WATERING_SYSTEM_TYPE_NAME, PAYLOAD_MSG_KEY, TOPIC_MSG_KEY
 from SharedClasses.helper_functions import * 
@@ -217,7 +218,10 @@ class BiDirectionalMQTTComms():
                 
                 self.fmqtt_subscriber_thread = MQTTSubscriberThread(self)
                 self.fmqtt_subscriber_thread.start()
-
+                
+                if (self.fdevice_type == DeviceType.server):
+                    if self.fmqtt_interface is not None:
+                        self.sendMsg("{\"unique_thingsboard_id\": \"" + self.fmqtt_interface.getUniqueThingsBoardID() + "\"}")
 
             else:
                 if self.fmqtt_interface is not None:
@@ -239,5 +243,11 @@ class BiDirectionalMQTTComms():
         publish.single(topic, msgText, hostname = self.fdest_ip_address)
 
         if (self.fdevice_type == DeviceType.edge_device):
+
+            #send cli message to things board here!
+            ACCESS_TOKEN = "AQ3efa1BhBDCcMWqUrLN"
+            command = 'curl -v -X POST -d "' + msgText + '" https://demo.thingsboard.io/api/v1/%S/telemetry --header "Content-Type:application/json"' %(ACCESS_TOKEN)
+            subprocess.Popen(command, shell = True)
+
             #TODO: send cli message to things board here!
             return
