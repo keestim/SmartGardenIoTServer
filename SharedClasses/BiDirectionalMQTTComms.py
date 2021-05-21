@@ -113,6 +113,8 @@ class BiDirectionalMQTTComms():
 
         self.fmoisture_watcher_thread = None
 
+        self.fThingsBoardKey = ""
+
     def getInterfaceObj(self):
         return self.fmqtt_interface
 
@@ -222,7 +224,14 @@ class BiDirectionalMQTTComms():
                 if (self.fdevice_type == DeviceType.server):
                     if self.fmqtt_interface is not None:
                         self.sendMsg("{\"unique_thingsboard_id\": \"" + self.fmqtt_interface.getUniqueThingsBoardID() + "\"}")
-
+            elif ("unique_thingsboard_id" in payload):
+                try:
+                    device_data = json.loads(payload)
+                except:
+                    print("json error")
+                    return
+                                
+                self.fThingsBoardKey = device_data["unique_thingsboard_id"]
             else:
                 if self.fmqtt_interface is not None:
                     self.fmqtt_interface.onMessage(topic, payload)
@@ -243,11 +252,6 @@ class BiDirectionalMQTTComms():
         publish.single(topic, msgText, hostname = self.fdest_ip_address)
 
         if (self.fdevice_type == DeviceType.edge_device):
-
-            #send cli message to things board here!
-            ACCESS_TOKEN = "AQ3efa1BhBDCcMWqUrLN"
-            command = 'curl -v -X POST -d "' + msgText + '" https://demo.thingsboard.io/api/v1/%S/telemetry --header "Content-Type:application/json"' %(ACCESS_TOKEN)
-            subprocess.Popen(command, shell = True)
-
-            #TODO: send cli message to things board here!
-            return
+            if (self.fThingsBoardKey != ""):
+                command = 'curl -v -X POST -d "' + msgText + '" https://demo.thingsboard.io/api/v1/%S/telemetry --header "Content-Type:application/json"' %(self.fThingsBoardKey)
+                subprocess.Popen(command, shell = True)
