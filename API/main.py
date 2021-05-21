@@ -151,7 +151,7 @@ def get_all_devices_sensor_data():
                 output_str += ", "
 
             output_str += deviceSensorDataJSON(device.fmqtt_interface)
-    
+    print(output_str)
     return "[" + output_str + "]"   
 
 @app.route("/get_devices_of_type_info/<device_type_name>", methods=['GET', 'POST'])
