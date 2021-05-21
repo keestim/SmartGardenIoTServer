@@ -16,13 +16,6 @@ class CommunicationInterface():
     def __init__(self, device_type, topics):
         self.ftopic_list = topics
 
-        #need to validate that array being passed in is valid
-        #(I FORGOT A COMMA BEFORE!!!!)
-        
-        print("_______________")
-        print(self.ftopic_list)
-        print("_______________")
-
         self.fdevice_type = device_type
         self.farduino = Serial('/dev/ttyACM0', 9600)
 
@@ -33,13 +26,9 @@ class CommunicationInterface():
         return self.fdevice_type
 
     def onMessage(self, topic, payload):
-        if ("blink_led" in payload):
+        if (("blink_led" in payload) or ("valve_state" in payload)):
             self.farduino.write(payload.encode('utf_8'))
-        
-        if ("valve_state" in payload):
-            #fix this, try to pass payload straight in!
-            self.farduino.write(payload.encode('utf_8'))
-
+    
         print("")
 
     def getArdiuno(self):
@@ -65,11 +54,11 @@ if __name__ == "__main__":
 
     #try make this constant!
     interface_obj = CommunicationInterface(
-                        "WateringSystem", 
-                        ["/edge_device/data", 
-                        "/edge_device/water_info",
-                        "/edge_device/control_device", 
-                        "/edge_device/setup_device", 
+                        WATERING_SYSTEM_TYPE_NAME, 
+                        [DEFAULT_DATA_TOPIC, 
+                        CONTROL_DEVICE_TOPIC,
+                        SETUP_DEVICE_TOPIC, 
+                        WATERING_INFO_TOPIC,
                         "/edge_device/topic_stream"])
     
     mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, DeviceType.edge_device, interface_obj)
@@ -79,7 +68,6 @@ if __name__ == "__main__":
 
         if len(msg) > 0:
             print(msg)
-            mqtt_interface.sendMsg(msg, "/edge_device/water_info")
-            print("_______________________")
+            mqtt_interface.sendMsg(msg, WATERING_INFO_TOPIC)
 
         sleep(0.2)

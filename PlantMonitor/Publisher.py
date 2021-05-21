@@ -1,4 +1,4 @@
-from enum import Enum  
+from enum import Enum
 import socket
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
@@ -12,9 +12,9 @@ import datetime
 
 import repackage
 repackage.up()
-from SharedClasses.BiDirectionalMQTTComms import * 
-from SharedClasses.DeviceInterface import * 
-from SharedClasses.helper_functions import * 
+from SharedClasses.BiDirectionalMQTTComms import *
+from SharedClasses.DeviceInterface import *
+from SharedClasses.helper_functions import *
 
 #####################################communicationInterface class##################################################
 class CommunicationInterface():
@@ -22,6 +22,7 @@ class CommunicationInterface():
 		self.ftopic_list = topics
 		self.fdevice_type = device_type
 		self.fplantData = " "
+		self.farduino = serial.Serial('/dev/ttyACM0', 9600)
 
 	def getTopicList(self):
 		return self.ftopic_list
@@ -30,7 +31,11 @@ class CommunicationInterface():
 		return self.fdevice_type
 
 	def onMessage(self, topic, payload):
-		print(topic + "|" + payload)
+		print("sending..."+topic + "|" + payload)
+		self.getArduinoConnection().write(payload.encode('utf_8'))
+
+	def getArduinoConnection(self):
+		return self.farduino
 
 	def getDate(self):
 		return datetime.datetime.now().strftime('%m-%d-%Y_%H.%M.%S')
@@ -75,24 +80,23 @@ if __name__ == "__main__":
 
 	#try make this constant!
 	interface_obj = CommunicationInterface(
-						"PlantMonitor", 
-						["/edge_device/data", 
-						"/edge_device/control_device", 
-						"/edge_device/setup_device", 
+						PLANT_MONITOR_TYPE_NAME, 
+						[DEFAULT_DATA_TOPIC, 
+						CONTROL_DEVICE_TOPIC, 
+						SETUP_DEVICE_TOPIC, 
 						"/edge_device/topic_stream",
 						"/edge_device/PlantData",
 						"/edge_data/Picture"])
 
 	mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, DeviceType.edge_device, interface_obj)
 
-	arduino = serial.Serial('/dev/ttyACM2', 9600)
 
 	while True:
 
-		arduino.flush()
+		interface_obj.getArduinoConnection().flush()
 
 		#data read in
-		interface_obj.setPlantData(arduino.readline().decode())
+		interface_obj.setPlantData(interface_obj.getArduinoConnection().readline().decode())
 
 		print("plant data: %s" % (interface_obj.getPlantData()))
 
