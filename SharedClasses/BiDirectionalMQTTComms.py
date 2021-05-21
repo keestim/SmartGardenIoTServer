@@ -196,7 +196,8 @@ class BiDirectionalMQTTComms():
 
         topic = msg.topic
         payload = msg.payload.decode('ascii')
-        
+
+        print(topic + " | " + payload)
         if self.fdevice_status == ConnectionStatus.connected:
             if (payload == INIT_MSG_TXT):
                 self.sendMsg(INIT_RECEIVED_MSG_TXT, SETUP_DEVICE_TOPIC)
