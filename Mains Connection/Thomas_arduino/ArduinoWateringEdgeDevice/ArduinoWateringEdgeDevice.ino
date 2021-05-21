@@ -1,7 +1,7 @@
 #include <ArduinoJson.h>
 //code from :https://www.instructables.com/How-to-Use-Water-Flow-Sensor-Arduino-Tutorial/
 
-const int relayPin = 10;
+int solenoidPin = 4;
 bool valveOpen = false;
 bool blinkLED = false;
 
@@ -24,7 +24,7 @@ void setup() {
     // Initialize a serial connection for reporting values to the host
   Serial.begin(9600);
 
-  pinMode(relayPin, OUTPUT);
+pinMode(solenoidPin, OUTPUT);
   pinMode(sensorPin, INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
@@ -34,9 +34,7 @@ void setup() {
 }
 
 void acuateBlinkLed()
-{
-  Serial.write("BLINK LED");
-  
+{  
   if (blinkLED)
   {
     for (int i = 0; i < 10; i++)
@@ -113,11 +111,11 @@ void loop()
   if (valveOpen)
   {
     readFlowMeter();
-    digitalWrite(relayPin, HIGH);
+  digitalWrite(solenoidPin, HIGH);
   } 
   else {
     totalMilliLitres = 0;
-    digitalWrite(relayPin, LOW);
+  digitalWrite(solenoidPin, LOW);
   }  
   
   String waterVolumeJSON = "{\"total_volume\" : " + String(totalMilliLitres) + ", \"pump_state\" : " + String(valveOpen) + "}\n";
@@ -143,10 +141,7 @@ void readSerialMsgs()
   // all serial communication should occur through JSON
   if (serialMsg.length() > 0)
   {
-    DynamicJsonDocument doc(200);
-    Serial.print(serialMsg);
-    Serial.println("");
-    
+    DynamicJsonDocument doc(200);    
     auto error = deserializeJson(doc, serialMsg);
     
     if (error) {

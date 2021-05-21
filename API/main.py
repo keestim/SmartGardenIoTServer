@@ -1,6 +1,10 @@
-from flask import Flask, request, jsonify
+from flask import Flask
+from flask_cors import CORS
+
 import threading
 import pyshark
+
+
 from time import sleep  
 import sys
 
@@ -9,6 +13,7 @@ repackage.up()
 from SharedClasses.DeviceInterface import * 
 from SharedClasses.helper_functions import * 
 from SharedClasses.BiDirectionalMQTTComms import * 
+from SharedClasses.SystemConstants import *
 
 connection_list = []
 mqtt_ip_addresses = []
@@ -37,72 +42,83 @@ class MQTTSniffer(threading.Thread):
                             
             if (ip_data.src not in mqtt_ip_addresses) and not(ip_data.src == device_ip_address):
                 mqtt_ip_addresses.append(ip_data.src)
-
-                print(mqtt_data)
-                print("Setting up MQTT Connection with IP: " + ip_data.src)
-                
                 connection_list.append(BiDirectionalMQTTComms(device_ip_address, ip_data.src, DeviceType.server))
 
             new_connection_lock.release()
 
+def findDeviceByID(device_id):
+    if (not device_id.is_integer()):
+        return None
+    
+    for device in connection_list:
+        if device.fmqtt_interface != None:
+            if str(device.fmqtt_interface.getDeviceID()) == str(device_id):
+                return device
+
+def findDeviceByIDAndType(device_id, device_type):
+    potential_device = findDeviceByID(device_id)
+    if (type(potential_device.fmqtt_interface) is device_type):
+        return potential_device
+    else:
+        return None
+
 #https://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
+#https://restfulapi.net/http-status-codes/
+
 app = Flask(__name__)
-app.config["DEBUG"] = True
+CORS(app)
+
+#app.config["DEBUG"] = True
+
+#IF NOT RETURNING ANY DATA:
+#https://stackoverflow.com/questions/38804385/flask-to-return-nothing-but-only-run-script
+#just return a 204 response code
 
 @app.route('/', methods=['GET'])
 def home():
-    return "API Test"
+    return "Welcome to Smart Garden API"
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return ("Route Not Found", 404)
 
 @app.route("/get_device_details", methods=['GET'])
 def get_device_details():
     output_str = ""
 
     for device in connection_list:
-        if output_str == "":
-            output_str += "{"
-        else:
+        if output_str != "":
             output_str += ", "
 
         if device.fmqtt_interface != None:
             device_interface = device.fmqtt_interface
             output_str += "["
-            output_str += "[\"id\": " + int(device_interface.getDeviceID()) + ", "
+            output_str += "\"id\": " + str(device_interface.getDeviceID()) + ", "
             output_str += "\"device_type\" : \"" + device_interface.getDeviceType() + "\""
             output_str += "]"
-        
-    return output_str + "}"
+    
+    print(output_str)
+    return "{" + output_str + "}"
 
-@app.route("/get_device_of_type/<type>", methods=['GET'])
-def get_device_of_type(type):
+@app.route("/get_device_of_type/<device_type_name>", methods=['GET', 'POST'])
+def get_device_of_type(device_type_name):
     output_str = ""
 
     for device in connection_list:
-        if output_str == "":
-            output_str += "{"
-        else:
+        if output_str != "":
             output_str += ", "
 
         if device.fmqtt_interface != None:
-            if (device.fmqtt_interface.getDeviceType() == type):
+            if (device.fmqtt_interface.getDeviceType() == device_type_name):
                 device_interface = device.fmqtt_interface
                 output_str += "["
                 output_str += "\"id\": " + int(device_interface.getDeviceID()) + ", " 
                 output_str += "\"device_type\" : \"" + device_interface.getDeviceType() + "\""
                 output_str += "]"
-    return output_str + "}"
+    
+    return "{" + output_str + "}"
 
-@app.route("/probe_devices", methods=['GET'])
-def probe_devices():
-    devices_str = ""
-
-    for device in connection_list:
-        devices_str = devices_str + device.fdest_ip_address + ", "
-        device.sendMsg("The bois")
-
-    return devices_str
-
-@app.route("/flash_all_lights", methods=['GET'])
+@app.route("/flash_all_lights", methods=['GET', 'POST'])
 def flash_all_lights():
     for device in connection_list:
         if device.fmqtt_interface != None:
@@ -110,13 +126,26 @@ def flash_all_lights():
             print(msg_details)
             device.sendMsg(msg_details["payload"], msg_details["topic"])
 
-    return "Flash LIGHTS!"
+    return ('', 204)
 
-@app.route("/change_valve_state/<device_id>/<state>", methods=['GET'])
+@app.route("/flash_light/<device_id>", methods=['GET', 'POST'])
+def flash_light_for_id(device_id):
+    selected_device = findDeviceByID(device_id)
+
+    if selected_device is None:
+        return ('No Device Exists for Input ID', 400)
+    else:
+        msg_details = getattr(selected_device.fmqtt_interface, 'blinkLED')()
+        selected_device.sendMsg(msg_details["payload"], msg_details["topic"])
+
+    return ('', 204)
+
+@app.route("/change_valve_state/<device_id>/<state>", methods=['GET', 'POST'])
 def turn_on_valve(device_id, state):
     selected_device = None
 
-    #validate that id is an in
+    if (not device_id.is_integer()):
+        return ('', 400)
 
     if state not in ["open", "closed"]:
         return "invalid state provided"
@@ -137,15 +166,16 @@ def turn_on_valve(device_id, state):
         
         print(msg_details)
         device.sendMsg(msg_details["payload"], msg_details["topic"])
-        
-    return "Pump " + state
+
+    return ('', 204)
 
 #better to spawn a therad for this
-@app.route("/water_set_volume/<device_id>/<volume>", methods=['GET'])
+#test this out!
+@app.route("/water_set_volume/<device_id>/<volume>", methods=['GET', 'POST'])
 def water_set_volume(device_id, volume):
     selected_device = None
 
-    #validate that id is an in
+    #validate that id is an interger
 
     for device in connection_list:
         if device.fmqtt_interface != None:
@@ -160,24 +190,28 @@ def water_set_volume(device_id, volume):
         msg_details = getattr(selected_device.fmqtt_interface, 'openValve')()
         print(msg_details)
         device.sendMsg(msg_details["payload"], msg_details["topic"])
-
+        
         while (device.fmqtt_interface.getWaterVolume() <= float(volume)):
             sleep(0.2)
+            print("Volume: " + str(device.fmqtt_interface.getWaterVolume()))
             continue
 
         msg_details = getattr(selected_device.fmqtt_interface, 'closeValve')()
         device.sendMsg(msg_details["payload"], msg_details["topic"])
 
-    return "Specified Volume Released"
+    return ('', 204)
 
 #something about avaliable methods?
 
 #probably swap to GET variables approach
 #this makes for a most readable URL
-@app.route("/water_plant_to_target_moisture/<plant_id>/<watering_id>/<target_moisture>")
+#maybe something to add to note either client or server side
+#implement clean exit for script!
+@app.route("/water_plant_to_target_moisture/<plant_id>/<watering_id>/<target_moisture>", methods=['GET', 'POST'])
 def water_plant_to_target_moisture():
     return "Watering plant"
 
+#SCRIPT ENTRY POINT
 if __name__ == "__main__":
     try:
         server_network_interface = sys.argv[1]
@@ -188,6 +222,3 @@ if __name__ == "__main__":
     mqtt_sniffer = MQTTSniffer(server_network_interface)
     mqtt_sniffer.start()
     app.run()
-
-#maybe something to add to note either client or server side
-#implement clean exit for script!

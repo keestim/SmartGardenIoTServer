@@ -1,10 +1,17 @@
 import abc
 from flask import json
+import repackage
+repackage.up()
+from SharedClasses.SystemConstants import *
 
 num_edge_devices = 0
 
+PLANT_MONITOR_TYPE_NAME = "PlantMonitor" 
+WATERING_SYSTEM_TYPE_NAME = "WateringSystem"
+
 class DeviceInterface():
     global num_edge_devices
+
     def __init__(self, topics = ""):
         global num_edge_devices
 
@@ -22,8 +29,8 @@ class DeviceInterface():
 
     def blinkLED(self):
         output_msg = {}
-        output_msg["topic"] = "/edge_device/control_device"
-        output_msg["payload"] = "blink_led"
+        output_msg["topic"] = CONTROL_DEVICE_TOPIC
+        output_msg["payload"] = "{\"blink_led\" : \"true\"}"
         return output_msg
 
     def getDeviceID(self):
@@ -38,7 +45,7 @@ class PlantMonitorInterface(DeviceInterface):
         self.fTemperature = 0
         self.fMoisture = 0
         self.fHumidity = 0
-        self.fDeviceType = "PlantMonitor"
+        self.fDeviceType = PLANT_MONITOR_TYPE_NAME
         
     def onMessage(self, topic, payload):
         print(topic + "|" + payload)
@@ -64,17 +71,14 @@ class WaterSystemInterface(DeviceInterface):
 
         self.fWaterVolume = 0
         self.fValueOpen = False
-        self.fDeviceType = "WaterSystem"
+        self.fDeviceType = WATERING_SYSTEM_TYPE_NAME
 
     def onMessage(self, topic, payload):
         print(topic + "|" + payload)
-
-        if (topic == "/edge_device"):
+        if (topic == WATERING_INFO_TOPIC):
             device_data = json.loads(payload)
             self.fValueOpen = str(device_data["pump_state"]) == "1"
             self.fWaterVolume = float(device_data["total_volume"])
-
-            print("Updated Private Fields for Watering Device!")
 
     def getWaterVolume(self):
         return self.fWaterVolume
@@ -84,12 +88,12 @@ class WaterSystemInterface(DeviceInterface):
 
     def openValve(self):
         output_msg = {}
-        output_msg["topic"] = "/edge_device/control_device"
+        output_msg["topic"] = CONTROL_DEVICE_TOPIC
         output_msg["payload"] = "{\"valve_state\" : \"open\"}"
         return output_msg
 
     def closeValve(self):
         output_msg = {}
-        output_msg["topic"] = "/edge_device/control_device"
+        output_msg["topic"] = CONTROL_DEVICE_TOPIC
         output_msg["payload"] = "{\"valve_state\" : \"closed\"}"
         return output_msg
