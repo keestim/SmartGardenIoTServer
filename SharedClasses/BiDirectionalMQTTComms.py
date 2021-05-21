@@ -219,7 +219,10 @@ class BiDirectionalMQTTComms():
                 
                 self.fmqtt_subscriber_thread = MQTTSubscriberThread(self)
                 self.fmqtt_subscriber_thread.start()
-
+                
+                if (self.fdevice_type == DeviceType.server):
+                    if self.fmqtt_interface is not None:
+                        self.sendMsg("{\"unique_thingsboard_id\": \"" + self.fmqtt_interface.getUniqueThingsBoardID() + "\"}")
 
             else:
                 if self.fmqtt_interface is not None:
@@ -244,6 +247,8 @@ class BiDirectionalMQTTComms():
 
             #send cli message to things board here!
             ACCESS_TOKEN = "AQ3efa1BhBDCcMWqUrLN"
-            command = 'curl -v -X POST -d "{\"temperature\": 25}" https://demo.thingsboard.io/api/v1/%S/telemetry --header "Content-Type:application/json"' %(ACCESS_TOKEN)
+            command = 'curl -v -X POST -d "' + msgText + '" https://demo.thingsboard.io/api/v1/%S/telemetry --header "Content-Type:application/json"' %(ACCESS_TOKEN)
             subprocess.Popen(command, shell = True)
+
+            #TODO: send cli message to things board here!
             return

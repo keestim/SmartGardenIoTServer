@@ -6,6 +6,11 @@ from SharedClasses.SystemConstants import *
 
 num_edge_devices = 0
 
+num_plant_monitors = 0
+num_watering_systems = 0
+num_smoke_monitor_systems = 0
+
+
 PLANT_MONITOR_TYPE_NAME = "PlantMonitor" 
 WATERING_SYSTEM_TYPE_NAME = "WateringSystem"
 SMOKE_MONITOR_TYPE_NAME = "SmokeMonitor"
@@ -30,6 +35,10 @@ class DeviceInterface():
     @abc.abstractmethod
     def onMessage(self, topic, payload):
         pass
+    
+    @abc.abstractmethod
+    def getUniqueThingsBoardID(self):
+        pass
 
     def blinkLED(self):
         output_msg = {}
@@ -44,13 +53,19 @@ class DeviceInterface():
         return self.fDeviceType
 
 class PlantMonitorInterface(DeviceInterface):
-    def __init__(self): 
+    global num_plant_monitors
+    
+    def __init__(self):
+        global num_plant_montiors
+        
         super().__init__()
         self.fTemperature = 0
         self.fHumidity = 0
         self.fMoistureRaw = 0
         self.fMoisturePercentage = 0
         self.fDeviceType = PLANT_MONITOR_TYPE_NAME
+        self.fPlantID = num_plant_montiors
+        num_plant_montiors += 1
         
     def onMessage(self, topic, payload):
         if (topic == PLANT_INFO_TOPIC):
@@ -59,6 +74,9 @@ class PlantMonitorInterface(DeviceInterface):
             self.fMoistureRaw = device_data["moisture"]
             self.fMoisturePercentage = (self.fMoistureRaw / 850) * 100
             self.fTemperature = device_data["temperature"]
+
+    def getUniqueThingsBoardID(self):
+        return self.fDeviceType + str(self.fPlantID)
 
     def getTemperature(self):
         return self.fTemperature
@@ -73,7 +91,10 @@ class PlantMonitorInterface(DeviceInterface):
         return self.fHumidity
 
 class WaterSystemInterface(DeviceInterface):
+    global num_watering_systems
+    
     def __init__(self):
+        global num_watering_systems
         super().__init__()
 
         self.fWaterVolume = 0
@@ -82,6 +103,9 @@ class WaterSystemInterface(DeviceInterface):
         
         self.fCoupledPlantInterface = None
         self.fTriggerMoistureLevel = 0
+        
+        self.fWateringID = num_watering_systems
+        num_watering_systems += 1
 
     def onMessage(self, topic, payload):
         if (topic == WATERING_INFO_TOPIC):
@@ -118,12 +142,22 @@ class WaterSystemInterface(DeviceInterface):
 
     def setTriggerMoistureLevel(self, input_value):
         self.fTriggerMoistureLevel = input_value
+        
+    def getUniqueThingsBoardID(self):
+        return self.fDeviceType + str(self.fWateringID)
 
 class SmokeSensorInterface(DeviceInterface):
-    def __init__(self): 
+    global num_smoke_monitor_systems
+    
+    def __init__(self):
+        global num_smoke_monitor_systems
+        
         super().__init__()
         self.fSmokeValue = 0
         self.fDeviceType = SMOKE_MONITOR_TYPE_NAME
+        
+        self.fSmokeID = num_smoke_monitor_systems
+        num_smoke_monitor_systems += 1
         
     def onMessage(self, topic, payload):
         if (topic == SMOKE_INFO_TOPIC):
@@ -132,3 +166,6 @@ class SmokeSensorInterface(DeviceInterface):
 
     def getSmokeValue(self):
         return self.fSmokeValue
+    
+    def getUniqueThingsBoardID(self):
+        return self.fDeviceType + str(self.fSmokeID)
