@@ -1,7 +1,7 @@
 #include <ArduinoJson.h>
 //code from :https://www.instructables.com/How-to-Use-Water-Flow-Sensor-Arduino-Tutorial/
 
-const int relayPin = 10;
+const int relayPin = 11;
 bool valveOpen = false;
 bool blinkLED = false;
 
@@ -66,7 +66,7 @@ void initialiseFlowMeter()
 void readFlowMeter(){
   // only record is valve is open
   //when valve is closed, reset water measurement, etc!
-  if((millis() - oldTime) > 1000)    // Only process counters once per second
+  if((millis() - oldTime) > 200)    // Only process counters once per second
   { 
     // Disable the interrupt while calculating flow rate and sending the value to
     // the host
@@ -100,6 +100,9 @@ void readFlowMeter(){
     
     // Enable the interrupt again now that we've finished sending output
     attachInterrupt(sensorInterrupt, pulseCounter, FALLING);
+
+    String waterVolumeJSON = "{\"total_volume\" : " + String(totalMilliLitres) + ", \"pump_state\" : " + String(valveOpen) + "}\n";
+    Serial.print(waterVolumeJSON);
   }
 }
 
@@ -118,11 +121,7 @@ void loop()
     digitalWrite(relayPin, LOW);
   }  
   
-  String waterVolumeJSON = "{\"total_volume\" : " + String(totalMilliLitres) + ", \"pump_state\" : " + String(valveOpen) + "}\n";
-  Serial.print(waterVolumeJSON);
-
   acuateBlinkLed();
-  delay(200);
 }
 
 void readSerialMsgs()
