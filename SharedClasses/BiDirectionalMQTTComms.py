@@ -93,6 +93,7 @@ class BiDirectionalMQTTComms():
         self.fkeepAlive = keepAlive
 
         self.fmqtt_subscriber_thread = None
+
         self.fdevice_type = device_type
 
         #Construct a list of topics that all devices use
@@ -102,9 +103,6 @@ class BiDirectionalMQTTComms():
 
         self.fclient = None
         self.fdevice_status = ConnectionStatus.init
-
-        self.fdevice_type = ""
-
         self.__setupReader()
 
         self.mqtt_connection_initalizer = MQTTConnectInitializer(self)
@@ -193,9 +191,6 @@ class BiDirectionalMQTTComms():
             elif (device_type == SMOKE_MONITOR_TYPE_NAME):
                 self.fmqtt_interface = SmokeSensorInterface()
 
-            print("New Connection Added")
-            print(self.fmqtt_interface)
-
     def __onMessage(self, client, userData, msg):
         sleep(0.1)
 
@@ -214,16 +209,20 @@ class BiDirectionalMQTTComms():
 
                 self.fclient.disconnect()
                 sleep(0.5)
-                print("re-connect")
 
                 self.fclient.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
                 
                 self.fmqtt_subscriber_thread = MQTTSubscriberThread(self)
                 self.fmqtt_subscriber_thread.start()
                 
-                if (self.fdevice_type == DeviceType.server):
+                sleep(1)
+
+                if (self.fdevice_type is DeviceType.server):
                     if self.fmqtt_interface is not None:
-                        self.sendMsg("{\"unique_thingsboard_id\": \"" + self.fmqtt_interface.getUniqueThingsBoardID() + "\"}")
+                        print("output to thingsboard!")
+                        print("{\"unique_thingsboard_id\": \"" + str(self.fmqtt_interface.getUniqueThingsBoardID()) + "\"}")
+
+                        self.sendMsg("{\"unique_thingsboard_id\": \"" + str(self.fmqtt_interface.getUniqueThingsBoardID()) + "\"}")
             elif ("unique_thingsboard_id" in payload):
                 print(topic + " | " + payload)
 
@@ -232,6 +231,8 @@ class BiDirectionalMQTTComms():
                 except:
                     print("json error")
                     return
+
+                print(device_data["unique_thingsboard_id"])
                                 
                 self.fThingsBoardKey = device_data["unique_thingsboard_id"]
             else:
