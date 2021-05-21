@@ -6,10 +6,9 @@ from SharedClasses.SystemConstants import *
 
 num_edge_devices = 0
 
-num_plant_monitors = 0
 num_watering_systems = 0
 num_smoke_monitor_systems = 0
-
+num_plant_monitors = 0
 
 PLANT_MONITOR_TYPE_NAME = "PlantMonitor" 
 WATERING_SYSTEM_TYPE_NAME = "WateringSystem"
@@ -56,7 +55,7 @@ class PlantMonitorInterface(DeviceInterface):
     global num_plant_monitors
     
     def __init__(self):
-        global num_plant_montiors
+        global num_plant_monitors
         
         super().__init__()
         self.fTemperature = 0
@@ -64,8 +63,9 @@ class PlantMonitorInterface(DeviceInterface):
         self.fMoistureRaw = 0
         self.fMoisturePercentage = 0
         self.fDeviceType = PLANT_MONITOR_TYPE_NAME
-        self.fPlantID = num_plant_montiors
-        num_plant_montiors += 1
+
+        self.fPlantID = num_plant_monitors
+        num_plant_monitors += 1
         
     def onMessage(self, topic, payload):
         if (topic == PLANT_INFO_TOPIC):
