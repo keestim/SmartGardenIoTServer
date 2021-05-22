@@ -43,8 +43,7 @@ class MQTTSniffer(threading.Thread):
                             
             if (ip_data.src not in mqtt_ip_addresses) and not(ip_data.src == device_ip_address):
                 mqtt_ip_addresses.append(ip_data.src)
-                new_mqtt_connection = BiDirectionalMQTTComms(device_ip_address, ip_data.src, DeviceType.server)
-                connection_list.append(new_mqtt_connection)
+                connection_list.append(BiDirectionalMQTTComms(device_ip_address, ip_data.src, DeviceType.server))
 
             new_connection_lock.release()
 
