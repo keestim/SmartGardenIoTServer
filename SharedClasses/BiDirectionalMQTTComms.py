@@ -213,12 +213,14 @@ class BiDirectionalMQTTComms():
         topic = msg.topic
         payload = msg.payload.decode('ascii')
 
-        print(topic + " | " +  payload + " | " + self.fdest_ip_address)
-
         if self.fdevice_status == ConnectionStatus.connected:
             if (payload == INIT_MSG_TXT):
                 self.sendMsg(INIT_RECEIVED_MSG_TXT, SETUP_DEVICE_TOPIC)
             elif ("topics" in payload):
+                print(topic + " | " +  payload + " | " + self.fdest_ip_address)
+
+
+
                 print("TOPICS MSG RECEIVED!")
                 print("Status:")
                 print(self.fdevice_status)
@@ -243,12 +245,14 @@ class BiDirectionalMQTTComms():
                 sleep(1)
 
                 if (self.fdevice_type is DeviceType.server):
+                    print(topic + " | " +  payload + " | " + self.fdest_ip_address)
+
                     if self.fmqtt_interface is not None:
                         print("output to thingsboard!")
                         print("{\"unique_thingsboard_id\": \"" + str(self.fmqtt_interface.getUniqueThingsBoardID()) + "\"}")
                         self.sendMsg("{\"unique_thingsboard_id\": \"" + str(self.fmqtt_interface.getUniqueThingsBoardID()) + "\"}")
             elif ("unique_thingsboard_id" in payload):
-                print(topic + " | " + payload)
+                print(topic + " | " +  payload + " | " + self.fdest_ip_address)
 
                 try:
                     device_data = json.loads(payload)
