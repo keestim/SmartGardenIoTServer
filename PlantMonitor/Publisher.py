@@ -105,8 +105,6 @@ if __name__ == "__main__":
 			print(msg)
 			interface_obj.setPlantData(msg)
 
-			
-			print("plant data: %s" % (interface_obj.getPlantData()))
 			mqtt_interface.sendMsg(interface_obj.getPlantData(), PLANT_INFO_TOPIC)
 
 		sleep(0.2)

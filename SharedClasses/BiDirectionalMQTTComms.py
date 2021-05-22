@@ -210,6 +210,10 @@ class BiDirectionalMQTTComms():
             if (payload == INIT_MSG_TXT):
                 self.sendMsg(INIT_RECEIVED_MSG_TXT, SETUP_DEVICE_TOPIC)
             elif ("topics" in payload):
+                print("TOPICS MSG RECEIVED!")
+                print("Status:")
+                print(self.fdevice_status)
+
                 self.ftopic_list = self.__encodeTopicsString(payload)
                 self.fclient.subscribe(self.ftopic_list)
                 
