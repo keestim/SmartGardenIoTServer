@@ -206,21 +206,26 @@ class BiDirectionalMQTTComms():
         topic = msg.topic
         payload = msg.payload.decode('ascii')
 
+        print(topic  + "|" + payload)
+
         if self.fdevice_status == ConnectionStatus.connected:
             if (payload == INIT_MSG_TXT):
                 self.sendMsg(INIT_RECEIVED_MSG_TXT, SETUP_DEVICE_TOPIC)
             elif ("topics" in payload):
                 self.ftopic_list = self.__encodeTopicsString(payload)
                 self.fclient.subscribe(self.ftopic_list)
+                
                 self.__assignDeviceInterface(payload)
                 
                 self.fmqtt_subscriber_thread.setKillLoop(True)
-                self.fmqtt_subscriber_thread.join()
+                self.fmqtt_subscriber_thread.terminate()
 
-                self.fclient.disconnect()
-                sleep(0.5)
+                #self.fclient.disconnect()
+                #sleep(0.5)
 
-                self.fclient.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
+                
+
+                #self.fclient.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
                 
                 self.fmqtt_subscriber_thread = MQTTSubscriberThread(self)
                 self.fmqtt_subscriber_thread.start()
@@ -263,6 +268,7 @@ class BiDirectionalMQTTComms():
 
     def sendMsg(self, msgText, topic = DEFAULT_DATA_TOPIC):
         publish.single(topic, msgText, hostname = self.fdest_ip_address)
+        print("Sending MSG: " + msgText)
 
         if (self.fdevice_type == DeviceType.edge_device):
             if (self.fThingsBoardKey != ""):
