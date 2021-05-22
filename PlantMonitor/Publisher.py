@@ -31,12 +31,17 @@ class CommunicationInterface():
 		return self.fdevice_type
 
 	def onMessage(self, topic, payload):
-		print("sending..."+topic + "|" + payload)
 		#fix handling here!
-		self.getArduinoConnection().write(payload.encode('utf_8'))
+		self.farduino.write(payload.encode('utf_8'))
 
-	def getArduinoConnection(self):
+	def getArdiuno(self):
 		return self.farduino
+
+	def readArdinoSerial(self):
+		try:
+			return self.farduino.read(self.farduino.inWaiting()).decode() 
+		except:
+			return ""
 
 	def getDate(self):
 		return datetime.datetime.now().strftime('%m-%d-%Y_%H.%M.%S')
@@ -93,17 +98,13 @@ if __name__ == "__main__":
 
 
 	while True:
+		msg = interface_obj.readArdinoSerial()
 
-		interface_obj.getArduinoConnection().flush()
+		if len(msg) > 0:
+			interface_obj.setPlantData(msg)
 
-		#data read in
-		interface_obj.setPlantData(interface_obj.getArduinoConnection().readline().decode())
+			print(msg)
+			print("plant data: %s" % (interface_obj.getPlantData()))
+			mqtt_interface.sendMsg(interface_obj.getPlantData(), PLANT_INFO_TOPIC)
 
-		print("plant data: %s" % (interface_obj.getPlantData()))
-
-		#send plant data
-		mqtt_interface.sendMsg(interface_obj.getPlantData(), PLANT_INFO_TOPIC)
-
-		#img_path = interface_obj.capture_photo()
-		#mqtt_interface.sendMsg(interface_obj.getCameraDataMsg(img_path), "/edge_device/Picture")
-
+		sleep(0.2)
