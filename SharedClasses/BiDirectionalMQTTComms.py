@@ -193,6 +193,9 @@ class BiDirectionalMQTTComms():
             json_output = json.loads(payload)
             device_type = json_output['device_type']
 
+            print("DEVICE TYPE")
+            print(device_type)
+
             if (device_type == PLANT_MONITOR_TYPE_NAME):
                 self.fmqtt_interface = PlantMonitorInterface()
             elif (device_type == WATERING_SYSTEM_TYPE_NAME):
