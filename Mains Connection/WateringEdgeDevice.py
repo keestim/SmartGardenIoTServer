@@ -26,6 +26,8 @@ class CommunicationInterface():
         return self.fdevice_type
 
     def onMessage(self, topic, payload):
+        print(topic + " | " + payload)
+
         if (("blink_led" in payload) or ("valve_state" in payload)):
             self.farduino.write(payload.encode('utf_8'))
     
@@ -36,7 +38,8 @@ class CommunicationInterface():
 
     def readArdinoSerial(self):
         try:
-            return self.farduino.read(self.farduino.inWaiting()).decode() 
+            avaliable_msg = self.farduino.inWaiting()
+            return self.farduino.read(avaliable_msg).decode()
         except:
             return ""
 
