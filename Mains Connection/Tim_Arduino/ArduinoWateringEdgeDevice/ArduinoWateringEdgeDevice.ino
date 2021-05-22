@@ -122,7 +122,7 @@ void loop()
   Serial.print(waterVolumeJSON);
 
   acuateBlinkLed();
-  delay(500);
+  delay(200);
 }
 
 void readSerialMsgs()
