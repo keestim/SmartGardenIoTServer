@@ -96,14 +96,14 @@ if __name__ == "__main__":
 
 	mqtt_interface = BiDirectionalMQTTComms(get_ip(), server_ip_address, DeviceType.edge_device, interface_obj)
 
-
 	while True:
 		msg = interface_obj.readArdinoSerial()
 
 		if len(msg) > 0:
+			print(msg)
 			interface_obj.setPlantData(msg)
 
-			print(msg)
+			
 			print("plant data: %s" % (interface_obj.getPlantData()))
 			mqtt_interface.sendMsg(interface_obj.getPlantData(), PLANT_INFO_TOPIC)
 
