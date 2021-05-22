@@ -63,7 +63,7 @@ void loop()
 
   sendJson(m,t,h);
 
-  irrigationSystem();
+  readSerialMsgs();
   
 }
 
@@ -74,11 +74,51 @@ void sendJson(int moisture, float temp, float humid)
 }
 
 //Reads from serial to determine wheather irrigation should be turned on 
-void irrigationSystem()
+void readSerialMsgs()
 {
+  
+void readSerialMsgs()
+{
+  String serialMsg;
+
+  while(Serial.available()) {
+    delay(3);
+   
+    if (Serial.available() > 0) {
+      serialMsg += char(Serial.read());// read the incoming data as string
+    }
+  }
+
+  // if the string that's been read in is longer that 0 length, then try to parse the string as JSON
+  // all serial communication should occur through JSON
+  if (serialMsg.length() > 0)
+  {
+    DynamicJsonDocument doc(200);    
+    auto error = deserializeJson(doc, serialMsg);
+    
+    if (error) {
+        Serial.print(F("deserializeJson() failed with code "));
+        Serial.println(error.c_str());
+        return;
+    }
+
+    if (doc.containsKey("blink_led"))
+    {
+      LCD.clear();
+      LCD.setCursor(0,0);
+      char string = "Water"
+      LCD.print(string);
+      
+      String ledState = doc["blink_led"];
+      blinkLED = (ledState == "true");
+    }
+  }
+}
+  
+  /*
   if(Serial.available() > 0)
   {
-    int serial = Serial.read() - '0'; // convert int to ASCII using char
+    serialMsg += char(Serial.read());
     Serial.flush();
     //if serial recieved is 0 (off) or 1 (on)
     switch(serial)
@@ -115,5 +155,6 @@ void irrigationSystem()
         break;
     }
   }
+  */
 
 }
