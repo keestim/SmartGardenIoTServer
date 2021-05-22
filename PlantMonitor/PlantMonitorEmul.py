@@ -96,6 +96,9 @@ if __name__ == "__main__":
 	humidity = 20
 
 	while True:
+		print("Send MSG")
+		print("{\"temperature" + "\" : " + str(temperature) + ", \"moisture\": " + str(moisture) + ", \"humidity\": " + str(humidity) + "}")
+
 		mqtt_interface.sendMsg(
 			"{\"temperature" + "\" : " + str(temperature) + ", \"moisture\": " + str(moisture) + ", \"humidity\": " + str(humidity) + "}", 
 			PLANT_INFO_TOPIC)
