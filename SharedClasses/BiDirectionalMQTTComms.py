@@ -108,7 +108,9 @@ class BiDirectionalMQTTComms():
         #Construct a list of topics that all devices use
         self.ftopic_list = [(DEFAULT_DATA_TOPIC, 0), 
                             (SETUP_DEVICE_TOPIC, 0), 
-                            (CONTROL_DEVICE_TOPIC, 0)]
+                            (CONTROL_DEVICE_TOPIC, 0),
+                            (PLANT_INFO_TOPIC, 0),
+                            (WATERING_INFO_TOPIC, 0)]
 
         self.fclient = None
         self.fdevice_status = ConnectionStatus.init
