@@ -1,3 +1,5 @@
+#include <ArduinoJson.h>
+
 /*
 ##########VALUES#############
           TEMP
@@ -29,7 +31,7 @@ int d5 = 3;
 int d6 = 4;
 int d7 = 5;
 //##########################
-
+bool blinkLED = false;
 int moistureSensor = A0;
 int LED = 8;
 int DHTPIN = A1; // DHT pin allocation *A1*
@@ -45,6 +47,7 @@ void setup()
   
   pinMode(moistureSensor, INPUT);
   pinMode(LED,OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 
   //Setup LCD
   LCD.begin(16,2);
@@ -64,6 +67,7 @@ void loop()
   sendJson(m,t,h);
 
   readSerialMsgs();
+  acuateBlinkLed();
   
 }
 
@@ -74,9 +78,6 @@ void sendJson(int moisture, float temp, float humid)
 }
 
 //Reads from serial to determine wheather irrigation should be turned on 
-void readSerialMsgs()
-{
-  
 void readSerialMsgs()
 {
   String serialMsg;
@@ -106,55 +107,27 @@ void readSerialMsgs()
     {
       LCD.clear();
       LCD.setCursor(0,0);
-      char string = "Water"
-      LCD.print(string);
+      String serialMsg = "Water";
+      LCD.print(serialMsg);
       
       String ledState = doc["blink_led"];
       blinkLED = (ledState == "true");
     }
   }
 }
-  
-  /*
-  if(Serial.available() > 0)
+
+void acuateBlinkLed()
+{  
+  if (blinkLED)
   {
-    serialMsg += char(Serial.read());
-    Serial.flush();
-    //if serial recieved is 0 (off) or 1 (on)
-    switch(serial)
+    for (int i = 0; i < 10; i++)
     {
-      case 0:
-        digitalWrite(LED,LOW);
-        LCD.clear();
-        LCD.setCursor(0,0);
-        while(Serial.available() > 0)
-        {
-          //read in whole char array after 0 bit is set
-          //sent string from Rpi
-          char string = Serial.read();
-          LCD.print(string);
-        }
-        break;
-
-        case 1:
-        digitalWrite(LED,HIGH);
-        LCD.clear();
-        LCD.setCursor(0,0);
-        while(Serial.available() > 0)
-        {
-          //read in whole char array after 0 bit is set
-          //Sent string from Rpi
-          char string = Serial.read();
-          LCD.print(string);
-        }
-        break;
-
-        
-        default:
-        //nothing
-        break;
+      digitalWrite(LED_BUILTIN, HIGH);
+      delay(100);
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(100);
     }
-  }
-  */
 
+    blinkLED = false;
+  }
 }
