@@ -226,8 +226,8 @@ class BiDirectionalMQTTComms():
                 
                 self.fmqtt_subscriber_thread.setKillLoop(True)
 
-                #self.fclient.disconnect()
-                #sleep(0.5)
+                self.fclient.disconnect()
+                sleep(0.5)
 
                 self.fclient.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
                 
@@ -241,9 +241,9 @@ class BiDirectionalMQTTComms():
                 if (self.fdevice_type is DeviceType.server):
                     if self.fmqtt_interface is not None:
                         print("output to thingsboard!")
-                        print("{\"unique_thingsboard_id\": \"" + str(self.fmqtt_interface.getUniqueThingsBoardID()) + "\"}")
+                        #print("{\"unique_thingsboard_id\": \"" + str(self.fmqtt_interface.getUniqueThingsBoardID()) + "\"}")
 
-                        self.sendMsg("{\"unique_thingsboard_id\": \"" + str(self.fmqtt_interface.getUniqueThingsBoardID()) + "\"}")
+                        #self.sendMsg("{\"unique_thingsboard_id\": \"" + str(self.fmqtt_interface.getUniqueThingsBoardID()) + "\"}")
             elif ("unique_thingsboard_id" in payload):
                 print(topic + " | " + payload)
 
