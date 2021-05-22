@@ -185,6 +185,7 @@ def flash_light_for_id(device_id):
         return ('No Device Exists for Input ID', 400)
     else:
         msg_details = getattr(selected_device.fmqtt_interface, 'blinkLED')()
+        print(msg_details)
         selected_device.sendMsg(msg_details[PAYLOAD_MSG_KEY], msg_details["topic"])
 
     return ('', 204)
