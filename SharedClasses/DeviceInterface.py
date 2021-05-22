@@ -99,8 +99,8 @@ class WaterSystemInterface(DeviceInterface):
     
     def __init__(self):
         global num_watering_systems
+        
         super().__init__()
-
         self.fWaterVolume = 0
         self.fValueOpen = False
         self.fDeviceType = WATERING_SYSTEM_TYPE_NAME
