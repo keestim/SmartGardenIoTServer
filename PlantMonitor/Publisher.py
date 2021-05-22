@@ -105,5 +105,5 @@ if __name__ == "__main__":
 			interface_obj.setPlantData(msg)
 
 			mqtt_interface.sendMsg(interface_obj.getPlantData(), PLANT_INFO_TOPIC)
-
+			interface_obj.getArdiuno().flush()
 		sleep(0.2)

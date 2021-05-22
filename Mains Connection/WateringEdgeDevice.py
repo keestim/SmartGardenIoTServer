@@ -74,5 +74,6 @@ if __name__ == "__main__":
         if len(msg) > 0:
             print(msg)
             mqtt_interface.sendMsg(msg, WATERING_INFO_TOPIC)
+            interface_obj.getArdiuno().flush()
 
         sleep(0.2)
