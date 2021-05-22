@@ -40,7 +40,6 @@ class CommunicationInterface():
 	def readArdinoSerial(self):
 		try:
 			avaliable_msg = self.farduino.inWaiting()
-			print(avaliable_msg)
 			return self.farduino.read(avaliable_msg).decode() 
 		except:
 			return ""
