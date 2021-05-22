@@ -203,6 +203,8 @@ class BiDirectionalMQTTComms():
             elif (device_type == SMOKE_MONITOR_TYPE_NAME):
                 self.fmqtt_interface = SmokeSensorInterface()
 
+            print(self.fmqtt_interface)
+
     def __onMessage(self, client, userData, msg):
         sleep(0.1)
 
