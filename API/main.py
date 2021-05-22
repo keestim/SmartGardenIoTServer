@@ -88,6 +88,9 @@ def deviceJSONFormat(device_mqtt_interface):
 
 def deviceSensorDataJSON(device_mqtt_interface):
     core_output_str = deviceJSONFormat(device_mqtt_interface)
+
+    print(core_output_str)
+    print(type(device_mqtt_interface))
     output_str = core_output_str.replace("{", "").replace("}", "") + ", "
 
     if (type(device_mqtt_interface) is PlantMonitorInterface):
