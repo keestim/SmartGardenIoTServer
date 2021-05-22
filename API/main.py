@@ -144,6 +144,9 @@ def get_all_devices_info():
 def get_all_devices_sensor_data():
     output_str = ""
 
+    print(connection_list)
+    print(len(connection_list))
+
     for device in connection_list:
         if device.fmqtt_interface != None:
             if output_str != "":
