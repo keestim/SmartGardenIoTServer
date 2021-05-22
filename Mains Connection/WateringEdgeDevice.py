@@ -17,7 +17,7 @@ class CommunicationInterface():
         self.ftopic_list = topics
 
         self.fdevice_type = device_type
-        self.farduino = Serial('/dev/ttyACM0', 9600)
+        self.farduino = Serial('/dev/ttyACM1', 9600)
 
     def getTopicList(self):
         return self.ftopic_list
@@ -29,6 +29,8 @@ class CommunicationInterface():
         print(topic + " | " + payload)
 
         if (("blink_led" in payload) or ("valve_state" in payload)):
+            print("writing to arduino")
+            print(payload.encode('utf_8'))
             self.farduino.write(payload.encode('utf_8'))
     
         print("")
