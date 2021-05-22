@@ -1,3 +1,5 @@
+#include <ArduinoJson.h>
+
 /*
 ##########VALUES#############
           TEMP
@@ -29,7 +31,7 @@ int d5 = 3;
 int d6 = 4;
 int d7 = 5;
 //##########################
-
+bool blinkLED = false;
 int moistureSensor = A0;
 int LED = 8;
 int DHTPIN = A1; // DHT pin allocation *A1*
@@ -45,6 +47,7 @@ void setup()
   
   pinMode(moistureSensor, INPUT);
   pinMode(LED,OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 
   //Setup LCD
   LCD.begin(16,2);
@@ -63,7 +66,8 @@ void loop()
 
   sendJson(m,t,h);
 
-  irrigationSystem();
+  readSerialMsgs();
+  acuateBlinkLed();
   
 }
 
@@ -74,46 +78,56 @@ void sendJson(int moisture, float temp, float humid)
 }
 
 //Reads from serial to determine wheather irrigation should be turned on 
-void irrigationSystem()
+void readSerialMsgs()
 {
-  if(Serial.available() > 0)
-  {
-    int serial = Serial.read() - '0'; // convert int to ASCII using char
-    Serial.flush();
-    //if serial recieved is 0 (off) or 1 (on)
-    switch(serial)
-    {
-      case 0:
-        digitalWrite(LED,LOW);
-        LCD.clear();
-        LCD.setCursor(0,0);
-        while(Serial.available() > 0)
-        {
-          //read in whole char array after 0 bit is set
-          //sent string from Rpi
-          char string = Serial.read();
-          LCD.print(string);
-        }
-        break;
+  String serialMsg;
 
-        case 1:
-        digitalWrite(LED,HIGH);
-        LCD.clear();
-        LCD.setCursor(0,0);
-        while(Serial.available() > 0)
-        {
-          //read in whole char array after 0 bit is set
-          //Sent string from Rpi
-          char string = Serial.read();
-          LCD.print(string);
-        }
-        break;
-
-        
-        default:
-        //nothing
-        break;
+  while(Serial.available()) {
+    delay(3);
+   
+    if (Serial.available() > 0) {
+      serialMsg += char(Serial.read());// read the incoming data as string
     }
   }
 
+  // if the string that's been read in is longer that 0 length, then try to parse the string as JSON
+  // all serial communication should occur through JSON
+  if (serialMsg.length() > 0)
+  {
+    DynamicJsonDocument doc(200);    
+    auto error = deserializeJson(doc, serialMsg);
+    
+    if (error) {
+        Serial.print(F("deserializeJson() failed with code "));
+        Serial.println(error.c_str());
+        return;
+    }
+
+    if (doc.containsKey("blink_led"))
+    {
+      LCD.clear();
+      LCD.setCursor(0,0);
+      String serialMsg = "Water";
+      LCD.print(serialMsg);
+      
+      String ledState = doc["blink_led"];
+      blinkLED = (ledState == "true");
+    }
+  }
+}
+
+void acuateBlinkLed()
+{  
+  if (blinkLED)
+  {
+    for (int i = 0; i < 10; i++)
+    {
+      digitalWrite(LED_BUILTIN, HIGH);
+      delay(100);
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(100);
+    }
+
+    blinkLED = false;
+  }
 }
