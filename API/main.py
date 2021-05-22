@@ -78,6 +78,9 @@ def findDeviceByIDAndType(device_id, device_type):
 
 def deviceJSONFormat(device_mqtt_interface):
     output_str = ""
+
+    print(device_mqtt_interface.getDeviceType())
+
     output_str += "\"id\": " + str(device_mqtt_interface.getDeviceID()) + ", "
     output_str += "\"device_type\" : \"" + device_mqtt_interface.getDeviceType() + "\""
 
@@ -126,6 +129,8 @@ def get_all_devices_info():
     for device in connection_list:
         if output_str != "":
             output_str += ", "
+
+        print(device.fmqtt_interface)
 
         if device.fmqtt_interface != None:
             output_str += deviceJSONFormat(device.fmqtt_interface)

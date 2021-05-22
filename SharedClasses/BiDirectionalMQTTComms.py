@@ -233,6 +233,8 @@ class BiDirectionalMQTTComms():
                 
                 self.fmqtt_subscriber_thread = MQTTSubscriberThread(self)
                 self.fmqtt_subscriber_thread.start()
+
+                print(self.fmqtt_interface)
                 
                 sleep(1)
 
