@@ -122,9 +122,12 @@ void acuateBlinkLed()
   {
     for (int i = 0; i < 10; i++)
     {
+     
       digitalWrite(LED_BUILTIN, HIGH);
+      LCD.write("LED BLINK");
       delay(100);
       digitalWrite(LED_BUILTIN, LOW);
+      LCD.clear();
       delay(100);
     }
 
