@@ -250,7 +250,6 @@ class BiDirectionalMQTTComms():
                 try:
                     device_data = json.loads(payload)
                 except:
-                    print("json error")
                     return
 
                 print(device_data["unique_thingsboard_id"])
@@ -274,10 +273,8 @@ class BiDirectionalMQTTComms():
 
     def sendMsg(self, msgText, topic = DEFAULT_DATA_TOPIC):
         publish.single(topic, msgText, hostname = self.fdest_ip_address)
-        print("Sending MSG: " + msgText)
 
         if (self.fdevice_type == DeviceType.edge_device):
             if (self.fThingsBoardKey != ""):
                 command = 'curl -v -X POST -d "' + msgText + '" https://demo.thingsboard.io/api/v1/' + self.fThingsBoardKey + '/telemetry --header "Content-Type:application/json"'
-                print(str(command))
                 subprocess.Popen(command, shell = True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

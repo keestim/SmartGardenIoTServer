@@ -72,7 +72,6 @@ class PlantMonitorInterface(DeviceInterface):
             try:
                 device_data = json.loads(payload)
             except:
-                print("json error")
                 return
             
             self.fHumidity = int(device_data["humidity"]) 
@@ -117,7 +116,6 @@ class WaterSystemInterface(DeviceInterface):
             try:
                 device_data = json.loads(payload)
             except:
-                print("json error")
                 return
      
             self.fValueOpen = str(device_data["pump_state"]) == "1"
@@ -174,7 +172,6 @@ class SmokeSensorInterface(DeviceInterface):
             try:
                 device_data = json.loads(payload)
             except:
-                print("json error")
                 return
             
             self.fSmokeValue = int(device_data["smoke_reading"]) 
