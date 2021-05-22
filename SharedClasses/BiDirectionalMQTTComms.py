@@ -30,15 +30,20 @@ class MQTTSubscriberThread(threading.Thread):
         super().__init__()
         self.fmqtt_connection = mqtt_connection
         print("new sub thread!")
+        self.fKillLoop = False
+
+    def setKillLoop(self, input_value):
+        self.fKillLoop = input_value
 
     def run(self):
-        while True:
+        while True and self.fKillLoop is False:
             try:
                 self.fmqtt_connection.getClient().loop(0.01) #check for messages
                 sleep(0.1)
             except:
-                print("message loop problem")
                 continue
+
+        exit()
 
 #TODO: potentially add a new enum to enforce that "initial message received" is sent before enum!
 #http://www.steves-internet-guide.com/multiple-client-connections-python-mqtt/
@@ -201,7 +206,6 @@ class BiDirectionalMQTTComms():
         topic = msg.topic
         payload = msg.payload.decode('ascii')
 
-        print(topic + " | " + payload)
         if self.fdevice_status == ConnectionStatus.connected:
             if (payload == INIT_MSG_TXT):
                 self.sendMsg(INIT_RECEIVED_MSG_TXT, SETUP_DEVICE_TOPIC)
@@ -210,7 +214,8 @@ class BiDirectionalMQTTComms():
                 self.fclient.subscribe(self.ftopic_list)
                 self.__assignDeviceInterface(payload)
                 
-                #self.fmqtt_subscriber_thread.join()
+                self.fmqtt_subscriber_thread.setKillLoop(True)
+                self.fmqtt_subscriber_thread.join()
 
                 self.fclient.disconnect()
                 sleep(0.5)
