@@ -218,14 +218,11 @@ class BiDirectionalMQTTComms():
                 self.__assignDeviceInterface(payload)
                 
                 self.fmqtt_subscriber_thread.setKillLoop(True)
-                self.fmqtt_subscriber_thread.terminate()
 
                 #self.fclient.disconnect()
                 #sleep(0.5)
 
-                
-
-                #self.fclient.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
+                self.fclient.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
                 
                 self.fmqtt_subscriber_thread = MQTTSubscriberThread(self)
                 self.fmqtt_subscriber_thread.start()
