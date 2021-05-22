@@ -219,8 +219,6 @@ class BiDirectionalMQTTComms():
             elif ("topics" in payload):
                 print(topic + " | " +  payload + " | " + self.fdest_ip_address)
 
-
-
                 print("TOPICS MSG RECEIVED!")
                 print("Status:")
                 print(self.fdevice_status)
@@ -230,16 +228,17 @@ class BiDirectionalMQTTComms():
                 
                 self.__assignDeviceInterface(payload)
                 
-                self.fmqtt_subscriber_thread.setKillLoop(True)
+                #self.fmqtt_subscriber_thread.setKillLoop(True)
 
-                self.fclient.disconnect()
-                sleep(0.5)
+                #self.fclient.disconnect()
+                #sleep(0.5)
 
-                self.fclient.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
+                #self.fclient.connect(self.fdevice_ip_address, self.fport, self.fkeepAlive)
                 
-                self.fmqtt_subscriber_thread = MQTTSubscriberThread(self)
-                self.fmqtt_subscriber_thread.start()
+                #self.fmqtt_subscriber_thread = MQTTSubscriberThread(self)
+                #self.fmqtt_subscriber_thread.start()
 
+                print("MQTT INTERFACE:")
                 print(self.fmqtt_interface)
                 
                 sleep(1)
