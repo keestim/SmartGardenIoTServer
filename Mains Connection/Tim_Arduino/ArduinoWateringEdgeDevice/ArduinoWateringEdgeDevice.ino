@@ -121,8 +121,10 @@ void loop()
     
     String waterVolumeJSON = "{\"total_volume\" : " + String(totalMilliLitres) + ", \"pump_state\" : " + String(valveOpen) + "}\n";
     Serial.print(waterVolumeJSON);
-    delay(300);
+    
   }  
+
+  delay(600);
   
   acuateBlinkLed();
 }
@@ -148,6 +150,7 @@ void readSerialMsgs()
     if (error) {
         Serial.print(F("deserializeJson() failed with code "));
         Serial.println(error.c_str());
+        Serial.println("Failed Msg: " + serialMsg);
         return;
     }
 
