@@ -45,7 +45,6 @@ class MQTTSubscriberThread(threading.Thread):
 
         exit()
 
-#TODO: potentially add a new enum to enforce that "initial message received" is sent before enum!
 #http://www.steves-internet-guide.com/multiple-client-connections-python-mqtt/
 
 class MQTTConnectInitializer(threading.Thread):
@@ -155,7 +154,6 @@ class BiDirectionalMQTTComms():
             elif (payload == INIT_RECEIVED_MSG_TXT):
                 self.fdevice_status = ConnectionStatus.connected
 
-                #TODO: need to do this more elegantly!
                 self.sendMsg(INIT_RECEIVED_MSG_TXT, SETUP_DEVICE_TOPIC)
 
                 if (self.fmqtt_interface is not None):

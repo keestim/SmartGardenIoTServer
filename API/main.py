@@ -211,7 +211,6 @@ def turn_on_valve(device_id, state):
 
     return ('', 204)
 
-#TODO: see how this performs when trying to water two devices at once!
 @app.route("/water_set_volume/<device_id>/<volume>", methods=['GET', 'POST'])
 def water_set_volume(device_id, volume):
     selected_device = None
@@ -232,8 +231,6 @@ def water_set_volume(device_id, volume):
         selected_device.sendMsg(msg_details[PAYLOAD_MSG_KEY], msg_details["topic"])
 
     return ('', 204)
-
-#TODO: route to return all avaliable methods?
 
 #example URL:
 #/water_plant_to_target_moisture?plant_id=0&watering_id&target_moisture=20
