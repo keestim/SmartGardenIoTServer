@@ -66,8 +66,9 @@ void initialiseFlowMeter()
 void readFlowMeter(){
   // only record is valve is open
   //when valve is closed, reset water measurement, etc!
-  if((millis() - oldTime) > 200)    // Only process counters once per second
+  if((millis() - oldTime) > 1000)    // Only process counters once per second
   { 
+    Serial.print("reading");
     // Disable the interrupt while calculating flow rate and sending the value to
     // the host
     detachInterrupt(sensorInterrupt);
@@ -99,10 +100,9 @@ void readFlowMeter(){
     pulseCount = 0;
     
     // Enable the interrupt again now that we've finished sending output
-    attachInterrupt(sensorInterrupt, pulseCounter, FALLING);
-
     String waterVolumeJSON = "{\"total_volume\" : " + String(totalMilliLitres) + ", \"pump_state\" : " + String(valveOpen) + "}\n";
     Serial.print(waterVolumeJSON);
+    attachInterrupt(sensorInterrupt, pulseCounter, FALLING);
   }
 }
 
@@ -119,6 +119,10 @@ void loop()
   else {
     totalMilliLitres = 0;
     digitalWrite(relayPin, LOW);
+    
+    String waterVolumeJSON = "{\"total_volume\" : " + String(totalMilliLitres) + ", \"pump_state\" : " + String(valveOpen) + "}\n";
+    Serial.print(waterVolumeJSON);
+    delay(300);
   }  
   
   acuateBlinkLed();
