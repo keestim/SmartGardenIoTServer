@@ -87,8 +87,6 @@ created: 18/05/2021
         print('<input type="text" name= "Moisture" id="ThresMoisture" pattern="\d{0,9}" placeholder="30"/>');
         print("</p>");
 
-        print("<p>Potentially add bindings for Fire Sensor");
-        print("<br/>");
 
         print('<button value="Bind devices"  id="bind_devices" onclick="setDeviceBinding(this)">Bind Devices</button>');
         print('<button value="Remove Any Bindings"  id="remove_any_binding" onclick="removeAnyDeviceBinding(this)">Remove Any Bindings</button>');
