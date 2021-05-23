@@ -68,7 +68,6 @@ void readFlowMeter(){
   //when valve is closed, reset water measurement, etc!
   if((millis() - oldTime) > 1000)    // Only process counters once per second
   { 
-    Serial.print("reading");
     // Disable the interrupt while calculating flow rate and sending the value to
     // the host
     detachInterrupt(sensorInterrupt);
@@ -133,7 +132,6 @@ void readSerialMsgs()
   String serialMsg;
 
   while(Serial.available()) {
-    delay(3);
    
     if (Serial.available() > 0) {
       serialMsg += char(Serial.read());// read the incoming data as string
