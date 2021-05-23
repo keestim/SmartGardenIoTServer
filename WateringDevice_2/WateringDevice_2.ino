@@ -1,75 +1,153 @@
-int solenoidPin = 4;    //This is the output pin on the Arduino we are using
-bool solOnOff = false;
-int state = 1; //start in close position
+#include <ArduinoJson.h>
+//code from :https://www.instructables.com/How-to-Use-Water-Flow-Sensor-Arduino-Tutorial/
 
-// FLOWRATE
-  volatile int flow_frequency; // Measures flow sensor pulses
-  // Calculated litres/hour
-  float vol = 0.0,l_minute;
-  unsigned char flowsensor = 2; // Sensor Input
-  int skipflow = 0;
-  
-  void flow () // Interrupt function
-  {
-   flow_frequency++;
-  }
+int solenoidPin = 4;
+bool valveOpen = false;
+bool blinkLED = false;
+
+byte sensorInterrupt = 0;  // 0 = digital pin 2
+byte sensorPin       = 2;
+
+// The hall-effect flow sensor outputs approximately 4.5 pulses per second per
+// litre/minute of flow.
+float calibrationFactor = 4.5;
+
+volatile byte pulseCount;  
+
+float flowRate;
+unsigned int flowMilliLitres;
+unsigned long totalMilliLitres;
+
+unsigned long oldTime;
 
 void setup() {
-  // put your setup code here, to run once:
-  pinMode(solenoidPin, OUTPUT);           //Sets the pin as an output
+    // Initialize a serial connection for reporting values to the host
   Serial.begin(9600);
-  digitalWrite(flowsensor, HIGH); // Optional Internal Pull-Up
-  attachInterrupt(digitalPinToInterrupt(flowsensor), flow, RISING); // Setup Interrupt
+
+pinMode(solenoidPin, OUTPUT);
+  pinMode(sensorPin, INPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
+
+  digitalWrite(sensorPin, HIGH);
+  
+  initialiseFlowMeter();
 }
- 
-void loop() {
 
-if (skipflow < 1)
-   {
-  if(flow_frequency != 0)
+void acuateBlinkLed()
+{  
+  if (blinkLED)
   {
-      // Pulse frequency (Hz) = 7.5Q, Q is flow rate in L/min.
-      l_minute = (flow_frequency / 1); // (Pulse frequency x 60 min) / 7.5Q = flowrate in L/hour
-      Serial.print(flow_frequency);
-      Serial.print(" ");
-      flow_frequency = 0; // Reset Counter
-
-    }
-    else 
+    for (int i = 0; i < 10; i++)
     {
-      Serial.print("0");
-      Serial.print(" ");
-      //Serial.println(" flow rate = 0 ");
+      digitalWrite(LED_BUILTIN, HIGH);
+      delay(100);
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(100);
     }
+
+    blinkLED = false;
+  }
 }
 
-  int temp = Serial.parseInt();
+void initialiseFlowMeter()
+{
+  pulseCount        = 0;
+  flowRate          = 0.0;
+  flowMilliLitres   = 0;
+  totalMilliLitres  = 0;
+  oldTime           = 0;
   
-  if (!(temp == NULL))
-  {
-    state = temp;
+  attachInterrupt(sensorInterrupt, pulseCounter, FALLING);
+}
+
+void readFlowMeter(){
+
+  if((millis() - oldTime) > 1000)    
+  { 
+
+    detachInterrupt(sensorInterrupt);
+        
+
+    flowRate = ((1000.0 / (millis() - oldTime)) * pulseCount) / calibrationFactor;
+    
+    oldTime = millis();
+    
+    flowMilliLitres = (flowRate / 60) * 1000;
+  
+    totalMilliLitres += flowMilliLitres;
+      
+    unsigned int frac;
+
+    // Reset pulse 
+    pulseCount = 0;
+    
+    // Enable the interrupt again now that we've finished sending output
+    attachInterrupt(sensorInterrupt, pulseCounter, FALLING);
   }
+}
+
+void loop() 
+{
+  readSerialMsgs();
   
-  if (state == 1) {
-    solOnOff = false;
-    //Serial.println("Closed");
-    Serial.println(state);
+  if (valveOpen)
+  {
+    readFlowMeter();
+  digitalWrite(solenoidPin, HIGH);
+  } 
+  else {
+    totalMilliLitres = 0;
+  digitalWrite(solenoidPin, LOW);
+  }  
+  
+  String waterVolumeJSON = "{\"total_volume\" : " + String(totalMilliLitres) + ", \"pump_state\" : " + String(valveOpen) + "}\n";
+  Serial.print(waterVolumeJSON);
+
+  acuateBlinkLed();
+  delay(500);
+}
+
+void readSerialMsgs()
+{
+  String serialMsg;
+
+  while(Serial.available()) {
+    delay(3);
+   
+    if (Serial.available() > 0) {
+      serialMsg += char(Serial.read());// read the incoming data as string
     }
-  if (state == 2
-  ) {
-    solOnOff = true;
-    //Serial.println("Open");
-    Serial.println(state);
+  }
+
+  if (serialMsg.length() > 0)
+  {
+    DynamicJsonDocument doc(200);    
+    auto error = deserializeJson(doc, serialMsg);
+    
+    if (error) {
+        Serial.print(F("deserializeJson() failed with code "));
+        Serial.println(error.c_str());
+        return;
     }
-  
-  if (solOnOff == true)
-  {
-  digitalWrite(solenoidPin, HIGH);    //Switch Solenoid ON
-  delay(1000);   
+
+    if (doc.containsKey("valve_state"))
+    {
+      String valveState = doc["valve_state"];
+
+      valveOpen = (valveState == "open");
+    }
+
+    if (doc.containsKey("blink_led"))
+    {
+      String ledState = doc["blink_led"];
+      blinkLED = (ledState == "true");
+    }
   }
-  else
-  {
-  digitalWrite(solenoidPin, LOW);     //Switch Solenoid OFF
-  delay(1000);      
-  }
+}
+
+
+void pulseCounter()
+{
+  // Increment the pulse counter
+  pulseCount++;
 }
